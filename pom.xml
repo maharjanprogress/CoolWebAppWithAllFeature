@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.progress</groupId>
-    <artifactId>KipaaJava</artifactId>
+    <artifactId>CoolJava</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>KipaaJava</name>
-    <description>KipaaJava</description>
+    <name>CoolJava</name>
+    <description>Cool Web Application</description>
     <url/>
     <licenses>
         <license/>
@@ -98,6 +98,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
     </dependencies>
 
