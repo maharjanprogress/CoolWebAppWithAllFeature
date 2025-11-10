@@ -1,0 +1,11 @@
+<div class="snackbar-container" *ngIf="state.show" [ngClass]="state.type">
+  <div class="icon-container">
+    <mat-icon>{{ getIcon() }}</mat-icon>
+  </div>
+  <div class="message-container">
+    <p>{{ state.message }}</p>
+  </div>
+  <button (click)="close()" class="close-btn" aria-label="Close notification">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>

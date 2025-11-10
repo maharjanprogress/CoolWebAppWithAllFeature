@@ -1,0 +1,12 @@
+<div class="model-overlay" (click)="onClose()">
+  <button class="close-btn" (click)="onClose()" aria-label="Close 3D view">
+    <mat-icon>close</mat-icon>
+  </button>
+
+  <div class="loading-indicator" *ngIf="isLoading">
+    <mat-progress-bar mode="determinate" [value]="loadingPercentage"></mat-progress-bar>
+    <span>Loading Model... {{ loadingPercentage | number:'1.0-0' }}%</span>
+  </div>
+
+  <canvas #rendererCanvas class="renderer-canvas" (click)="$event.stopPropagation()"></canvas>
+</div>

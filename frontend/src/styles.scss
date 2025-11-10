@@ -1,0 +1,161 @@
+// Custom Theming for Angular Material
+// For more information: https://material.angular.io/guide/theming
+@use '@angular/material' as mat;
+
+// Include the common styles for Angular Material. We include this here so that you only
+// have to load a single css file for Angular Material in your app.
+// Be sure that you only ever include this mixin once!
+@include mat.core();
+
+// Define the theme object.
+$lumanti-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: mat.$violet-palette,
+    tertiary: mat.$blue-palette,
+  ),
+  density: (
+    scale: 0,
+  )
+));
+
+/*
+  Define a gorgeous lavender-inspired color palette.
+  This will be the foundation for both light and dark themes.
+*/
+:root {
+  @include mat.all-component-themes($lumanti-theme);
+
+  --error: #b00020; // Standard Material Design error color
+  --warning: #ff9800; // Standard Material Design warning color
+  --success: #4caf50; // Standard Material Design success color
+  --info: #2196f3; // Standard Material Design info color
+
+  // Lavender color scale - soft, calming, elegant
+  --lavender-50: #f7f5fd;
+  --lavender-100: #ede9fe;
+  --lavender-200: #ddd6fe;
+  --lavender-300: #c4b5fd;
+  --lavender-400: #a78bfa;
+  --lavender-500: #8b5cf6; // Main lavender
+  --lavender-600: #7c3aed;
+  --lavender-700: #6d28d9;
+  --lavender-800: #5b21b6;
+  --lavender-900: #4c1d95;
+
+  // Complementary soft purple tones
+  --purple-50: #faf5ff;
+  --purple-100: #f3e8ff;
+  --purple-200: #e9d5ff;
+  --purple-300: #d8b4fe;
+  --purple-400: #c084fc;
+  --purple-500: #a855f7;
+  --purple-600: #9333ea;
+  --purple-700: #7e22ce;
+  --purple-800: #6b21a8;
+  --purple-900: #581c87;
+
+  // Soft periwinkle - lavender's blue cousin
+  --periwinkle-50: #f5f7ff;
+  --periwinkle-100: #ebf0ff;
+  --periwinkle-200: #d6e0ff;
+  --periwinkle-300: #b8c7ff;
+  --periwinkle-400: #94a8ff;
+  --periwinkle-500: #7086ff;
+  --periwinkle-600: #5865f2;
+  --periwinkle-700: #4752c4;
+  --periwinkle-800: #3c4398;
+  --periwinkle-900: #2e3473;
+
+  // Cool neutrals with subtle lavender undertones
+  --neutral-50: #fafafe;
+  --neutral-100: #f4f4f9;
+  --neutral-200: #e7e7ef;
+  --neutral-300: #d1d1e0;
+  --neutral-400: #a0a0bc;
+  --neutral-500: #737391;
+  --neutral-600: #565671;
+  --neutral-700: #40405a;
+  --neutral-800: #2d2d42;
+  --neutral-900: #1a1a2e;
+
+  // Accent: Soft mint for subtle contrast
+  --mint-400: #86efac;
+  --mint-500: #6ee7b7;
+}
+
+/*
+  Light Theme (Default)
+  Applied when no specific theme class is on the <body>
+*/
+:root, body.light-theme {
+  // Primary colors based on lavender
+  --primary: var(--lavender-500);
+  --primary-light: var(--lavender-300);
+  --primary-dark: var(--lavender-700);
+
+  // Secondary: Complementary periwinkle
+  --secondary: var(--periwinkle-400);
+  --secondary-light: var(--periwinkle-300);
+  --secondary-dark: var(--periwinkle-500);
+
+
+  // Backgrounds - very light with subtle lavender tint
+  --background: var(--lavender-50);
+  --surface: #ffffff;
+  --surface-alt: var(--neutral-100);
+
+  // Text colors
+  --text-primary: var(--neutral-900);
+  --text-secondary: var(--neutral-600);
+  --text-on-primary: #ffffff;
+
+  // Border colors
+  --border: var(--lavender-200);
+  --divider: var(--neutral-200);
+
+  // Accent
+  --accent: var(--mint-500);
+}
+
+/*
+  Dark Theme
+  Applied when body has the class "dark-theme"
+*/
+body.dark-theme {
+  // Primary colors - lighter lavender for dark mode contrast
+  --primary: var(--lavender-400);
+  --primary-light: var(--lavender-300);
+  --primary-dark: var(--lavender-600);
+
+  // Secondary: Brighter periwinkle for dark mode
+  --secondary: var(--periwinkle-500);
+  --secondary-light: var(--periwinkle-400);
+  --secondary-dark: var(--periwinkle-600);
+
+  // Backgrounds - deep purplish dark tones
+  --background: #0f0e1a;
+  --surface: var(--neutral-900);
+  --surface-alt: var(--neutral-800);
+
+  // Text colors
+  --text-primary: var(--neutral-50);
+  --text-secondary: var(--neutral-300);
+  --text-on-primary: var(--neutral-900);
+
+  // Border colors
+  --border: var(--neutral-800);
+  --divider: var(--neutral-700);
+
+  // Accent
+  --accent: var(--mint-400);
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}

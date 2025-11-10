@@ -1,0 +1,15 @@
+<app-snackbar></app-snackbar>
+
+<!--this is for the image Expand-->
+<ng-container *ngIf="imageModalState$ | async as imageState">
+  <app-image-expand *ngIf="imageState.show" [imageUrl]="imageState.imageUrl" (close)="closeImageModal()"></app-image-expand>
+</ng-container>
+
+<!--this is for the 3d model Expand-->
+<ng-container *ngIf="model3dState$ | async as state">
+  <app-model3d *ngIf="state.show" [modelUrl]="state.modelUrl" (close)="closeModel3d()"></app-model3d>
+</ng-container>
+
+
+
+<router-outlet />

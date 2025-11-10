@@ -1,0 +1,8 @@
+<div class="image-overlay" (click)="onClose()">
+  <button class="close-btn" (click)="onClose()" aria-label="Close image view">
+    <mat-icon>close</mat-icon>
+  </button>
+  <div class="image-content" (click)="$event.stopPropagation()">
+    <img [src]="imageUrl" alt="Expanded project image" *ngIf="imageUrl">
+  </div>
+</div>
