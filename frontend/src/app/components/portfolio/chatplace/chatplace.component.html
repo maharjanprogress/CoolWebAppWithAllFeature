@@ -1,0 +1,14 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <h2>Live Chat</h2>
+  </div>
+  <div class="messages-area">
+    <div *ngFor="let msg of messages" class="message">
+      {{ msg }}
+    </div>
+  </div>
+  <form class="message-form" [formGroup]="chatForm" (ngSubmit)="sendMessage()">
+    <input formControlName="message" type="text" placeholder="Type a message...">
+    <button type="submit" [disabled]="!chatForm.valid">Send</button>
+  </form>
+</div>
