@@ -7,10 +7,10 @@ import {CommonModule} from "@angular/common";
   imports: [
     CommonModule,
   ],
-  templateUrl: './base-portfolio.component.html',
-  styleUrl: './base-portfolio.component.scss'
+  templateUrl: './base-welcome.component.html',
+  styleUrl: './base-welcome.component.scss'
 })
-export class BasePortfolioComponent implements OnInit, OnDestroy {
+export class BaseWelcomeComponent implements OnInit, OnDestroy {
 
   constructor() {
   }
