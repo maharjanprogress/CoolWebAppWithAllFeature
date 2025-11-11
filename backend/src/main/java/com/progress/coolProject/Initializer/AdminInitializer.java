@@ -50,12 +50,21 @@ public class AdminInitializer {
                 logger.info("Admin User created");
             }else {
                 logger.error("Admin User already exists");
-                return;
             }
         }
         else {
             logger.error("Admin Role already exists");
-            return;
+        }
+        if (!roleRepo.existsByRoleAlias("CLIENT")){
+            logger.info("Creating Client Role");
+            Role role = new Role();
+            role.setRoleAlias("CLIENT");
+            role.setRoleName("clients");
+            role.setRemarks("nice peoples that uses our engineering services");
+            roleRepo.save(role);
+            logger.info("Client Role created");
+        }else {
+            logger.error("Client Role already exists");
         }
     }
 }

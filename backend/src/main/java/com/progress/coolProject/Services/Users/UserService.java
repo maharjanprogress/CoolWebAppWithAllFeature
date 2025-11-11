@@ -99,13 +99,7 @@ public class UserService implements IUserService {
         if (authentication.isAuthenticated()) {
             User user = userRepo.findByUserName(dto.getUserName())
                     .orElseThrow(() -> new RuntimeException("User not found"));
-            String token = jwtService.generateToken(dto.getUserName(), user.getId());
-            LoginOutput output = new LoginOutput();
-            output.setRole(user.getRole().getRoleAlias());
-            output.setUserName(user.getUserName());
-            output.setToken(token);
-            output.setUserId(user.getId());
-            return output;
+            return jwtService.generateLoginOutput(user);
         }
         else return null;
     }

@@ -1,5 +1,7 @@
 package com.progress.coolProject.Services.JWT;
 
+import com.progress.coolProject.DTO.LoginAndRegistration.LoginOutput;
+import com.progress.coolProject.Entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -42,6 +44,16 @@ public class JWTService {
                 .and()
                 .signWith(getkey())
                 .compact();
+    }
+
+    public LoginOutput generateLoginOutput(User user){
+        String token = generateToken(user.getUserName(), user.getId());
+        LoginOutput output = new LoginOutput();
+        output.setUserName(user.getUserName());
+        output.setRole(user.getRole().getRoleAlias());
+        output.setToken(token);
+        output.setUserId(user.getId());
+        return output;
     }
 
     private SecretKey getkey() {
