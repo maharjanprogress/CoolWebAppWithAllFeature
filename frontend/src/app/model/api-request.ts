@@ -3,3 +3,13 @@ export interface MessegeRequest {
   userId: number;
   message: string;
 }
+
+
+export interface LoginDTO {
+  userName: string;
+  password: string;
+}
+
+export interface GoogleLoginRequest {
+  token: string;
+}

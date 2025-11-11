@@ -16,6 +16,34 @@ export enum ResponseStatus{
   INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
 }
 
+export interface LoginDetails{
+  role: UserRole;
+  userName: string;
+  token: string;
+  userId: number;
+}
+
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  CLIENT = 'CLIENT'
+}
+
+export class RoleUtils {
+  static fromString(role: string): UserRole | null {
+    return Object.values(UserRole).includes(role as UserRole) ? role as UserRole : null;
+  }
+
+  static toString(role: UserRole): string {
+    return role.valueOf();
+  }
+
+  static isValidRole(role: string): role is UserRole {
+    return Object.values(UserRole).includes(role as UserRole);
+  }
+}
+
+export interface LoginResponse extends RestApiResponse<LoginDetails, never> {}
+
 export interface JobExperiencePhotoDTO {
   id: number;
   imageUrl: string;

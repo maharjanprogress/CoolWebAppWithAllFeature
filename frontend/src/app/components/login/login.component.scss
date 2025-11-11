@@ -1,0 +1,163 @@
+.login-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-light);
+}
+
+.login-panel {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  min-height: 600px;
+  background: var(--background-card);
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  animation: fade-in 0.5s ease-in-out;
+}
+
+.login-image-side {
+  flex: 1;
+  background-image: linear-gradient(rgba(44, 62, 80, 0.7), rgba(44, 62, 80, 0.7)), url('/portfolioBackground.webp');
+  background-size: cover;
+  background-position: center;
+  color: var(--text-light);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 3rem;
+}
+
+.image-text-overlay h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.image-text-overlay p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.login-form-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .login-image-side {
+    display: none;
+  }
+  .login-panel {
+    min-height: auto;
+  }
+}
+
+.login-card {
+  // Remove shadow and background as the panel now has it
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+mat-card-header {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+mat-card-title {
+  font-size: 1.8rem;
+  color: var(--text-dark);
+}
+
+mat-card-subtitle {
+  color: var(--text-muted);
+}
+
+mat-card-content {
+  padding-top: 1rem;
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+.login-submit-btn {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  min-height: 48px; /* Prevents layout shift when spinner appears */
+}
+
+.divider {
+  text-align: center;
+  margin: 1rem 0;
+  color: var(--text-muted);
+  font-weight: 500;
+  position: relative;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background-color: #e0e0e0;
+  }
+
+  &::before { left: 0; }
+  &::after { right: 0; }
+}
+
+.google-login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.65rem;
+  border-radius: 4px;
+  background-color: #fff;
+  border: 1px solid #dadce0;
+  color: #3c4043;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color .2s, box-shadow .2s;
+  margin-bottom: 1rem;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+}
+
+mat-card-footer {
+  text-align: center;
+  padding: 1.5rem 0 1rem;
+}
+
+.back-link {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+}
