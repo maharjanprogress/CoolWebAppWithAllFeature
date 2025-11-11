@@ -1,4 +1,4 @@
-import {Component, OnDestroy} from '@angular/core';
+import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {Router, RouterLink} from "@angular/router";
@@ -10,10 +10,11 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {Subscription} from "rxjs";
 import {HttpErrorResponse} from "@angular/common/http";
 import {ResponseStatus} from "../../model/api-responses";
-import {GoogleLoginRequest, LoginDTO} from "../../model/api-request";
+import {LoginDTO} from "../../model/api-request";
 import {LoginService} from "../../services/LoginAndRegistration/login.service";
 import {SnackbarService} from "../../services/snackbar.service";
-import {GoogleLoginProvider, SocialAuthService} from "@abacritt/angularx-social-login";
+declare const google: any;
+
 
 @Component({
   selector: 'app-login',
@@ -31,7 +32,7 @@ import {GoogleLoginProvider, SocialAuthService} from "@abacritt/angularx-social-
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
 })
-export class LoginComponent implements OnDestroy{
+export class LoginComponent implements OnInit, OnDestroy{
   isLoading = false;
   private loginSubscription?: Subscription;
   private socialAuthSubscription?: Subscription;
@@ -41,9 +42,9 @@ export class LoginComponent implements OnDestroy{
   constructor(
     private fb: FormBuilder,
     private loginService: LoginService,
-    private socialAuthService: SocialAuthService,
     private router: Router,
-    private snackbarService: SnackbarService
+    private snackbarService: SnackbarService,
+    private ngZone: NgZone,
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
@@ -51,31 +52,63 @@ export class LoginComponent implements OnDestroy{
     });
   }
 
-  signInWithGoogle(): void {
-    this.isLoading = true;
-    this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID).then(socialUser => {
-      this.loginSubscription = this.loginService.loginWithGoogle(socialUser.idToken).subscribe({
-        next: (response) => {
+  ngOnInit() {
+    // Wait for Google script to load
+    this.initGoogleSignIn();
+  }
+
+  initGoogleSignIn() {
+    if (typeof google === 'undefined') {
+      console.log("temporarily waiting for google sdk");
+      setTimeout(() => this.initGoogleSignIn(), 100);
+      return;
+    }
+
+    google.accounts.id.initialize({
+      client_id: '169761438157-p3m6mv3bmfguqnb53bq6a5mmaqqredvh.apps.googleusercontent.com',
+      callback: (response: any) => this.handleGoogleResponse(response)
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById('googleButton'),
+      {
+        theme: 'outline',
+        size: 'large',
+        width: 250
+      }
+    );
+  }
+
+  handleGoogleResponse(response: any) {
+    this.ngZone.run(() => {
+      this.isLoading = true;
+      this.loginService.loginWithGoogle(response.credential).subscribe({
+        next: (res) => {
           this.isLoading = false;
-          if (response.status === ResponseStatus.SUCCESS) {
+          if (res.status === ResponseStatus.SUCCESS) {
             this.snackbarService.show('Login successful!', 'success', 2);
-            this.router.navigate(['/app']).catch(error => console.error('Navigation failed', error));
-          } else {
-            this.snackbarService.show(response.message || 'An unexpected error occurred.', 'error');
+            this.router.navigate(['/app']).catch(error => {
+              console.error('Navigation failed', error)
+            });
           }
         },
-        error: (err: HttpErrorResponse) => {
+        error: (err) => {
           this.isLoading = false;
-          this.snackbarService.show(err.error?.message || 'Google login failed.', 'error', 5);
+          this.snackbarService.show('Login failed', 'error');
+          console.error('Google login error:', err);
         }
       });
-    }).catch(error => {
-      this.isLoading = false;
-      // This usually happens if the user closes the popup.
-      if (error !== 'Login providers not ready yet') {
-        this.snackbarService.show('Google Sign-In was cancelled or failed.', 'info');
-      }
     });
+  }
+
+  signInWithGoogle(): void {
+    const googleButton = document.getElementById('googleButton');
+    if (googleButton) {
+      const iframe = googleButton.querySelector('div[role="button"]') as HTMLElement;
+      if (iframe) {
+        iframe.click();
+      }
+    }
   }
 
   onSubmit(): void {
