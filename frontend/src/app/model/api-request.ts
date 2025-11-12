@@ -10,6 +10,6 @@ export interface LoginDTO {
   password: string;
 }
 
-export interface GoogleLoginRequest {
+export interface OauthLoginRequest {
   token: string;
 }

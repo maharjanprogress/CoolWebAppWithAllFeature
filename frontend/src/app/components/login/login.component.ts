@@ -13,6 +13,10 @@ import {ResponseStatus} from "../../model/api-responses";
 import {LoginDTO} from "../../model/api-request";
 import {LoginService} from "../../services/LoginAndRegistration/login.service";
 import {SnackbarService} from "../../services/snackbar.service";
+import {
+  FacebookLoginProvider,
+  SocialAuthService,
+} from "@abacritt/angularx-social-login";
 declare const google: any;
 
 
@@ -45,6 +49,7 @@ export class LoginComponent implements OnInit, OnDestroy{
     private router: Router,
     private snackbarService: SnackbarService,
     private ngZone: NgZone,
+    private authService: SocialAuthService
   ) {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
@@ -62,6 +67,7 @@ export class LoginComponent implements OnInit, OnDestroy{
       console.log("temporarily waiting for google sdk");
       setTimeout(() => this.initGoogleSignIn(), 100);
       return;
+      // this is to handle the asynchronous loading of Google's SDK
     }
 
     google.accounts.id.initialize({
@@ -94,21 +100,41 @@ export class LoginComponent implements OnInit, OnDestroy{
         },
         error: (err) => {
           this.isLoading = false;
-          this.snackbarService.show('Login failed', 'error');
+          this.snackbarService.show(err.error?.message ||'Login failed', 'error');
           console.error('Google login error:', err);
         }
       });
     });
   }
 
-  signInWithGoogle(): void {
-    const googleButton = document.getElementById('googleButton');
-    if (googleButton) {
-      const iframe = googleButton.querySelector('div[role="button"]') as HTMLElement;
-      if (iframe) {
-        iframe.click();
-      }
-    }
+  signInWithFacebook(): void {
+    this.isLoading = true;
+    this.authService.signIn(FacebookLoginProvider.PROVIDER_ID)
+      .then((facebookUser) => {
+        this.isLoading = false;
+        console.log("Facebook user info:");
+        console.log(facebookUser);
+        this.loginService.loginWithFacebook(facebookUser.authToken).subscribe({
+          next: (res) => {
+            this.isLoading = false;
+            if (res.status === ResponseStatus.SUCCESS) {
+              this.snackbarService.show('Login successful!', 'success', 2);
+              this.router.navigate(['/app']).catch(error => {
+                console.error('Navigation failed', error)
+              });
+            }
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.snackbarService.show(err.error?.message ||'Login failed', 'error');
+            console.error('Google login error:', err);
+          }
+        });
+      })
+      .catch((err) => {
+        this.isLoading = false;
+      console.error('Facebook login error:', err);
+    });
   }
 
   onSubmit(): void {

@@ -123,10 +123,11 @@ mat-card-content {
   &::after { right: 0; }
 }
 
-.google-login-btn {
+.facebook-login-btn {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative; // Important for absolute positioning
   width: 100%;
   padding: 0.65rem;
   border-radius: 4px;
@@ -137,12 +138,24 @@ mat-card-content {
   cursor: pointer;
   transition: background-color .2s, box-shadow .2s;
   margin-bottom: 1rem;
+
+  &:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  }
 }
 
-.google-icon {
+.facebook-icon {
   width: 20px;
   height: 20px;
-  margin-right: 12px;
+  position: absolute; // Position it absolutely
+  left: 12px; // Place it on the far left
+}
+
+.facebook-login-btn span {
+  text-align: center; // Center the text
+  flex: 1; // Take up remaining space
+  font-size: 0.95rem;
 }
 
 mat-card-footer {

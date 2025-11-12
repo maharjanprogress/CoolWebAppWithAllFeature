@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {Observable, tap} from "rxjs";
 import {SessionService} from "../session.service";
 import {ApiService} from "../mainApi/api.service";
-import {GoogleLoginRequest, LoginDTO} from "../../model/api-request";
+import {OauthLoginRequest, LoginDTO} from "../../model/api-request";
 import {LoginResponse} from "../../model/api-responses";
 import {Router} from "@angular/router";
 
@@ -29,8 +29,20 @@ export class LoginService {
   }
 
   loginWithGoogle(googleToken: string): Observable<LoginResponse> {
-    const request: GoogleLoginRequest = { token: googleToken };
+    const request: OauthLoginRequest = { token: googleToken };
     return this.apiService.postWithoutAuth<LoginResponse>('/login/oauth2/google', request).pipe(
+      tap(response => {
+        if (response.status === 'SUCCESS' && response.detail?.token) {
+          this.sessionService.setToken(response.detail.token);
+          this.sessionService.setRole(response.detail.role);
+        }
+      })
+    );
+  }
+
+  loginWithFacebook(facebookToken: string): Observable<LoginResponse> {
+    const request: OauthLoginRequest = { token: facebookToken };
+    return this.apiService.postWithoutAuth<LoginResponse>('/login/oauth2/facebook', request).pipe(
       tap(response => {
         if (response.status === 'SUCCESS' && response.detail?.token) {
           this.sessionService.setToken(response.detail.token);
