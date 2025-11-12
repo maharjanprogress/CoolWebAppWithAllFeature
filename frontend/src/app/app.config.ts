@@ -5,7 +5,7 @@ import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {provideHttpClient} from "@angular/common/http";
 import {provideNativeDateAdapter} from "@angular/material/core";
-import {FacebookLoginProvider, GoogleLoginProvider, SocialAuthServiceConfig} from "@abacritt/angularx-social-login";
+import {FacebookLoginProvider, SocialAuthServiceConfig} from "@abacritt/angularx-social-login";
 
 export const appConfig: ApplicationConfig = {
   providers: [
