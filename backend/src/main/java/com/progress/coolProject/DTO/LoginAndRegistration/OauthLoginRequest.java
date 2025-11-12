@@ -3,6 +3,6 @@ package com.progress.coolProject.DTO.LoginAndRegistration;
 import lombok.Data;
 
 @Data
-public class GoogleLoginRequest {
+public class OauthLoginRequest {
     private String token;
 }
