@@ -24,7 +24,7 @@ RUN rm -rf /usr/share/nginx/html/*
 
 # Copy built Angular app from builder stage
 # IMPORTANT: Changed from dist/sadiksha/browser to dist/sadiksha
-COPY --from=builder /app/dist/sadiksha /usr/share/nginx/html
+COPY --from=builder /app/dist/sadiksha/browser /usr/share/nginx/html
 
 # Copy custom nginx configuration for Angular routing
 COPY nginx.conf /etc/nginx/conf.d/default.conf
