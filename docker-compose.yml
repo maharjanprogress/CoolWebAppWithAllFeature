@@ -1,26 +1,6 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: coolwebapp-postgres
-    environment:
-      POSTGRES_DB: cool_web_app
-      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
-      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - coolwebapp-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   # Spring Boot Backend
   backend:
     build:
@@ -28,44 +8,24 @@ services:
       dockerfile: Dockerfile
     container_name: coolwebapp-backend
     environment:
-      # Database connection
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cool_web_app
+      # Connect to existing postgres-db container
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/cool_web_app
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-
-      # JWT Secret
       JWT_SECRET: ${JWT_SECRET}
-
-      # CORS - allow requests from your local domain
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
-
-      # Cloudinary (add your credentials)
       CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME}
       CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY}
       CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET}
-
-      # Google OAuth
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-
-      # Facebook OAuth
       FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
       FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
-
-      # Port configuration
       PORT: 9030
     ports:
       - "9030:9030"
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
-      - coolwebapp-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9030/actuator/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - meeting-management-system_app-network  # Join existing network
+    restart: unless-stopped
 
   # Angular Frontend
   frontend:
@@ -78,11 +38,10 @@ services:
     depends_on:
       - backend
     networks:
-      - coolwebapp-network
+      - meeting-management-system_app-network  # Join existing network
+    restart: unless-stopped
 
+# Use the existing network
 networks:
-  coolwebapp-network:
-    driver: bridge
-
-volumes:
-  postgres_data:
+  meeting-management-system_app-network:
+    external: true
