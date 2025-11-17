@@ -41,8 +41,8 @@ jobs:
           script: |
             cd ~/CoolWebAppWithAllFeature
             git pull origin master
-            docker-compose build backend
-            docker-compose up -d backend
+            docker compose build backend
+            docker compose up -d backend
             docker image prune -f
 
   deploy-frontend:
@@ -62,6 +62,6 @@ jobs:
           script: |
             cd ~/CoolWebAppWithAllFeature
             git pull origin master
-            docker-compose build frontend
-            docker-compose up -d frontend
+            docker compose build frontend
+            docker compose up -d frontend
             docker image prune -f
