@@ -1,34 +1,73 @@
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+.container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: auto;
 }
 
-.loading-card {
-  background: white;
-  padding: 2rem;
+h2 {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+.upload-btn {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:disabled {
+    background-color: var(--secondary);
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+  }
+}
+
+.processing-section {
+  background-color: var(--surface);
+  padding: 1.5rem 2rem;
   border-radius: 8px;
-  min-width: 400px;
-  text-align: center;
+  border: 1px solid var(--border);
+}
+
+.log-message {
+  color: var(--text-secondary);
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .progress-bar {
   height: 20px;
-  background: #e0e0e0;
+  background: var(--surface-alt);
   border-radius: 10px;
   overflow: hidden;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
+  border: 1px solid var(--border);
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #45a049);
+  background: var(--primary);
   transition: width 0.3s ease;
+}
+
+.progress-text {
+  text-align: right;
+  font-weight: 500;
+  color: var(--text-secondary);
 }

@@ -5,6 +5,7 @@ import {ExcelService} from "../../../../../services/Excel/excel.service";
 import {WebsocketService} from "../../../../../services/websocket/websocket.service";
 import {SnackbarService} from "../../../../../services/snackbar.service";
 import {CommonModule} from "@angular/common";
+import {FileType} from "../../../../../model/file-types";
 
 @Component({
   selector: 'app-trial-balance',
@@ -18,6 +19,8 @@ import {CommonModule} from "@angular/common";
 })
 export class TrialBalanceComponent implements OnInit, OnDestroy {
   @ViewChild('fileUpload') fileUpload!: FileUploadComponent;
+
+  allowedFileTypes = [FileType.XLSX, FileType.XLS, FileType.CSV];
 
   isProcessing = false;
   currentProgress = 0;

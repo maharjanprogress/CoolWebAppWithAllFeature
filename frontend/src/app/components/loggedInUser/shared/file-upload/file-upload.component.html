@@ -1,7 +1,22 @@
-<div class="upload-area"
+<!-- Show this when no file is selected -->
+<div *ngIf="!selectedFile"
+     class="upload-area"
+     [class.dragging]="isDragging"
      (drop)="onDrop($event)"
      (dragover)="onDragOver($event)"
+     (dragleave)="onDragLeave($event)"
      (click)="fileInput.click()">
-  <p>Drag & drop or click to select</p>
-  <input #fileInput type="file" hidden (change)="onFileSelected($event)">
+  <p>Drag & drop your file here, or <span>click to browse</span></p>
+  <p class="file-types" *ngIf="acceptTypes !== '*/*'">Allowed types: {{ acceptTypes }}</p>
+  <input #fileInput type="file" hidden [accept]="acceptTypes" (change)="onFileSelected($event)">
+</div>
+
+<!-- Show this when a file IS selected -->
+<div *ngIf="selectedFile" class="file-preview">
+  <img [src]="fileIcon" alt="File type icon" class="file-icon">
+  <div class="file-details">
+    <span class="file-name">{{ selectedFile.name }}</span>
+    <span class="file-size">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</span>
+  </div>
+  <button class="remove-btn" (click)="removeFile()">×</button>
 </div>

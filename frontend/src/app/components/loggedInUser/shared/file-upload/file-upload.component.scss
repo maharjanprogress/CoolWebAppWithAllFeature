@@ -1,0 +1,101 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.upload-area {
+  border: 2px dashed var(--border);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  background-color: var(--surface-alt);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 1rem;
+
+    span {
+      color: var(--primary);
+      font-weight: 500;
+      text-decoration: underline;
+    }
+  }
+
+  .file-types {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    color: var(--text-secondary);
+  }
+
+  &:hover, &.dragging {
+    background-color: var(--primary-light-alpha, rgba(124, 58, 237, 0.05)); // Fallback color
+    border-color: var(--primary);
+  }
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.file-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 1rem;
+}
+
+.file-details {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.file-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-size {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0 0.5rem;
+  line-height: 1;
+  margin-left: 1rem;
+
+  &:hover {
+    color: var(--error);
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .upload-area {
+    padding: 1.5rem;
+    p {
+      font-size: 0.9rem;
+    }
+  }
+
+  .file-preview {
+    padding: 0.75rem;
+  }
+}
