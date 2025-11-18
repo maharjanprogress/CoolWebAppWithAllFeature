@@ -40,9 +40,9 @@ public class ExcelService implements IExcelService {
         }
 
         String fileName = file.getOriginalFilename();
-        if (fileName == null || !fileName.endsWith(".xlsx")) {
-            throw new RuntimeException("Only .xlsx files are allowed");
-        }
+//        if (fileName == null || !fileName.endsWith(".xlsx")) {
+//            throw new RuntimeException("Only .xlsx files are allowed");
+//        }
 
         // Create job record
         ProcessingJob job = new ProcessingJob();
@@ -78,7 +78,7 @@ public class ExcelService implements IExcelService {
             // Example:
             sendProgress(job, 10, "Reading Excel file...");
             // Workbook workbook = new XSSFWorkbook(file.getInputStream());
-            Thread.sleep(2000); // Simulate work
+            Thread.sleep(20000); // Simulate work
 
             sendProgress(job, 30, "Validating data...");
             // Your validation logic
@@ -90,7 +90,7 @@ public class ExcelService implements IExcelService {
 
             sendProgress(job, 80, "Saving to database...");
             // Your database save logic
-            Thread.sleep(2000);
+            Thread.sleep(10000);
 
             sendProgress(job, 100, "Completed!");
 

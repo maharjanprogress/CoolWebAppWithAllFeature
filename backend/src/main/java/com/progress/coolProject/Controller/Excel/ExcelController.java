@@ -29,6 +29,10 @@ public class ExcelController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ResponseDTO> getStatus() {
         ProcessingJob job = excelService.getActiveJob(currentUser.getCurrentUser());
-        return ResponseEntity.ok(ResponseDTO.success("Job ID: " + job.getId()+ ". Currently has status: "+job.getStatus().toString(), job));
+        if (job == null) {
+            return ResponseEntity.ok(ResponseDTO.success("No active processing job found."));
+        }else {
+            return ResponseEntity.ok(ResponseDTO.success("", job));
+        }
     }
 }
