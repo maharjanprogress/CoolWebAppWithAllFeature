@@ -1,0 +1,56 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  height: 100%;
+  transition: grid-template-columns 0.3s ease-in-out;
+}
+
+.content-area {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.router-content {
+  padding: 2rem;
+  flex-grow: 1;
+}
+
+.mobile-menu-trigger {
+  display: none; // Hide by default on desktop
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-menu-trigger {
+    display: flex; // Show on mobile
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 50; // Below the menu overlay, but above content
+    width: 48px;
+    height: 48px;
+    background: var(--text-on-primary);
+    border: 1px solid var(--text-on-primary);
+    border-radius: 50%;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    cursor: move; /* Indicates the element is draggable */
+    color: var(--text-dark);
+    transition: box-shadow 0.2s ease-in-out;
+  }
+
+  /* Style applied by the CDK while the element is being dragged */
+  .cdk-drag-dragging .mobile-menu-trigger {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+  }
+}

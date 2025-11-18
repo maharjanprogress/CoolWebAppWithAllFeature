@@ -1,0 +1,14 @@
+<div class="dashboard-layout" [class.menu-closed]="!isMenuOpen">
+  <app-dynamic-menu (menuToggle)="onMenuToggle($event)"></app-dynamic-menu>
+
+  <main class="content-area">
+    <button class="mobile-menu-trigger" *ngIf="!isMenuOpen" (click)="openMenu()" cdkDrag cdkDragBoundary="body">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <div class="router-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <app-snackbar></app-snackbar>
+</div>

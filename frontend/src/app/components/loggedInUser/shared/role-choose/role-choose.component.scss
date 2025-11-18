@@ -1,0 +1,12 @@
+.role-select-field {
+  width: 100%;
+}
+
+.loading-text {
+  margin-left: 1rem;
+  vertical-align: middle;
+}
+
+mat-option[disabled] .mat-pseudo-checkbox {
+  display: none;
+}

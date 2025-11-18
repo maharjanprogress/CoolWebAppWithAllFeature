@@ -1,3 +1,5 @@
+import {UserDTO} from "./api-responses";
+
 export interface MessegeRequest {
   sessionId: string;
   userId: number;
@@ -13,3 +15,5 @@ export interface LoginDTO {
 export interface OauthLoginRequest {
   token: string;
 }
+
+export type CreateUserDTO = Omit<UserDTO, 'id'>;

@@ -1,0 +1,13 @@
+<mat-form-field appearance="outline" class="role-select-field">
+  <mat-label>{{ label }}</mat-label>
+  <mat-select [value]="value" (selectionChange)="onSelectionChange($event.value)" [disabled]="isDisabled || isLoading">
+    <mat-option *ngIf="isLoading" disabled>
+      <mat-progress-spinner mode="indeterminate" diameter="20"></mat-progress-spinner>
+      <span class="loading-text">Loading Roles...</span>
+    </mat-option>
+    <mat-option *ngFor="let role of roles" [value]="returnId ? role.id : role.roleAlias">
+      {{ role.roleName }} ({{ role.roleAlias }})
+    </mat-option>
+  </mat-select>
+  <mat-hint *ngIf="roles.length === 0 && !isLoading">No roles available.</mat-hint>
+</mat-form-field>

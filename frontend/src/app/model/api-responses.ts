@@ -28,6 +28,39 @@ export enum UserRole {
   CLIENT = 'CLIENT'
 }
 
+export interface UserDTO {
+  id: number;
+  userName: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  middleName: string | null;
+  phoneNumber: string;
+  roleId: number;
+  role: UserRole;
+  email: string | null;
+  isActive: boolean | null;
+}
+
+export interface SubMenuDTO {
+  id: number;
+  title: string;
+  url: string;
+}
+
+export interface MenuDTO {
+  id: number;
+  title: string;
+  subMenuDTOList: SubMenuDTO[];
+}
+
+export interface RoleDTO {
+  id: number;
+  roleAlias: UserRole
+  roleName: string;
+  remarks: string;
+}
+
 export class RoleUtils {
   static fromString(role: string): UserRole | null {
     return Object.values(UserRole).includes(role as UserRole) ? role as UserRole : null;
@@ -44,30 +77,11 @@ export class RoleUtils {
 
 export interface LoginResponse extends RestApiResponse<LoginDetails, never> {}
 
-export interface JobExperiencePhotoDTO {
-  id: number;
-  imageUrl: string;
-  caption: string;
-  displayOrder: number;
-}
+export interface UserListResponse extends RestApiResponse<null, UserDTO[]> {}
 
-export interface JobExperienceDTO {
-  id: number;
-  title: string;
-  company: string;
-  location: string | null;
-  employmentType: string;
-  description: string;
-  achievements: string[];
-  technologiesUsed: string[];
-  startDate: string;
-  endDate: string;
-  isCurrent: boolean;
-  displayOrder: number;
-  insertUser: string;
-  editUser: string;
-  photos: JobExperiencePhotoDTO[];
-  extra?: Record<string, string> | null;
-}
+export interface UserResponse extends RestApiResponse<UserDTO, never> {}
 
-export interface jobExperienceResponse extends RestApiResponse<never, JobExperienceDTO[]> {}
+export interface MenuResponse extends RestApiResponse<null, MenuDTO[]> {}
+
+export interface RoleListResponse extends RestApiResponse<null, RoleDTO[]> {}
+

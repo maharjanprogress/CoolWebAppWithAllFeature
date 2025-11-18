@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from "@angular/common";
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from "@angular/forms";
-import { WebsocketService } from "../../../services/websocket/websocket.service";
+import { WebsocketService } from "../../../../../services/websocket/websocket.service";
 import { IMessage, StompSubscription } from "@stomp/stompjs";
 
 @Component({

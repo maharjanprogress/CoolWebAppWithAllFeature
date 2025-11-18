@@ -1,0 +1,42 @@
+<div class="menu-container">
+  <div class="menu-header">
+    <h2 *ngIf="isMenuOpen">Cool App</h2>
+    <button class="toggle-btn" (click)="toggleMenu()" [attr.aria-label]="isMenuOpen ? 'Close menu' : 'Open menu'">
+      <mat-icon>{{ isMenuOpen ? 'menu_open' : 'menu' }}</mat-icon>
+    </button>
+  </div>
+
+  <div class="menu-scroll-area">
+    <div *ngIf="isLoading" class="loading-container">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <nav class="menu-nav" *ngIf="!isLoading && menuItems.length > 0">
+      <div *ngFor="let superMenu of menuItems" class="super-menu-item">
+        <button class="super-menu-btn" (click)="toggleSubMenu(superMenu.id)" [class.active]="activeSuperMenu === superMenu.id">
+          <span>{{ superMenu.title }}</span>
+          <mat-icon class="chevron">expand_more</mat-icon>
+        </button>
+        <div class="sub-menu-container" [class.open]="activeSuperMenu === superMenu.id">
+          <ul>
+            <li *ngFor="let subMenu of superMenu.subMenuDTOList">
+              <a [routerLink]="subMenu.url" routerLinkActive="active-link">{{ subMenu.title }}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div *ngIf="!isLoading && menuItems.length === 0" class="empty-state">
+      <mat-icon>menu</mat-icon>
+      <span>No menu items available.</span>
+    </div>
+  </div>
+
+  <div class="menu-footer">
+    <button class="logout-btn" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span *ngIf="isMenuOpen">Logout</span>
+    </button>
+  </div>
+</div>

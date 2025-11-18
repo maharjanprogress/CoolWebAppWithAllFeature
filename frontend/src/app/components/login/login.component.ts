@@ -148,7 +148,7 @@ export class LoginComponent implements OnInit, OnDestroy{
         this.isLoading = false;
         if (response.status === ResponseStatus.SUCCESS) {
           this.snackbarService.show('Login successful!', 'success',3);
-          this.router.navigate(['/app']).catch(error => {
+          this.router.navigate(['/user']).catch(error => {
             console.error('Navigation failed', error);
           });
         } else {
