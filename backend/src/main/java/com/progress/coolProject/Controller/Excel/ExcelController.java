@@ -1,5 +1,6 @@
 package com.progress.coolProject.Controller.Excel;
 
+import com.progress.coolProject.DTO.ResponseDTO;
 import com.progress.coolProject.Entity.Excel.ProcessingJob;
 import com.progress.coolProject.Services.Impl.Excel.IExcelService;
 import com.progress.coolProject.Utils.CurrentUser;
@@ -19,15 +20,15 @@ public class ExcelController {
 
     @PostMapping("/upload")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<ProcessingJob> uploadExcel(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ResponseDTO> uploadExcel(@RequestParam("file") MultipartFile file) {
         ProcessingJob job = excelService.startProcessing(file, currentUser.getCurrentUser());
-        return ResponseEntity.ok(job);
+        return ResponseEntity.ok(ResponseDTO.success("File uploaded successfully. Job ID: " + job.getId(), job));
     }
 
     @GetMapping("/status")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<ProcessingJob> getStatus() {
+    public ResponseEntity<ResponseDTO> getStatus() {
         ProcessingJob job = excelService.getActiveJob(currentUser.getCurrentUser());
-        return ResponseEntity.ok(job);
+        return ResponseEntity.ok(ResponseDTO.success("Job ID: " + job.getId()+ ". Currently has status: "+job.getStatus().toString(), job));
     }
 }
