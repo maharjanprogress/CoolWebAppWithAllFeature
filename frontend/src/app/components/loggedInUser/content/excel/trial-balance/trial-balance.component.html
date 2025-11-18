@@ -1,1 +1,20 @@
-<p>trial-balance works!</p>
+<div class="container">
+  <!-- Loading overlay when processing -->
+  <div *ngIf="isProcessing" class="loading-overlay">
+    <div class="loading-card">
+      <h2>Processing Your File</h2>
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="currentProgress"></div>
+      </div>
+      <p>{{ currentProgress }}% - {{ currentMessage }}</p>
+    </div>
+  </div>
+
+  <!-- Upload interface -->
+  <div *ngIf="!isProcessing">
+    <app-file-upload #fileUpload></app-file-upload>
+    <button (click)="uploadFile()" [disabled]="uploading">
+      {{ uploading ? 'Uploading...' : 'Send File' }}
+    </button>
+  </div>
+</div>

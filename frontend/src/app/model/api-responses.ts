@@ -61,6 +61,22 @@ export interface RoleDTO {
   remarks: string;
 }
 
+export interface ProcessingJob {
+  id: number;
+  fileName: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  progress: number;
+  currentStep: string;
+  errorMessage?: string;
+}
+
+export interface ProgressUpdate {
+  jobId: number;
+  progress: number;
+  message: string;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+}
+
 export class RoleUtils {
   static fromString(role: string): UserRole | null {
     return Object.values(UserRole).includes(role as UserRole) ? role as UserRole : null;
@@ -84,4 +100,6 @@ export interface UserResponse extends RestApiResponse<UserDTO, never> {}
 export interface MenuResponse extends RestApiResponse<null, MenuDTO[]> {}
 
 export interface RoleListResponse extends RestApiResponse<null, RoleDTO[]> {}
+
+export interface FileProcessResponse extends RestApiResponse<ProcessingJob, never> {}
 

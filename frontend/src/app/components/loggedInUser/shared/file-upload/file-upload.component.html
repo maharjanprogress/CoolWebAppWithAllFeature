@@ -1,0 +1,7 @@
+<div class="upload-area"
+     (drop)="onDrop($event)"
+     (dragover)="onDragOver($event)"
+     (click)="fileInput.click()">
+  <p>Drag & drop or click to select</p>
+  <input #fileInput type="file" hidden (change)="onFileSelected($event)">
+</div>
