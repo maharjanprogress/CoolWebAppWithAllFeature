@@ -1,6 +1,24 @@
-version: '3.8'
-
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: coolwebapp-postgres
+    environment:
+      POSTGRES_DB: cool_web_app
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    # No need to expose port - only accessed via Docker network
+    networks:
+      - coolwebapp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   # Spring Boot Backend
   backend:
     build:
@@ -8,8 +26,8 @@ services:
       dockerfile: Dockerfile
     container_name: coolwebapp-backend
     environment:
-      # Connect to existing postgres-db container
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/cool_web_app
+      # Connect to postgres container via Docker network
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cool_web_app
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
@@ -23,8 +41,11 @@ services:
       PORT: 9030
     ports:
       - "9030:9030"
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
-      - meeting-management-system_app-network  # Join existing network
+      - coolwebapp-network
     restart: unless-stopped
 
   # Angular Frontend
@@ -38,10 +59,12 @@ services:
     depends_on:
       - backend
     networks:
-      - meeting-management-system_app-network  # Join existing network
+      - coolwebapp-network
     restart: unless-stopped
 
-# Use the existing network
 networks:
-  meeting-management-system_app-network:
-    external: true
+  coolwebapp-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
