@@ -41,6 +41,8 @@ services:
       PORT: 9030
     ports:
       - "9030:9030"
+    volumes:
+      - /opt/coolwebapp:/opt/coolwebapp  # ADD THIS LINE
     depends_on:
       postgres:
         condition: service_healthy
