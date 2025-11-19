@@ -17,7 +17,7 @@ export class RedirectComponent implements OnInit{
 
   ngOnInit(): void {
     if (this.sessionService.getToken()) {
-      this.router.navigate(['/app'], { replaceUrl: true }).catch(error => {
+      this.router.navigate(['/user'], { replaceUrl: true }).catch(error => {
         console.error('Navigation failed', error);
       });
     } else {
