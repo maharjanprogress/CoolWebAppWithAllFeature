@@ -36,7 +36,7 @@ public class ExcelService implements IExcelService {
     private final ProcessingJobRepository jobRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    private static final String OUTPUT_DIRECTORY = "/opt/excelfile";
+    private static final String OUTPUT_DIRECTORY = "/opt/coolwebapp/excelFile";
     private static final int HEADER_ROW_INDEX = 1;
     private static final int DATA_START_ROW = 2;
 
@@ -333,10 +333,10 @@ public class ExcelService implements IExcelService {
 
     private void createOutputDirectory() throws IOException {
         Path path = Paths.get(OUTPUT_DIRECTORY);
-        log.info("Checking/Creating output directory at: {}", path.toString());
+        log.info("Checking/Creating output directory at: {}", path);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
-            log.info("Created output directory: {}", path.toString());
+            log.info("Created output directory: {}", path);
         }
     }
 
