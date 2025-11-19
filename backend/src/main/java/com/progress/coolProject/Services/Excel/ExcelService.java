@@ -333,8 +333,10 @@ public class ExcelService implements IExcelService {
 
     private void createOutputDirectory() throws IOException {
         Path path = Paths.get(OUTPUT_DIRECTORY);
+        log.info("Checking/Creating output directory at: {}", path.toString());
         if (!Files.exists(path)) {
             Files.createDirectories(path);
+            log.info("Created output directory: {}", path.toString());
         }
     }
 
