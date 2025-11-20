@@ -8,6 +8,7 @@ import com.progress.coolProject.Enums.JobStatus;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Repo.Excel.ProcessingJobRepository;
 import com.progress.coolProject.Services.Impl.Excel.IExcelService;
+import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -25,9 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -118,7 +117,7 @@ public class ExcelService implements IExcelService {
 
             // Parse and validate data
             sendProgress(job, 30, "Validating data...");
-            List<ExcelRowDTO> rows = parseAndValidateData(sheet);
+            Map<TrialBalanceEnum, ExcelRowDTO> rows = parseAndValidateData(sheet);
 
             if (rows.isEmpty()) {
                 throw new RuntimeException("No valid data found in the Excel file");
@@ -181,8 +180,8 @@ public class ExcelService implements IExcelService {
         }
     }
 
-    private List<ExcelRowDTO> parseAndValidateData(Sheet sheet) throws Exception {
-        List<ExcelRowDTO> rows = new ArrayList<>();
+    private Map<TrialBalanceEnum, ExcelRowDTO> parseAndValidateData(Sheet sheet) throws Exception {
+        Map<TrialBalanceEnum, ExcelRowDTO> rowsMap = new HashMap<>();
         List<String> errors = new ArrayList<>();
 
         int lastRowNum = sheet.getLastRowNum();
@@ -222,7 +221,9 @@ public class ExcelService implements IExcelService {
                     continue;
                 }
 
-                rows.add(dto);
+                // Add to map with enum as key
+                rowsMap.put(entry, dto);
+
             } catch (Exception e) {
                 errors.add("Row " + (i + 1) + ": " + e.getMessage());
             }
@@ -232,7 +233,7 @@ public class ExcelService implements IExcelService {
             throw new Exception("Validation errors found:\n" + String.join("\n", errors));
         }
 
-        return rows;
+        return rowsMap;
     }
 
     private ExcelRowDTO parseRow(Row row, int rowNumber) throws Exception {
@@ -266,7 +267,8 @@ public class ExcelService implements IExcelService {
         return dto;
     }
 
-    private String generateNepaliExcel(List<ExcelRowDTO> rows, String username) throws IOException {
+    private String generateNepaliExcel(Map<TrialBalanceEnum, ExcelRowDTO> rowsMap, String username) throws IOException {
+        ExcelTrialBalanceExcelRowHelper excel = new ExcelTrialBalanceExcelRowHelper(rowsMap);
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Trial Balance (Nepali)");
 
@@ -288,17 +290,17 @@ public class ExcelService implements IExcelService {
 
         // Populate data rows with Nepali descriptions
         int rowIdx = 1;
-        for (ExcelRowDTO dto : rows) {
+        for (Map.Entry<TrialBalanceEnum, ExcelRowDTO> entry : rowsMap.entrySet()) {
+            TrialBalanceEnum enumEntry = entry.getKey();
+            ExcelRowDTO dto = entry.getValue();
+
             Row row = sheet.createRow(rowIdx++);
 
             // Ledger No
             row.createCell(0).setCellValue(dto.getLedgerNo());
 
-            // Nepali Description
-            Optional<TrialBalanceEnum> enumEntry = TrialBalanceEnum.findByLedgerNo(dto.getLedgerNo());
-            String nepaliDesc = enumEntry.map(TrialBalanceEnum::getDescriptionNp)
-                    .orElse(dto.getLedgerDescription());
-            row.createCell(1).setCellValue(nepaliDesc);
+            // Nepali Description (directly from enum)
+            row.createCell(1).setCellValue(enumEntry.getDescriptionNp());
 
             // Debit
             if (dto.getDebit() != null && dto.getDebit() > 0) {
