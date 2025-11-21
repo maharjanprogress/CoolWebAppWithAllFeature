@@ -42,6 +42,12 @@ public class ProcessingJob {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Column(name = "processed_excel_file_path")
+    private String processedExcelFilePath;
+
+    @Column(name = "processed_powerpoint_file_path")
+    private String processedPowerpointFilePath;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

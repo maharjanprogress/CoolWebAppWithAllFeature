@@ -44,6 +44,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/login","/login/**","/serverCheck","/awesome-database/**", "/ws/**","/ws","/topic/**","app/**").permitAll()
+                        .requestMatchers(
+                                "/coolwebapp/excelFile/**",
+                                "/coolwebapp/pptFile/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers

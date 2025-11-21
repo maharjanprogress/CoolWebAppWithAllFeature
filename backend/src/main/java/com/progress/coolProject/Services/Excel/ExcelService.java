@@ -8,6 +8,7 @@ import com.progress.coolProject.Enums.JobStatus;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Repo.Excel.ProcessingJobRepository;
 import com.progress.coolProject.Services.Impl.Excel.IExcelService;
+import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,7 +35,8 @@ public class ExcelService implements IExcelService {
     private final ProcessingJobRepository jobRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    private static final String OUTPUT_DIRECTORY = "/opt/coolwebapp/excelFile";
+    private static final String OUTPUT_EXCEL_DIRECTORY = "excelFile";
+    private static final String OUTPUT_POWERPOINT_DIRECTORY = "pptFile";
     private static final int HEADER_ROW_INDEX = 1;
     private static final int DATA_START_ROW = 2;
 
@@ -321,7 +322,9 @@ public class ExcelService implements IExcelService {
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String fileName = username + "_trial_balance_" + timestamp + ".xlsx";
-        String filePath = OUTPUT_DIRECTORY + File.separator + fileName;
+        String filePath = Paths.get(StringConstants.FILE_STORAGE_PATH,
+                OUTPUT_EXCEL_DIRECTORY,
+                fileName).toString();
 
         // Write to file
         try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
@@ -329,12 +332,11 @@ public class ExcelService implements IExcelService {
         } finally {
             workbook.close();
         }
-
-        return filePath;
+        return Paths.get(StringConstants.FILE_ACCESS_URL,OUTPUT_EXCEL_DIRECTORY, fileName).toString();
     }
 
     private void createOutputDirectory() throws IOException {
-        Path path = Paths.get(OUTPUT_DIRECTORY);
+        Path path = Paths.get(StringConstants.FILE_STORAGE_PATH+OUTPUT_EXCEL_DIRECTORY);
         log.info("Checking/Creating output directory at: {}", path);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
