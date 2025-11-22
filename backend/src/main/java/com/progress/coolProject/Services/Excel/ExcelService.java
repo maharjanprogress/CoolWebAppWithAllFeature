@@ -95,7 +95,7 @@ public class ExcelService implements IExcelService {
     public ProcessingJob getActiveJob(User user) {
         return jobRepository.findFirstByUserAndStatusInOrderByCreatedAtDesc(
                 user,
-                List.of(JobStatus.PENDING, JobStatus.PROCESSING)
+                List.of(JobStatus.PENDING, JobStatus.PROCESSING, JobStatus.COMPLETED)
         ).orElse(null);
     }
 
@@ -135,7 +135,7 @@ public class ExcelService implements IExcelService {
 
             job.setProcessedExcelFilePath(outputFilePath);
             // Complete processing
-            sendProgress(job, 70, "Completed! File saved at: " + outputFilePath);
+            sendProgress(job, 70, outputFilePath);
 
             job.setStatus(JobStatus.COMPLETED);
             job.setProgress(100);
