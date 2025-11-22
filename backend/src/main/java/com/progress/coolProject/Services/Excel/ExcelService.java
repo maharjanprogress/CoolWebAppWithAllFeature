@@ -2,6 +2,7 @@ package com.progress.coolProject.Services.Excel;
 
 import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
+import com.progress.coolProject.DTO.ResponseDTO;
 import com.progress.coolProject.Entity.Excel.ProcessingJob;
 import com.progress.coolProject.Entity.User;
 import com.progress.coolProject.Enums.JobStatus;
@@ -132,8 +133,9 @@ public class ExcelService implements IExcelService {
             sendProgress(job, 60, "Generating Nepali translation...");
             String outputFilePath = generateNepaliExcel(rows, job.getUser().getUserName());
 
+            job.setProcessedExcelFilePath(outputFilePath);
             // Complete processing
-            sendProgress(job, 100, "Completed! File saved at: " + outputFilePath);
+            sendProgress(job, 70, "Completed! File saved at: " + outputFilePath);
 
             job.setStatus(JobStatus.COMPLETED);
             job.setProgress(100);
@@ -415,14 +417,16 @@ public class ExcelService implements IExcelService {
                 job.getId(),
                 job.getProgress(),
                 message,
-                job.getStatus()
+                job.getStatus(),
+                job.getProcessedExcelFilePath()!= null,
+                job.getProcessedPowerpointFilePath()!= null
         );
 
         // IMPORTANT: Use the USERNAME (not userId) to send to specific user
         messagingTemplate.convertAndSendToUser(
                 job.getUser().getUserName(),  // This must match the username in JWT
                 "/queue/excel-status",
-                update
+                ResponseDTO.success("Progress update", update)
         );
 
         System.out.println("Sent progress to user: " + job.getUser().getUserName()

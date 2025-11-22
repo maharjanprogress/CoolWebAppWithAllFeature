@@ -11,4 +11,6 @@ public class ProgressUpdate {
     private Integer progress;
     private String message;
     private JobStatus status;
+    private Boolean excelComplete;
+    private Boolean powerpointComplete;
 }
