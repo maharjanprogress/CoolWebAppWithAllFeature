@@ -28,6 +28,13 @@ export enum UserRole {
   CLIENT = 'CLIENT'
 }
 
+export enum JobStatus{
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED'
+}
+
 export interface UserDTO {
   id: number;
   userName: string;
@@ -64,17 +71,21 @@ export interface RoleDTO {
 export interface ProcessingJob {
   id: number;
   fileName: string;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  status: JobStatus;
   progress: number;
   currentStep: string;
   errorMessage?: string;
+  processedExcelFilePath: string | null;
+  processedPowerpointFilePath: string | null;
 }
 
 export interface ProgressUpdate {
   jobId: number;
   progress: number;
   message: string;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  status: JobStatus;
+  excelComplete: boolean;
+  powerpointComplete: boolean;
 }
 
 export class RoleUtils {
@@ -102,4 +113,6 @@ export interface MenuResponse extends RestApiResponse<null, MenuDTO[]> {}
 export interface RoleListResponse extends RestApiResponse<null, RoleDTO[]> {}
 
 export interface FileProcessResponse extends RestApiResponse<ProcessingJob, never> {}
+
+export interface ExcelUploadResponse extends RestApiResponse<ProgressUpdate, never> {}
 

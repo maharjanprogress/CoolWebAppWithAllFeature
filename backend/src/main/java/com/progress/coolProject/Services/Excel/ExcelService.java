@@ -137,6 +137,10 @@ public class ExcelService implements IExcelService {
             // Complete processing
             sendProgress(job, 70, outputFilePath);
 
+            //todo: generate powerpoint file and set path to job
+            job.setProcessedPowerpointFilePath(outputFilePath);
+            sendProgress(job, 80, outputFilePath);
+
             job.setStatus(JobStatus.COMPLETED);
             job.setProgress(100);
             job.setCompletedAt(LocalDateTime.now());

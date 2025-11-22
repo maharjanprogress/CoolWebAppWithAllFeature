@@ -6,6 +6,8 @@ import {WebsocketService} from "../../../../../services/websocket/websocket.serv
 import {SnackbarService} from "../../../../../services/snackbar.service";
 import {CommonModule} from "@angular/common";
 import {FileType} from "../../../../../model/file-types";
+import {JobStatus} from "../../../../../model/api-responses";
+import {environment} from "../../../../../../environments/environment";
 
 @Component({
   selector: 'app-trial-balance',
@@ -27,6 +29,9 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
   currentMessage = '';
   uploading = false;
 
+  excelDownloadUrl: string | null = null;
+  powerpointDownloadUrl: string | null = null;
+
   private progressSubscription?: Subscription;
 
   constructor(
@@ -43,10 +48,14 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
     this.excelService.getStatus().subscribe({
       next: (jobDetail) => {
         const job = jobDetail.detail;
-        if (job && (job.status === 'PENDING' || job.status === 'PROCESSING')) {
+        if (job && (job.status === JobStatus.PENDING || job.status === JobStatus.PROCESSING)) {
           this.isProcessing = true;
           this.currentProgress = job.progress;
           this.currentMessage = job.currentStep;
+        }
+        if (job) {
+          this.excelDownloadUrl = job.processedExcelFilePath ? environment.apiUrl + job.processedExcelFilePath : null;
+          this.powerpointDownloadUrl = job.processedPowerpointFilePath ? environment.apiUrl + job.processedPowerpointFilePath : null;
         }
       },
       error: (err) => {
@@ -61,12 +70,15 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
           this.isProcessing = true;
           this.currentProgress = update.progress;
           this.currentMessage = update.message;
-
-          if (update.status === 'COMPLETED' || update.status === 'FAILED') {
+          if (update.excelComplete && update.progress === 70) {
+            this.excelDownloadUrl = environment.apiUrl + update.message;
+          }
+          if (update.powerpointComplete) {
+            this.powerpointDownloadUrl = environment.apiUrl + update.message;
+          }
+          if (update.status === JobStatus.COMPLETED || update.status === JobStatus.FAILED) {
             this.isProcessing = false;
-            if (update.status === 'COMPLETED') {
-              this.snackbar.show("Processing completed successfully.", 'success', 3);
-            } else {
+            if (update.status === JobStatus.FAILED) {
               this.snackbar.show("Processing failed: " + update.message, 'error', 5);
             }
           }
@@ -83,6 +95,10 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
     }
 
     this.uploading = true;
+    // Reset previous results
+    this.excelDownloadUrl = null;
+    this.powerpointDownloadUrl = null;
+
     this.excelService.uploadExcel(file).subscribe({
       next: (jobDetail) => {
         const job = jobDetail.detail;

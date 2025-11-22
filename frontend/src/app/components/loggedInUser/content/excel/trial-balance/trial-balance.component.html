@@ -17,4 +17,17 @@
     <div class="progress-bar"><div class="progress-fill" [style.width.%]="currentProgress"></div></div>
     <p class="progress-text">{{ currentProgress }}% Complete</p>
   </div>
+
+  <!-- Results View -->
+  <div class="results-section" *ngIf="excelDownloadUrl || powerpointDownloadUrl">
+    <h3>Results</h3>
+    <div class="download-buttons">
+      <a *ngIf="excelDownloadUrl" [href]="excelDownloadUrl" class="download-btn excel" target="_blank" download>
+        <img src="icons/excel.svg" alt="Excel Icon"> Download Excel
+      </a>
+      <a *ngIf="powerpointDownloadUrl" [href]="powerpointDownloadUrl" class="download-btn powerpoint" target="_blank" download>
+        <img src="icons/powerpoint.svg" alt="PowerPoint Icon"> Download PowerPoint
+      </a>
+    </div>
+  </div>
 </div>

@@ -11,6 +11,15 @@ h2 {
   margin-bottom: 0.5rem;
 }
 
+.results-section h3, .processing-section h3 {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
 .subtitle {
   font-size: 1rem;
   color: var(--text-secondary);
@@ -70,4 +79,45 @@ h2 {
   text-align: right;
   font-weight: 500;
   color: var(--text-secondary);
+}
+
+.results-section {
+  margin-top: 2rem;
+}
+
+.download-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  color: white;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+
+  &.excel {
+    background-color: #107C41; // Excel Green
+  }
+
+  &.powerpoint {
+    background-color: #D24726; // PowerPoint Orange
+  }
 }

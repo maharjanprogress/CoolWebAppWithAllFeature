@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core';
-import { Client, IMessage, StompSubscription } from '@stomp/stompjs';
+import {Injectable} from '@angular/core';
+import {Client, IMessage, StompSubscription} from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {BehaviorSubject, Observable} from 'rxjs';
-import { environment } from '../../../environments/environment';
+import {environment} from '../../../environments/environment';
 import {SnackbarService} from "../snackbar.service";
 import {SessionService} from "../session.service";
-import {ProgressUpdate} from "../../model/api-responses";
+import {ExcelUploadResponse, JobStatus, ProgressUpdate} from "../../model/api-responses";
 
 @Injectable({
   providedIn: 'root'
@@ -89,13 +89,18 @@ export class WebsocketService {
       '/user/queue/excel-status',
       (message: IMessage) => {
         try {
-          const update: ProgressUpdate = JSON.parse(message.body);
+          const baseResponse: ExcelUploadResponse = JSON.parse(message.body);
+          if (baseResponse.status !== 'SUCCESS' || baseResponse.detail == null) {
+            console.error('Received error status in progress update:', baseResponse.message);
+            return;
+          }
+          const update: ProgressUpdate = baseResponse.detail;
           this.progressSubject.next(update);
 
           // Show snackbar notifications for important status changes
-          if (update.status === 'COMPLETED') {
+          if (update.status === JobStatus.COMPLETED) {
             this.snackbar.show('File processing completed!', 'success', 5);
-          } else if (update.status === 'FAILED') {
+          } else if (update.status === JobStatus.FAILED) {
             this.snackbar.show('File processing failed: ' + update.message, 'error', 5);
           }
         } catch (error) {
