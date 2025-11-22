@@ -70,10 +70,11 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
           this.isProcessing = true;
           this.currentProgress = update.progress;
           this.currentMessage = update.message;
+          //todo: Always Check for completion percentage of files
           if (update.excelComplete && update.progress === 70) {
             this.excelDownloadUrl = environment.apiUrl + update.message;
           }
-          if (update.powerpointComplete) {
+          if (update.powerpointComplete && update.progress === 80) {
             this.powerpointDownloadUrl = environment.apiUrl + update.message;
           }
           if (update.status === JobStatus.COMPLETED || update.status === JobStatus.FAILED) {
