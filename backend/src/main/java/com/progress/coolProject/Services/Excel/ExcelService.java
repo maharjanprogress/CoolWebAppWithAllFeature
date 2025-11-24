@@ -13,21 +13,29 @@ import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xddf.usermodel.XDDFColor;
+import org.apache.poi.xddf.usermodel.text.XDDFTextRun;
+import org.apache.poi.xslf.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.Color;
+import java.awt.Rectangle;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -125,29 +133,31 @@ public class ExcelService implements IExcelService {
                 throw new RuntimeException("No valid data found in the Excel file");
             }
 
-            // Create output directory if not exists
-            sendProgress(job, 50, "Preparing output directory...");
-            createOutputDirectory();
+            // Create output directories
+            sendProgress(job, 40, "Preparing output directories...");
+            createOutputDirectory(OUTPUT_EXCEL_DIRECTORY);
+            createOutputDirectory(OUTPUT_POWERPOINT_DIRECTORY);
 
-            // Generate Nepali Excel file
-            sendProgress(job, 60, "Generating Nepali translation...");
-            String outputFilePath = generateNepaliExcel(rows, job.getUser().getUserName());
+            // Generate Nepali Excel file with 3 sheets
+            sendProgress(job, 50, "Generating Nepali translation with multiple sheets...");
+            String outputExcelPath = generateNepaliExcelWithSheets(rows, job.getUser().getUserName());
+            job.setProcessedExcelFilePath(outputExcelPath);
+            sendProgress(job, 65, outputExcelPath);
 
-            job.setProcessedExcelFilePath(outputFilePath);
+            // Generate PowerPoint presentation
+            sendProgress(job, 70, "Generating PowerPoint presentation...");
+            String outputPptPath = generatePowerPoint(rows, job.getUser().getUserName());
+            job.setProcessedPowerpointFilePath(outputPptPath);
+            sendProgress(job, 85, outputPptPath);
+
             // Complete processing
-            sendProgress(job, 70, outputFilePath);
-
-            //todo: generate powerpoint file and set path to job
-            job.setProcessedPowerpointFilePath(outputFilePath);
-            sendProgress(job, 80, outputFilePath);
-
             job.setStatus(JobStatus.COMPLETED);
             job.setProgress(100);
             job.setCompletedAt(LocalDateTime.now());
-            job.setCurrentStep("File processed successfully. Output: " + outputFilePath);
+            job.setCurrentStep("Files processed successfully!");
             jobRepository.save(job);
 
-            sendStatusUpdate(job, "Processing completed successfully! File saved at: " + outputFilePath);
+            sendStatusUpdate(job, "Processing completed successfully! Excel: " + outputExcelPath + " | PPT: " + outputPptPath);
 
         } catch (Exception e) {
             log.error(e.getMessage(),e);
@@ -274,10 +284,14 @@ public class ExcelService implements IExcelService {
         return dto;
     }
 
-    private String generateNepaliExcel(Map<TrialBalanceEnum, ExcelRowDTO> rowsMap, String username) throws IOException {
-        ExcelTrialBalanceExcelRowHelper excel = new ExcelTrialBalanceExcelRowHelper(rowsMap);
+    /**
+     * Generate Excel file with 3 sheets:
+     * 1. All rows (Nepali)
+     * 2. Credit only rows
+     * 3. Debit only rows
+     */
+    private String generateNepaliExcelWithSheets(Map<TrialBalanceEnum, ExcelRowDTO> rowsMap, String username) throws IOException {
         Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Trial Balance (Nepali)");
 
         // Create header style
         CellStyle headerStyle = workbook.createCellStyle();
@@ -286,44 +300,20 @@ public class ExcelService implements IExcelService {
         headerStyle.setFont(headerFont);
         headerStyle.setAlignment(HorizontalAlignment.CENTER);
 
-        // Create header row
-        Row headerRow = sheet.createRow(0);
-        String[] headers = {"Ledger", "Description", "Debit", "Credit"};
-        for (int i = 0; i < headers.length; i++) {
-            Cell cell = headerRow.createCell(i);
-            cell.setCellValue(headers[i]);
-            cell.setCellStyle(headerStyle);
-        }
+        // Sheet 1: All rows (Nepali)
+        createSheet(workbook, "All Data (Nepali)", rowsMap, headerStyle, null);
 
-        // Populate data rows with Nepali descriptions
-        int rowIdx = 1;
-        for (Map.Entry<TrialBalanceEnum, ExcelRowDTO> entry : rowsMap.entrySet()) {
-            TrialBalanceEnum enumEntry = entry.getKey();
-            ExcelRowDTO dto = entry.getValue();
+        // Sheet 2: Credit only rows
+        Map<TrialBalanceEnum, ExcelRowDTO> creditRows = rowsMap.entrySet().stream()
+                .filter(entry -> entry.getValue().getCredit() != null && entry.getValue().getCredit() > 0)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        createSheet(workbook, "Credit Only", creditRows, headerStyle, null);
 
-            Row row = sheet.createRow(rowIdx++);
-
-            // Ledger No
-            row.createCell(0).setCellValue(dto.getLedgerNo());
-
-            // Nepali Description (directly from enum)
-            row.createCell(1).setCellValue(enumEntry.getDescriptionNp());
-
-            // Debit
-            if (dto.getDebit() != null && dto.getDebit() > 0) {
-                row.createCell(2).setCellValue(dto.getDebit());
-            }
-
-            // Credit
-            if (dto.getCredit() != null && dto.getCredit() > 0) {
-                row.createCell(3).setCellValue(dto.getCredit());
-            }
-        }
-
-        // Auto-size columns
-        for (int i = 0; i < headers.length; i++) {
-            sheet.autoSizeColumn(i);
-        }
+        // Sheet 3: Debit only rows
+        Map<TrialBalanceEnum, ExcelRowDTO> debitRows = rowsMap.entrySet().stream()
+                .filter(entry -> entry.getValue().getDebit() != null && entry.getValue().getDebit() > 0)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        createSheet(workbook, "Debit Only", debitRows, headerStyle, null);
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -338,11 +328,199 @@ public class ExcelService implements IExcelService {
         } finally {
             workbook.close();
         }
-        return Paths.get(StringConstants.FILE_ACCESS_URL,OUTPUT_EXCEL_DIRECTORY, fileName).toString();
+
+        return Paths.get(StringConstants.FILE_ACCESS_URL, OUTPUT_EXCEL_DIRECTORY, fileName).toString();
     }
 
-    private void createOutputDirectory() throws IOException {
-        Path path = Paths.get(StringConstants.FILE_STORAGE_PATH+OUTPUT_EXCEL_DIRECTORY);
+    /**
+     * Helper method to create a sheet with given data
+     */
+    private void createSheet(Workbook workbook, String sheetName,
+                             Map<TrialBalanceEnum, ExcelRowDTO> data,
+                             CellStyle headerStyle, Integer maxRows) {
+        ExcelTrialBalanceExcelRowHelper excel = new ExcelTrialBalanceExcelRowHelper(data);
+        Sheet sheet = workbook.createSheet(sheetName);
+
+        // Create header row
+        Row headerRow = sheet.createRow(0);
+        String[] headers = {"Ledger", "Description", "Debit", "Credit"};
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+
+        // Populate data rows
+        int rowIdx = 1;
+        int count = 0;
+        for (Map.Entry<TrialBalanceEnum, ExcelRowDTO> entry : data.entrySet()) {
+            if (maxRows != null && count >= maxRows) {
+                break;
+            }
+
+            TrialBalanceEnum enumEntry = entry.getKey();
+            ExcelRowDTO dto = entry.getValue();
+
+            Row row = sheet.createRow(rowIdx++);
+
+            row.createCell(0).setCellValue(dto.getLedgerNo());
+            row.createCell(1).setCellValue(enumEntry.getDescriptionNp());
+
+            if (dto.getDebit() != null && dto.getDebit() > 0) {
+                row.createCell(2).setCellValue(dto.getDebit());
+            }
+
+            if (dto.getCredit() != null && dto.getCredit() > 0) {
+                row.createCell(3).setCellValue(dto.getCredit());
+            }
+            count++;
+        }
+        Row row = sheet.createRow(rowIdx+1);
+        row.createCell(1).setCellValue("Total");
+        double result = excel.getDebit(TrialBalanceEnum.KASKUN_REGULAR)+
+                excel.getDebit(TrialBalanceEnum.KRISHI_BIKASH_BANK)+
+                excel.getDebit(TrialBalanceEnum.KASKUN_DAINIK) +
+                excel.getDebit(TrialBalanceEnum.BANK_DEVIDEND_SAVING)+
+                excel.getDebit(TrialBalanceEnum.NEPAL_INV_BANK)+
+                excel.getDebit(TrialBalanceEnum.NATIONAL_COOPERATIVE);
+        row.createCell(2).setCellValue(new BigDecimal(Double.toString(result)).toPlainString());
+
+        // Auto-size columns
+        for (int i = 0; i < headers.length; i++) {
+            sheet.autoSizeColumn(i);
+        }
+    }
+
+    /**
+     * Generate PowerPoint presentation with:
+     * - Slide 1: Title slide
+     * - Slide 2: First 5 rows from Credit sheet
+     * - Slide 3: First 5 rows from Debit sheet
+     */
+    private String generatePowerPoint(Map<TrialBalanceEnum, ExcelRowDTO> rowsMap, String username) throws IOException {
+        XMLSlideShow ppt = new XMLSlideShow();
+
+        // Slide 1: Title Slide
+        XSLFSlide titleSlide = ppt.createSlide();
+        XSLFTextBox titleBox = titleSlide.createTextBox();
+        titleBox.setAnchor(new Rectangle(50, 100, 600, 100));
+        XSLFTextParagraph titlePara = titleBox.addNewTextParagraph();
+        titlePara.setTextAlign(TextParagraph.TextAlign.CENTER);
+        XSLFTextRun titleRun = titlePara.addNewTextRun();
+        titleRun.setText("Nepali Thing");
+        titleRun.setFontSize(44.0);
+        titleRun.setBold(true);
+
+        XSLFTextBox subtitleBox = titleSlide.createTextBox();
+        subtitleBox.setAnchor(new Rectangle(50, 250, 600, 50));
+        XSLFTextParagraph subtitlePara = subtitleBox.addNewTextParagraph();
+        subtitlePara.setTextAlign(TextParagraph.TextAlign.CENTER);
+        XSLFTextRun subtitleRun = subtitlePara.addNewTextRun();
+        subtitleRun.setText("Presented by Progress");
+        subtitleRun.setFontSize(24.0);
+
+        // Filter credit and debit rows
+        List<Map.Entry<TrialBalanceEnum, ExcelRowDTO>> creditRows = rowsMap.entrySet().stream()
+                .filter(entry -> entry.getValue().getCredit() != null && entry.getValue().getCredit() > 0)
+                .limit(5)
+                .collect(Collectors.toList());
+
+        List<Map.Entry<TrialBalanceEnum, ExcelRowDTO>> debitRows = rowsMap.entrySet().stream()
+                .filter(entry -> entry.getValue().getDebit() != null && entry.getValue().getDebit() > 0)
+                .limit(5)
+                .collect(Collectors.toList());
+
+        // Slide 2: Credit Data (First 5 rows)
+        createDataSlide(ppt, "Credit Entries (Top 5)", creditRows, true);
+
+        // Slide 3: Debit Data (First 5 rows)
+        createDataSlide(ppt, "Debit Entries (Top 5)", debitRows, false);
+
+        // Generate output file path
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
+        String fileName = username + "_trial_balance_" + timestamp + ".pptx";
+        String filePath = Paths.get(StringConstants.FILE_STORAGE_PATH,
+                OUTPUT_POWERPOINT_DIRECTORY,
+                fileName).toString();
+
+        // Write to file
+        try (FileOutputStream out = new FileOutputStream(filePath)) {
+            ppt.write(out);
+        } finally {
+            ppt.close();
+        }
+
+        return Paths.get(StringConstants.FILE_ACCESS_URL, OUTPUT_POWERPOINT_DIRECTORY, fileName).toString();
+    }
+
+    /**
+     * Create a slide with table data
+     */
+    private void createDataSlide(XMLSlideShow ppt, String title,
+                                 List<Map.Entry<TrialBalanceEnum, ExcelRowDTO>> data,
+                                 boolean isCredit) {
+        XSLFSlide slide = ppt.createSlide();
+
+        // Add title
+        XSLFTextBox titleBox = slide.createTextBox();
+        titleBox.setAnchor(new Rectangle(50, 20, 600, 50));
+        XSLFTextParagraph titlePara = titleBox.addNewTextParagraph();
+        titlePara.setTextAlign(TextParagraph.TextAlign.CENTER);
+        XSLFTextRun titleRun = titlePara.addNewTextRun();
+        titleRun.setText(title);
+        titleRun.setFontSize(32.0);
+        titleRun.setBold(true);
+
+        // Create table (4 columns: Ledger, Description, Debit, Credit)
+        int numRows = data.size() + 1; // +1 for header
+        int numCols = 4;
+        XSLFTable table = slide.createTable(numRows, numCols);
+        table.setAnchor(new Rectangle(50, 100, 600, 300));
+
+        // Set column widths
+        table.setColumnWidth(0, 80);  // Ledger
+        table.setColumnWidth(1, 300); // Description
+        table.setColumnWidth(2, 110); // Debit
+        table.setColumnWidth(3, 110); // Credit
+
+        // Header row
+        String[] headers = {"Ledger", "Description", "Debit", "Credit"};
+        for (int col = 0; col < numCols; col++) {
+            XSLFTableCell cell = table.getCell(0, col);
+            cell.setText(headers[col]);
+            cell.setFillColor(new Color(79, 129, 189));
+            XDDFTextRun run = cell.getTextBody().getParagraphs().getFirst().getTextRuns().getFirst();
+            run.setBold(true);
+            run.setFontColor(XDDFColor.from(125, 125, 125));
+        }
+
+        // Data rows
+        int rowIdx = 1;
+        for (Map.Entry<TrialBalanceEnum, ExcelRowDTO> entry : data) {
+            TrialBalanceEnum enumEntry = entry.getKey();
+            ExcelRowDTO dto = entry.getValue();
+
+            table.getCell(rowIdx, 0).setText(String.valueOf(dto.getLedgerNo()));
+            table.getCell(rowIdx, 1).setText(enumEntry.getDescriptionNp());
+
+            if (dto.getDebit() != null && dto.getDebit() > 0) {
+                table.getCell(rowIdx, 2).setText(String.format("%.2f", dto.getDebit()));
+            } else {
+                table.getCell(rowIdx, 2).setText("-");
+            }
+
+            if (dto.getCredit() != null && dto.getCredit() > 0) {
+                table.getCell(rowIdx, 3).setText(String.format("%.2f", dto.getCredit()));
+            } else {
+                table.getCell(rowIdx, 3).setText("-");
+            }
+
+            rowIdx++;
+        }
+    }
+
+    private void createOutputDirectory(String directoryName) throws IOException {
+        Path path = Paths.get(StringConstants.FILE_STORAGE_PATH, directoryName);
         log.info("Checking/Creating output directory at: {}", path);
         if (!Files.exists(path)) {
             Files.createDirectories(path);
