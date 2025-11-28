@@ -301,19 +301,19 @@ public class ExcelService implements IExcelService {
         headerStyle.setAlignment(HorizontalAlignment.CENTER);
 
         // Sheet 1: All rows (Nepali)
-        createSheet(workbook, "All Data (Nepali)", rowsMap, headerStyle, null);
+        createSheet(workbook, "All Data (Nepali)", rowsMap, headerStyle);
 
         // Sheet 2: Credit only rows
         Map<TrialBalanceEnum, ExcelRowDTO> creditRows = rowsMap.entrySet().stream()
                 .filter(entry -> entry.getValue().getCredit() != null && entry.getValue().getCredit() > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        createSheet(workbook, "Credit Only", creditRows, headerStyle, null);
+        createSheet(workbook, "Credit Only", creditRows, headerStyle);
 
         // Sheet 3: Debit only rows
         Map<TrialBalanceEnum, ExcelRowDTO> debitRows = rowsMap.entrySet().stream()
                 .filter(entry -> entry.getValue().getDebit() != null && entry.getValue().getDebit() > 0)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        createSheet(workbook, "Debit Only", debitRows, headerStyle, null);
+        createSheet(workbook, "Debit Only", debitRows, headerStyle);
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -337,7 +337,7 @@ public class ExcelService implements IExcelService {
      */
     private void createSheet(Workbook workbook, String sheetName,
                              Map<TrialBalanceEnum, ExcelRowDTO> data,
-                             CellStyle headerStyle, Integer maxRows) {
+                             CellStyle headerStyle) {
         ExcelTrialBalanceExcelRowHelper excel = new ExcelTrialBalanceExcelRowHelper(data);
         Sheet sheet = workbook.createSheet(sheetName);
 
@@ -352,11 +352,7 @@ public class ExcelService implements IExcelService {
 
         // Populate data rows
         int rowIdx = 1;
-        int count = 0;
         for (Map.Entry<TrialBalanceEnum, ExcelRowDTO> entry : data.entrySet()) {
-            if (maxRows != null && count >= maxRows) {
-                break;
-            }
 
             TrialBalanceEnum enumEntry = entry.getKey();
             ExcelRowDTO dto = entry.getValue();
@@ -373,7 +369,6 @@ public class ExcelService implements IExcelService {
             if (dto.getCredit() != null && dto.getCredit() > 0) {
                 row.createCell(3).setCellValue(dto.getCredit());
             }
-            count++;
         }
         Row row = sheet.createRow(rowIdx+1);
         row.createCell(1).setCellValue("Total");
@@ -431,10 +426,10 @@ public class ExcelService implements IExcelService {
                 .collect(Collectors.toList());
 
         // Slide 2: Credit Data (First 5 rows)
-        createDataSlide(ppt, "Credit Entries (Top 5)", creditRows, true);
+        createDataSlide(ppt, "Credit Entries (Top 5)", creditRows);
 
         // Slide 3: Debit Data (First 5 rows)
-        createDataSlide(ppt, "Debit Entries (Top 5)", debitRows, false);
+        createDataSlide(ppt, "Debit Entries (Top 5)", debitRows);
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -457,8 +452,7 @@ public class ExcelService implements IExcelService {
      * Create a slide with table data
      */
     private void createDataSlide(XMLSlideShow ppt, String title,
-                                 List<Map.Entry<TrialBalanceEnum, ExcelRowDTO>> data,
-                                 boolean isCredit) {
+                                 List<Map.Entry<TrialBalanceEnum, ExcelRowDTO>> data) {
         XSLFSlide slide = ppt.createSlide();
 
         // Add title
