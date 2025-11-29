@@ -1,7 +1,10 @@
 package com.progress.coolProject.Services.Excel;
 
+import com.ibm.icu.text.NumberFormat;
+import com.ibm.icu.util.ULocale;
 import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
+import com.progress.coolProject.DTO.Excel.Slides.SlideOne;
 import com.progress.coolProject.DTO.ResponseDTO;
 import com.progress.coolProject.Entity.Excel.ProcessingJob;
 import com.progress.coolProject.Entity.User;
@@ -395,6 +398,15 @@ public class ExcelService implements IExcelService {
     private String generatePowerPoint(Map<TrialBalanceEnum, ExcelRowDTO> rowsMap, String username) throws IOException {
         XMLSlideShow ppt = new XMLSlideShow();
 
+        ExcelTrialBalanceExcelRowHelper excel = new ExcelTrialBalanceExcelRowHelper(rowsMap);
+
+//        todo: Remove this.... just for test
+        NumberFormat nf = NumberFormat.getInstance(new ULocale("ne_NP"));
+        nf.setMinimumFractionDigits(2);
+
+        String formatted = nf.format(SlideOne.getReserveFund(excel));
+        System.out.println(formatted);
+
         // Slide 1: Title Slide
         XSLFSlide titleSlide = ppt.createSlide();
         XSLFTextBox titleBox = titleSlide.createTextBox();
@@ -414,22 +426,7 @@ public class ExcelService implements IExcelService {
         subtitleRun.setText("Presented by Progress");
         subtitleRun.setFontSize(24.0);
 
-        // Filter credit and debit rows
-        List<Map.Entry<TrialBalanceEnum, ExcelRowDTO>> creditRows = rowsMap.entrySet().stream()
-                .filter(entry -> entry.getValue().getCredit() != null && entry.getValue().getCredit() > 0)
-                .limit(5)
-                .collect(Collectors.toList());
-
-        List<Map.Entry<TrialBalanceEnum, ExcelRowDTO>> debitRows = rowsMap.entrySet().stream()
-                .filter(entry -> entry.getValue().getDebit() != null && entry.getValue().getDebit() > 0)
-                .limit(5)
-                .collect(Collectors.toList());
-
-        // Slide 2: Credit Data (First 5 rows)
-        createDataSlide(ppt, "Credit Entries (Top 5)", creditRows);
-
-        // Slide 3: Debit Data (First 5 rows)
-        createDataSlide(ppt, "Debit Entries (Top 5)", debitRows);
+        SlideOne.createDataSlide(ppt, "पहिलो त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
