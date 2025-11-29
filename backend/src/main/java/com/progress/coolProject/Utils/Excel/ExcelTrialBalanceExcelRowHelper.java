@@ -22,6 +22,24 @@ public class ExcelTrialBalanceExcelRowHelper {
         return credit;
     }
 
+    public Double getCreditSum(TrialBalanceEnum... enumKeys) {
+        double sum = 0.0;
+        for (TrialBalanceEnum key : enumKeys) {
+            sum += getCredit(key);
+        }
+        return sum;
+    }
+
+    public Double getTotalCredit() {
+        double total = 0.0;
+        for (ExcelRowDTO row : rowsMap.values()) {
+            if (row.getCredit() != null) {
+                total += row.getCredit();
+            }
+        }
+        return total;
+    }
+
     public Double getDebit(TrialBalanceEnum enumKey) {
         ExcelRowDTO row = rowsMap.get(enumKey);
         double debit;
@@ -31,5 +49,23 @@ public class ExcelTrialBalanceExcelRowHelper {
             debit = 0.0;
         }
         return debit;
+    }
+
+    public Double getDebitSum(TrialBalanceEnum... enumKeys) {
+        double sum = 0.0;
+        for (TrialBalanceEnum key : enumKeys) {
+            sum += getDebit(key);
+        }
+        return sum;
+    }
+
+    public Double getTotalDebit() {
+        double total = 0.0;
+        for (ExcelRowDTO row : rowsMap.values()) {
+            if (row.getDebit() != null) {
+                total += row.getDebit();
+            }
+        }
+        return total;
     }
 }
