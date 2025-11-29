@@ -1,11 +1,8 @@
 package com.progress.coolProject.DTO.Excel.Slides;
 
-import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import lombok.experimental.UtilityClass;
-
-import java.util.Map;
 
 @UtilityClass
 public final class SlideOne {
