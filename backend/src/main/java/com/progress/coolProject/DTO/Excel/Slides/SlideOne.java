@@ -4,6 +4,7 @@ import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
+import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
 import lombok.experimental.UtilityClass;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.sl.usermodel.VerticalAlignment;
@@ -101,8 +102,6 @@ public final class SlideOne {
                 + getOtherLiability(excel) + getProfitLossLeft(excel);
     }
 
-//    todo: complete the right side functions
-
     public static Double getCash(ExcelTrialBalanceExcelRowHelper excel) {
         return excel.getDebitSum(TrialBalanceEnum.CASH);
     }
@@ -171,40 +170,16 @@ public final class SlideOne {
         NumberFormat nepaliFormat = NumberFormat.getInstance(new ULocale("ne_NP"));
         nepaliFormat.setMinimumFractionDigits(2);
 
-        // Add slide title with yellow background (top)
-        XSLFTextBox slideTitleBox = slide.createTextBox();
-        slideTitleBox.setAnchor(new Rectangle(0, 0, 720, 50));
-        slideTitleBox.setFillColor(new Color(255, 204, 102)); // Yellow background
-
-        XSLFTextParagraph slideTitlePara = slideTitleBox.addNewTextParagraph();
-        slideTitlePara.setTextAlign(TextParagraph.TextAlign.CENTER);
-        XSLFTextRun slideTitleRun = slideTitlePara.addNewTextRun();
-        slideTitleRun.setText(slideTitle);
-        slideTitleRun.setFontSize(18.0);
-        slideTitleRun.setBold(true);
-        slideTitleRun.setFontColor(Color.BLACK);
-
-        // Add table title with blue background (below slide title)
-        XSLFTextBox tableTitleBox = slide.createTextBox();
-        tableTitleBox.setAnchor(new Rectangle(0, 50, 720, 40));
-        tableTitleBox.setFillColor(new Color(79, 129, 189)); // Blue background
-
-        XSLFTextParagraph tableTitlePara = tableTitleBox.addNewTextParagraph();
-        tableTitlePara.setTextAlign(TextParagraph.TextAlign.CENTER);
-        XSLFTextRun tableTitleRun = tableTitlePara.addNewTextRun();
-        tableTitleRun.setText(FIRST_ROW_TITLE);
-        tableTitleRun.setFontSize(16.0);
-        tableTitleRun.setBold(false);
-        tableTitleRun.setFontColor(Color.WHITE);
+        PPTUtils.makeTitleForSlide(slide, slideTitle);
 
         // Create table structure: 2 main sections (left and right)
         // Left: Capital & Liability | Amount | Percentage
         // Right: Assets | Amount | Percentage
-        int numRows = 10; // 1 header + 8 data rows + 1 total row
+        int numRows = 11; // 1 header + 8 data rows + 1 total row
         int numCols = 6;  // 3 columns for left section + 3 columns for right section
 
         XSLFTable table = slide.createTable(numRows, numCols);
-        table.setAnchor(new Rectangle(20, 110, 680, 400));
+        table.setAnchor(new Rectangle(20, 60, 680, 400));
 
         // Set column widths
         table.setColumnWidth(0, 150); // Left - Description
@@ -213,6 +188,21 @@ public final class SlideOne {
         table.setColumnWidth(3, 150); // Right - Description
         table.setColumnWidth(4, 90);  // Right - Amount
         table.setColumnWidth(5, 80);  // Right - Percentage
+
+        // ROW 0: Merged title row (merge all 6 cells)
+        XSLFTableCell mergedCell = table.getCell(0, 0);
+        mergedCell.setText(FIRST_ROW_TITLE);
+        mergedCell.setFillColor(new Color(79, 129, 189)); // Blue background
+        mergedCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
+
+        table.mergeCells(0, 0, 0, 5); // (firstRow, lastRow, firstCol, lastCol)
+
+        XDDFTextParagraph mergedPara = mergedCell.getTextBody().getParagraphs().getFirst();
+        mergedPara.setTextAlignment(TextAlignment.CENTER);
+        XDDFTextRun mergedRun = mergedPara.getTextRuns().getFirst();
+        mergedRun.setBold(true);
+        mergedRun.setFontSize(14.0);
+        mergedRun.setFontColor(XDDFColor.from(255, 255, 255)); // White text
 
         // Style for header cells (yellow background)
         Color headerYellow = new Color(255, 255, 0);
@@ -224,7 +214,7 @@ public final class SlideOne {
         };
 
         for (int col = 0; col < numCols; col++) {
-            XSLFTableCell cell = table.getCell(0, col);
+            XSLFTableCell cell = table.getCell(1, col);
             cell.setText(headers[col]);
             cell.setFillColor(headerYellow);
             cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
@@ -243,55 +233,55 @@ public final class SlideOne {
         Double totalRight = getTotalRight(data);
 
         // Row 1: Share Capital
-        int row = 1;
+        int row = 2;
         fillLeftSection(table, row, ROW_SHARE_CAPITAL, getShareCapital(data),
                 totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
         fillRightSection(table, row, ROW_CASH, getCash(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 2: Reserve Fund
-        row = 2;
+        row = 3;
         fillLeftSection(table, row, ROW_RESERVE_FUND, getReserveFund(data),
                 totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
         fillRightSection(table, row, ROW_BANK, getBank(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 3: Other Funds
-        row = 3;
+        row = 4;
         fillLeftSection(table, row, ROW_OTHER_FUND, getOtherFunds(data),
                 totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
         fillRightSection(table, row, ROW_INVESTMENT, getInvestment(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 4: Savings Deposit
-        row = 4;
+        row = 5;
         fillLeftSection(table, row, ROW_SAVINGS_DEPOSIT, getSavingsDeposit(data),
                 totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
         fillRightSection(table, row, ROW_LOAN_TO_MEMBERS, getLoanToMembers(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 5: Grant
-        row = 5;
+        row = 6;
         fillLeftSection(table, row, ROW_GRANT, getGrant(data),
                 totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
         fillRightSection(table, row, ROW_RECEIVABLE, getReceivable(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 6: Payable
-        row = 6;
+        row = 7;
         fillLeftSection(table, row, ROW_PAYABLE, getPayable(data),
                 totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
         fillRightSection(table, row, ROW_FIXED_ASSETS, getFixedAssets(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 7: Other Liability
-        row = 7;
+        row = 8;
         fillLeftSection(table, row, ROW_OTHER_LIABILITY, getOtherLiability(data),
                 totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
         fillRightSection(table, row, ROW_OTHER_ASSETS, getOtherAssets(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 8: Profit/Loss
-        row = 8;
+        row = 9;
         fillLeftSection(table, row, ROW_PROFIT_LOSS_LEFT, getProfitLossLeft(data),
                 totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
         fillRightSection(table, row, ROW_PROFIT_LOSS_RIGHT, getProfitLossRight(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 9: Total (blue background)
-        row = 9;
+        row = 10;
         Color totalBlue = new Color(79, 129, 189);
 
         fillLeftSection(table, row, ROW_TOTAL_LEFT, totalLeft,
