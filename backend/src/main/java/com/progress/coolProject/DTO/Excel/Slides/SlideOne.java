@@ -154,7 +154,7 @@ public final class SlideOne {
     }
 
     public static Double getProfitLossRight(ExcelTrialBalanceExcelRowHelper excel) {
-        return 610876.02;
+        return excel.getDebitSum(TrialBalanceEnum.CURRENT_YEAR_PROFIT_LOSS);
     }
 
     public static Double getTotalRight(ExcelTrialBalanceExcelRowHelper excel) {
