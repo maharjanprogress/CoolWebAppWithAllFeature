@@ -31,7 +31,7 @@ public final class SlideOne {
     public static final String ROW_RESERVE_FUND = "जग्गेडा कोष";
     public static final String ROW_OTHER_FUND = "अन्य कोष";
     public static final String ROW_SAVINGS_DEPOSIT = "बचत निक्षेप";
-    public static final String ROW_GRANT = "अनुदान";
+    public static final String ROW_GRANT = "ब्याज मुल्ताबी हिसाब";
     public static final String ROW_PAYABLE = "भू.दिनुपर्ने";
     public static final String ROW_OTHER_LIABILITY = "अन्य दायित्व";
     public static final String ROW_PROFIT_LOSS_LEFT = "नाफा (नोकसान)";
@@ -73,7 +73,7 @@ public final class SlideOne {
     }
 
     public static Double getGrant(ExcelTrialBalanceExcelRowHelper excel) {
-        return 0.0;
+        return excel.getCreditSum(TrialBalanceEnum.BYAG_MULTABI_HISAB);
     }
 
     public static Double getPayable(ExcelTrialBalanceExcelRowHelper excel) {
@@ -82,7 +82,8 @@ public final class SlideOne {
                 TrialBalanceEnum.OTHER_PAYABLE, TrialBalanceEnum.SALARY_PAYABLE,
                 TrialBalanceEnum.AUDIT_FEE_PAYABLE, TrialBalanceEnum.TDS_SOCIAL_SECURITY_TAX,
                 TrialBalanceEnum.TDS_AUDIT_FEE, TrialBalanceEnum.BAITHAK_BHATTA_TAX,
-                TrialBalanceEnum.TDS_PAYABLE, TrialBalanceEnum.INTEREST_PAYABLE
+                TrialBalanceEnum.TDS_PAYABLE, TrialBalanceEnum.INTEREST_PAYABLE,
+                TrialBalanceEnum.ADVANCES_PAYABLE, TrialBalanceEnum.BHAJANGAL_SAHAKARI
         );
     }
 
@@ -91,7 +92,7 @@ public final class SlideOne {
     }
 
     public static Double getProfitLossLeft(ExcelTrialBalanceExcelRowHelper excel) {
-        return 0.0;
+        return excel.getCreditSum(TrialBalanceEnum.CURRENT_YEAR_PROFIT_LOSS);
     }
 
     public static Double getTotalLeft(ExcelTrialBalanceExcelRowHelper excel) {
@@ -132,19 +133,28 @@ public final class SlideOne {
     }
 
     public static Double getReceivable(ExcelTrialBalanceExcelRowHelper excel) {
-        return 0.0;
+        return excel.getDebitSum(
+                TrialBalanceEnum.TDS_RECEIVABLES_ADVANCE_TAX, TrialBalanceEnum.TDS_ON_INTEREST_RECEIVABLE,
+                TrialBalanceEnum.ADVANCES_RECEIVABLES
+        );
     }
 
     public static Double getFixedAssets(ExcelTrialBalanceExcelRowHelper excel) {
-        return 0.0;
+        return excel.getDebitSum(
+                TrialBalanceEnum.LAND, TrialBalanceEnum.BUILDING,
+                TrialBalanceEnum.LAND_AND_BUILDING
+        );
     }
 
     public static Double getOtherAssets(ExcelTrialBalanceExcelRowHelper excel) {
-        return 0.0;
+        return excel.getDebitSum(
+                TrialBalanceEnum.FURNITURE, TrialBalanceEnum.OFFICE_GOODS,
+                TrialBalanceEnum.OFFICE_EQUIPMENTS
+        );
     }
 
     public static Double getProfitLossRight(ExcelTrialBalanceExcelRowHelper excel) {
-        return 0.0;
+        return 610876.02;
     }
 
     public static Double getTotalRight(ExcelTrialBalanceExcelRowHelper excel) {

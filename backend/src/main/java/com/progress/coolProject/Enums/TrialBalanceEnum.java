@@ -103,7 +103,7 @@ public enum TrialBalanceEnum {
     INTEREST_PAYABLE(9036, "Interest Payable", "ब्याज तिर्नुपर्ने"),
     OTHER_LIABILITIES(9038, "Other Liabilities", "अन्य दायित्व"),
     NATIONAL_COOPERATIVE(9040, "National Co-operative Bank Ltd.", "राष्ट्रिय सहकारी"),
-    ADVANCES_RECEIVAL(9057, "Advances Receivables", "अग्रिम प्राप्ति"),
+    ADVANCES_RECEIVABLES(9057, "Advances Receivables", "अग्रिम प्राप्ति"),
     TDS_RECEIVABLES_ADVANCE_TAX(9063, "TDS Receivables & Advance Tax", "टीडीएस प्राप्य र अग्रिम कर"),
     LAND_AND_BUILDING(9066, "Land & Building", "जग्गा तथा भवन"),
     OFFICE_EQUIPMENTS(9067, "Office Equipments", "कार्यालय उपकरण"),
