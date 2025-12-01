@@ -102,7 +102,56 @@ public final class SlideOne {
 
 //    todo: complete the right side functions
 
+    public static Double getCash(ExcelTrialBalanceExcelRowHelper excel) {
+        return excel.getDebitSum(TrialBalanceEnum.CASH);
+    }
 
+    public static Double getBank(ExcelTrialBalanceExcelRowHelper excel) {
+        return excel.getDebitSum(
+                TrialBalanceEnum.KASKUN_REGULAR,
+                TrialBalanceEnum.KRISHI_BIKASH_BANK, TrialBalanceEnum.KASKUN_DAINIK,
+                TrialBalanceEnum.BANK_DEVIDEND_SAVING, TrialBalanceEnum.NEPAL_INV_BANK,
+                TrialBalanceEnum.KASKUN_TIME_SAVING, TrialBalanceEnum.SANIMA_BANK,
+                TrialBalanceEnum.RSB_TIME_SAVING, TrialBalanceEnum.NATIONAL_COOPERATIVE,
+                TrialBalanceEnum.NEFSCUN_REGULAR_SAVING
+        );
+    }
+
+    public static Double getInvestment(ExcelTrialBalanceExcelRowHelper excel) {
+        return excel.getDebitSum(
+                TrialBalanceEnum.SHARE_NEFSCUN, TrialBalanceEnum.SHARE_INVEST_NCBL,
+                TrialBalanceEnum.SHARE_JILLA_SAHAKARI, TrialBalanceEnum.SHARE_KASKUN
+
+        );
+    }
+
+    public static Double getLoanToMembers(ExcelTrialBalanceExcelRowHelper excel) {
+        return excel.getDebitSum(
+                TrialBalanceEnum.LOAN_ACCOUNT
+        );
+    }
+
+    public static Double getReceivable(ExcelTrialBalanceExcelRowHelper excel) {
+        return 0.0;
+    }
+
+    public static Double getFixedAssets(ExcelTrialBalanceExcelRowHelper excel) {
+        return 0.0;
+    }
+
+    public static Double getOtherAssets(ExcelTrialBalanceExcelRowHelper excel) {
+        return 0.0;
+    }
+
+    public static Double getProfitLossRight(ExcelTrialBalanceExcelRowHelper excel) {
+        return 0.0;
+    }
+
+    public static Double getTotalRight(ExcelTrialBalanceExcelRowHelper excel) {
+        return getCash(excel) + getBank(excel) + getInvestment(excel)
+                + getLoanToMembers(excel) + getReceivable(excel) + getFixedAssets(excel)
+                + getOtherAssets(excel) + getProfitLossRight(excel);
+    }
 
     public static void createDataSlide(XMLSlideShow ppt, String slideTitle,
                                        ExcelTrialBalanceExcelRowHelper data) {
@@ -111,7 +160,6 @@ public final class SlideOne {
         // Configure Nepali number formatter
         NumberFormat nepaliFormat = NumberFormat.getInstance(new ULocale("ne_NP"));
         nepaliFormat.setMinimumFractionDigits(2);
-        nepaliFormat.setMaximumFractionDigits(2);
 
         // Add slide title with yellow background (top)
         XSLFTextBox slideTitleBox = slide.createTextBox();
@@ -181,62 +229,65 @@ public final class SlideOne {
         // Data rows (alternating white and light blue)
         Color lightBlue = new Color(217, 225, 242);
 
+        Double totalLeft = getTotalLeft(data);
+        Double totalRight = getTotalRight(data);
+
         // Row 1: Share Capital
         int row = 1;
         fillLeftSection(table, row, ROW_SHARE_CAPITAL, getShareCapital(data),
-                getTotalLeft(data), nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_CASH, 0.0, 0.0, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+        fillRightSection(table, row, ROW_CASH, getCash(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 2: Reserve Fund
         row = 2;
         fillLeftSection(table, row, ROW_RESERVE_FUND, getReserveFund(data),
-                getTotalLeft(data), nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_BANK, 0.0, 0.0, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+        fillRightSection(table, row, ROW_BANK, getBank(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 3: Other Funds
         row = 3;
         fillLeftSection(table, row, ROW_OTHER_FUND, getOtherFunds(data),
-                getTotalLeft(data), nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_INVESTMENT, 0.0, 0.0, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+        fillRightSection(table, row, ROW_INVESTMENT, getInvestment(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 4: Savings Deposit
         row = 4;
         fillLeftSection(table, row, ROW_SAVINGS_DEPOSIT, getSavingsDeposit(data),
-                getTotalLeft(data), nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_LOAN_TO_MEMBERS, 0.0, 0.0, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+        fillRightSection(table, row, ROW_LOAN_TO_MEMBERS, getLoanToMembers(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 5: Grant
         row = 5;
         fillLeftSection(table, row, ROW_GRANT, getGrant(data),
-                getTotalLeft(data), nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_RECEIVABLE, 0.0, 0.0, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+        fillRightSection(table, row, ROW_RECEIVABLE, getReceivable(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 6: Payable
         row = 6;
         fillLeftSection(table, row, ROW_PAYABLE, getPayable(data),
-                getTotalLeft(data), nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_FIXED_ASSETS, 0.0, 0.0, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+        fillRightSection(table, row, ROW_FIXED_ASSETS, getFixedAssets(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 7: Other Liability
         row = 7;
         fillLeftSection(table, row, ROW_OTHER_LIABILITY, getOtherLiability(data),
-                getTotalLeft(data), nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_OTHER_ASSETS, 0.0, 0.0, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+        fillRightSection(table, row, ROW_OTHER_ASSETS, getOtherAssets(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 8: Profit/Loss
         row = 8;
         fillLeftSection(table, row, ROW_PROFIT_LOSS_LEFT, getProfitLossLeft(data),
-                getTotalLeft(data), nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_PROFIT_LOSS_RIGHT, 0.0, 0.0, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+        fillRightSection(table, row, ROW_PROFIT_LOSS_RIGHT, getProfitLossRight(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
 
         // Row 9: Total (blue background)
         row = 9;
         Color totalBlue = new Color(79, 129, 189);
-        Double totalLeft = getTotalLeft(data);
 
         fillLeftSection(table, row, ROW_TOTAL_LEFT, totalLeft,
                 totalLeft, nepaliFormat, totalBlue);
-        fillRightSection(table, row, ROW_TOTAL_RIGHT, 0.0, 0.0, nepaliFormat, totalBlue);
+        fillRightSection(table, row, ROW_TOTAL_RIGHT, totalRight,
+                totalRight, nepaliFormat, totalBlue);
 
         // Make total row text white and bold
         for (int col = 0; col < numCols; col++) {
