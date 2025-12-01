@@ -22,7 +22,7 @@ public class TestController {
         // Simulate processing delay
         Thread.sleep(1000);
         System.out.println(message);
-        return "Server receives: " + message;
+        return "Test Server receives: " + message;
     }
 
 }
