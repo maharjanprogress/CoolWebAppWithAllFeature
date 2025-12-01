@@ -375,7 +375,7 @@ public class ExcelService implements IExcelService {
         }
         Row row = sheet.createRow(rowIdx+1);
         row.createCell(1).setCellValue("Total");
-        double result = excel.getDebit(TrialBalanceEnum.KASKUN_REGULAR)+
+        double result = excel.getDebit(TrialBalanceEnum.KASKUN_REGULAR_SAVING)+
                 excel.getDebit(TrialBalanceEnum.KRISHI_BIKASH_BANK)+
                 excel.getDebit(TrialBalanceEnum.KASKUN_DAINIK) +
                 excel.getDebit(TrialBalanceEnum.BANK_DEVIDEND_SAVING)+

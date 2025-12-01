@@ -108,7 +108,7 @@ public final class SlideOne {
 
     public static Double getBank(ExcelTrialBalanceExcelRowHelper excel) {
         return excel.getDebitSum(
-                TrialBalanceEnum.KASKUN_REGULAR,
+                TrialBalanceEnum.KASKUN_REGULAR_SAVING,
                 TrialBalanceEnum.KRISHI_BIKASH_BANK, TrialBalanceEnum.KASKUN_DAINIK,
                 TrialBalanceEnum.BANK_DEVIDEND_SAVING, TrialBalanceEnum.NEPAL_INV_BANK,
                 TrialBalanceEnum.KASKUN_TIME_SAVING, TrialBalanceEnum.SANIMA_BANK,

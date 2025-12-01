@@ -60,7 +60,7 @@ public enum TrialBalanceEnum {
     SAVING_ACCOUNT(4001, "Saving Account", "बचत खाता"),
     SANJAL_MEMBER_FEE(4747, "Sanjal member fee", "सञ्जाल सदस्य शुल्क"),
     CASH(5001, "Cash", "नगद"),
-    KASKUN_REGULAR(5003, "KASKUN REGULAR SAVING", "कास्कुन नियमित"),
+    KASKUN_REGULAR_SAVING(5003, "KASKUN REGULAR SAVING", "कास्कुन नियमित"),
     KRISHI_BIKASH_BANK(5005, "KRISHI BIKASH BANK", "कृषि विकास बैंक"),
     SHARE_INVEST_NCBL(5006, "SHARE INVEST NCBL", "शेयर लगानी एनसीई"),
     KASKUN_DAINIK(5007, "KASKUN DAILY SAVING", "कास्कुन दैनिक"),
