@@ -31,9 +31,13 @@
   }
 
   &:hover, &.dragging {
-    background-color: var(--primary-light-alpha, rgba(124, 58, 237, 0.05)); // Fallback color
+    background-color: var(--primary-light-alpha, rgba(124, 58, 237, 0.05));
     border-color: var(--primary);
   }
+}
+
+.files-container {
+  width: 100%;
 }
 
 .file-preview {
@@ -43,12 +47,14 @@
   background-color: var(--surface-alt);
   border: 1px solid var(--border);
   border-radius: 8px;
+  margin-bottom: 0.5rem;
 }
 
 .file-icon {
   width: 40px;
   height: 40px;
   margin-right: 1rem;
+  flex-shrink: 0;
 }
 
 .file-details {
@@ -80,9 +86,59 @@
   padding: 0 0.5rem;
   line-height: 1;
   margin-left: 1rem;
+  flex-shrink: 0;
 
   &:hover {
     color: var(--error);
+  }
+}
+
+// Multiple files specific styles
+.multiple-files {
+  .files-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 0.5rem 0;
+
+    span {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .clear-all-btn {
+      background: none;
+      border: 1px solid var(--error);
+      color: var(--error);
+      padding: 0.4rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: var(--error);
+        color: white;
+      }
+    }
+  }
+
+  .add-more-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--surface-alt);
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    color: var(--primary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--primary-light-alpha, rgba(124, 58, 237, 0.05));
+      border-color: var(--primary);
+    }
   }
 }
 

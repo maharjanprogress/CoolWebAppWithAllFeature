@@ -12,26 +12,27 @@ import {SnackbarService} from "../../../../services/snackbar.service";
 })
 export class FileUploadComponent {
   @Input() onlyInclude: FileType[] = [];
+  @Input() singleFile: boolean = true; // NEW: Default to single file mode
 
-  selectedFile: File | null = null;
-  fileIcon = '';
+  // Changed to support multiple files
+  selectedFiles: File[] = [];
   isDragging = false;
 
   constructor(private snackbar: SnackbarService) {}
 
   onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.handleFile(file);
+    const files = Array.from(event.target.files) as File[];
+    if (files.length > 0) {
+      this.handleFiles(files);
     }
   }
 
   onDrop(event: DragEvent) {
     event.preventDefault();
     this.isDragging = false;
-    const file = event.dataTransfer?.files[0];
-    if (file) {
-      this.handleFile(file);
+    const files = Array.from(event.dataTransfer?.files || []) as File[];
+    if (files.length > 0) {
+      this.handleFiles(files);
     }
   }
 
@@ -45,35 +46,59 @@ export class FileUploadComponent {
     this.isDragging = false;
   }
 
-  handleFile(file: File) {
-    if (this.onlyInclude.length > 0 && !this.onlyInclude.includes(file.type as FileType)) {
-      const allowedExtensions = this.onlyInclude.map(type => fileTypeExtensions[type]?.join(', ')).join(', ');
-      this.snackbar.show(`Invalid file type. Please upload one of: ${allowedExtensions}`, 'error', 4);
-      return;
+  handleFiles(files: File[]) {
+    // Validate file types
+    const validFiles: File[] = [];
+    for (const file of files) {
+      if (this.onlyInclude.length > 0 && !this.onlyInclude.includes(file.type as FileType)) {
+        const allowedExtensions = this.onlyInclude.map(type => fileTypeExtensions[type]?.join(', ')).join(', ');
+        this.snackbar.show(`Invalid file type for ${file.name}. Allowed: ${allowedExtensions}`, 'error', 4);
+        continue;
+      }
+      validFiles.push(file);
     }
-    this.selectedFile = file;
-    this.fileIcon = fileTypeIcons[file.type] || fileTypeIcons['default'];
+
+    if (validFiles.length === 0) return;
+
+    // Single file mode: replace existing file
+    if (this.singleFile) {
+      this.selectedFiles = [validFiles[0]];
+    } else {
+      // Multiple file mode: add to existing files
+      this.selectedFiles.push(...validFiles);
+    }
   }
 
-  removeFile() {
-    this.selectedFile = null;
-    this.fileIcon = '';
+  removeFile(index: number) {
+    this.selectedFiles.splice(index, 1);
   }
 
-  // Method parent will call
+  removeAllFiles() {
+    this.selectedFiles = [];
+  }
+
+  // Method parent component calls to get file(s)
   getFile(): File | null {
-    return this.selectedFile;
+    return this.selectedFiles.length > 0 ? this.selectedFiles[0] : null;
+  }
+
+  getFiles(): File[] {
+    return this.selectedFiles;
+  }
+
+  getFileIcon(file: File): string {
+    return fileTypeIcons[file.type] || fileTypeIcons['default'];
   }
 
   // Dynamically generate the accept string for the file input
   get acceptTypes(): string {
     if (this.onlyInclude.length === 0) {
-      return '*/*'; // Allow all files if no filter is provided
+      return '*/*';
     }
     return this.onlyInclude
       .map(type => fileTypeExtensions[type])
       .flat()
-      .filter(ext => ext) // Filter out any undefined extensions
+      .filter(ext => ext)
       .join(',');
   }
 }

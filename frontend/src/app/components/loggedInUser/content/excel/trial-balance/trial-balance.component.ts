@@ -20,6 +20,9 @@ import {environment} from "../../../../../../environments/environment";
   styleUrl: './trial-balance.component.scss'
 })
 export class TrialBalanceComponent implements OnInit, OnDestroy {
+  @ViewChild('trialBalanceUpload') trialBalanceUpload!: FileUploadComponent;
+  @ViewChild('profitAndLossUpload') profitAndLossUpload!: FileUploadComponent;
+  @ViewChild('balanceSheetUpload') balanceSheetUpload!: FileUploadComponent;
   @ViewChild('fileUpload') fileUpload!: FileUploadComponent;
 
   allowedFileTypes = [FileType.XLSX, FileType.XLS, FileType.CSV];
@@ -89,9 +92,12 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
   }
 
   uploadFile(): void {
-    const file = this.fileUpload.getFile();
-    if (!file) {
-      this.snackbar.show("Please select a file to upload.", 'warning', 3);
+    const trialBalance = this.trialBalanceUpload.getFile();
+    const profitAndLoss = this.profitAndLossUpload.getFile();
+    const balanceSheet = this.balanceSheetUpload.getFile();
+
+    if (!trialBalance || !profitAndLoss || !balanceSheet) {
+      this.snackbar.show("Please select all three files to upload.", 'warning', 3);
       return;
     }
 
@@ -100,7 +106,7 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
     this.excelDownloadUrl = null;
     this.powerpointDownloadUrl = null;
 
-    this.excelService.uploadExcel(file).subscribe({
+    this.excelService.uploadExcel(trialBalance, profitAndLoss, balanceSheet).subscribe({
       next: (jobDetail) => {
         const job = jobDetail.detail;
         this.uploading = false;

@@ -121,3 +121,15 @@ h2 {
     background-color: #D24726; // PowerPoint Orange
   }
 }
+
+.file-upload-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+}

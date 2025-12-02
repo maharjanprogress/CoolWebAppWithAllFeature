@@ -10,9 +10,11 @@ export class ExcelService {
 
   constructor(private apiService : ApiService) { }
 
-  uploadExcel(file: File): Observable<FileProcessResponse> {
+  uploadExcel(trialBalance: File, profitAndLoss: File, balanceSheet: File): Observable<FileProcessResponse> {
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('trialBalance', trialBalance);
+    formData.append('profitAndLoss', profitAndLoss);
+    formData.append('balanceSheet', balanceSheet);
     return this.apiService.postMultipart<FileProcessResponse>('/api/excel/upload', formData);
   }
 

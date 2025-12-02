@@ -1,22 +1,59 @@
-<!-- Show this when no file is selected -->
-<div *ngIf="!selectedFile"
+<!-- Show this when no files are selected -->
+<div *ngIf="selectedFiles.length === 0"
      class="upload-area"
      [class.dragging]="isDragging"
      (drop)="onDrop($event)"
      (dragover)="onDragOver($event)"
      (dragleave)="onDragLeave($event)"
      (click)="fileInput.click()">
-  <p>Drag & drop your file here, or <span>click to browse</span></p>
+  <p>Drag & drop your {{ singleFile ? 'file' : 'files' }} here, or <span>click to browse</span></p>
   <p class="file-types" *ngIf="acceptTypes !== '*/*'">Allowed types: {{ acceptTypes }}</p>
-  <input #fileInput type="file" hidden [accept]="acceptTypes" (change)="onFileSelected($event)">
+  <input #fileInput
+         type="file"
+         hidden
+         [accept]="acceptTypes"
+         [multiple]="!singleFile"
+         (change)="onFileSelected($event)">
 </div>
 
-<!-- Show this when a file IS selected -->
-<div *ngIf="selectedFile" class="file-preview">
-  <img [src]="fileIcon" alt="File type icon" class="file-icon">
-  <div class="file-details">
-    <span class="file-name">{{ selectedFile.name }}</span>
-    <span class="file-size">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</span>
+<!-- Show this when file(s) ARE selected -->
+<div *ngIf="selectedFiles.length > 0" class="files-container">
+
+  <!-- If single file mode: show one file preview -->
+  <div *ngIf="singleFile" class="file-preview">
+    <img [src]="getFileIcon(selectedFiles[0])" alt="File type icon" class="file-icon">
+    <div class="file-details">
+      <span class="file-name">{{ selectedFiles[0].name }}</span>
+      <span class="file-size">{{ (selectedFiles[0].size / 1024 / 1024).toFixed(2) }} MB</span>
+    </div>
+    <button class="remove-btn" (click)="removeFile(0)">×</button>
   </div>
-  <button class="remove-btn" (click)="removeFile()">×</button>
+
+  <!-- If multiple file mode: show all files -->
+  <div *ngIf="!singleFile" class="multiple-files">
+    <div class="files-header">
+      <span>{{ selectedFiles.length }} file(s) selected</span>
+      <button class="clear-all-btn" (click)="removeAllFiles()">Clear All</button>
+    </div>
+
+    <div *ngFor="let file of selectedFiles; let i = index" class="file-preview">
+      <img [src]="getFileIcon(file)" alt="File type icon" class="file-icon">
+      <div class="file-details">
+        <span class="file-name">{{ file.name }}</span>
+        <span class="file-size">{{ (file.size / 1024 / 1024).toFixed(2) }} MB</span>
+      </div>
+      <button class="remove-btn" (click)="removeFile(i)">×</button>
+    </div>
+
+    <!-- Add more files button -->
+    <button class="add-more-btn" (click)="fileInput.click()">
+      + Add More Files
+    </button>
+    <input #fileInput
+           type="file"
+           hidden
+           [accept]="acceptTypes"
+           multiple
+           (change)="onFileSelected($event)">
+  </div>
 </div>
