@@ -226,7 +226,9 @@ public class ExcelService implements IExcelService {
 
                 // Validate the row
                 if (!dto.isValid()) {
-                    errors.add("Row " + (i + 1) + ": " + dto.getValidationError());
+                    if (!dto.getLedgerDescription().equalsIgnoreCase("NET LOSS") && !dto.getLedgerDescription().equalsIgnoreCase("NET PROFIT")) {
+                        errors.add("Row " + (i + 1) + ": " + dto.getValidationError());
+                    }
                     continue;
                 }
 
