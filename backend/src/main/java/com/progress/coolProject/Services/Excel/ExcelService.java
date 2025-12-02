@@ -14,6 +14,7 @@ import com.progress.coolProject.Repo.Excel.ProcessingJobRepository;
 import com.progress.coolProject.Services.Impl.Excel.IExcelService;
 import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
+import com.progress.coolProject.Utils.Excel.ExcelUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.sl.usermodel.TextParagraph;
@@ -53,7 +54,7 @@ public class ExcelService implements IExcelService {
     private static final int DATA_START_ROW = 2;
 
     @Override
-    public ProcessingJob startProcessing(MultipartFile file, User user) {
+    public ProcessingJob startProcessing(MultipartFile trialBalance, MultipartFile profitAndLoss, MultipartFile balanceSheet, User user) {
         // Check if user already has an active job
         Optional<ProcessingJob> existingJob = jobRepository.findFirstByUserAndStatusInOrderByCreatedAtDesc(
                 user,
@@ -64,40 +65,18 @@ public class ExcelService implements IExcelService {
             throw new RuntimeException("You already have a file being processed. Please wait.");
         }
 
-        // Validate file
-        if (file.isEmpty()) {
-            throw new RuntimeException("File is empty");
-        }
-
-        String fileName = file.getOriginalFilename();
-        if (fileName == null) {
-            throw new RuntimeException("File name is null");
-        }
-
-        // Check file extension
-        String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        if (!fileExtension.equals("xlsx") && !fileExtension.equals("xls")) {
-            throw new RuntimeException("Only Excel files (.xlsx or .xls) are allowed");
-        }
-
-        // Validate MIME type
-        String contentType = file.getContentType();
-        if (contentType == null ||
-                (!contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") &&
-                        !contentType.equals("application/vnd.ms-excel"))) {
-            throw new RuntimeException("Invalid file type. Please upload a valid Excel file.");
-        }
+        String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(trialBalance, profitAndLoss, balanceSheet);
 
         // Create job record
         ProcessingJob job = new ProcessingJob();
         job.setUser(user);
-        job.setFileName(fileName);
+        job.setFileName(fileNames);
         job.setStatus(JobStatus.PENDING);
         job.setStartedAt(LocalDateTime.now());
         job = jobRepository.save(job);
 
         // Process asynchronously
-        processExcelAsync(job, file);
+        processExcelAsync(job, trialBalance, profitAndLoss, balanceSheet);
 
         return job;
     }
@@ -111,7 +90,9 @@ public class ExcelService implements IExcelService {
     }
 
     @Async
-    public void processExcelAsync(ProcessingJob job, MultipartFile file) {
+    public void processExcelAsync(ProcessingJob job, MultipartFile trialBalance,
+                                  MultipartFile profitAndLoss,
+                                  MultipartFile balanceSheet) {
         Workbook workbook = null;
         try {
             // Update status to processing
@@ -119,25 +100,53 @@ public class ExcelService implements IExcelService {
             jobRepository.save(job);
             sendProgress(job, 0, "Starting processing...");
 
-            // Read Excel file
-            sendProgress(job, 10, "Reading Excel file...");
-            workbook = new XSSFWorkbook(file.getInputStream());
+            // Read Trial Balance Excel file
+            sendProgress(job, 5, "Reading Trial Balance Excel file...");
+            workbook = new XSSFWorkbook(trialBalance.getInputStream());
             Sheet sheet = workbook.getSheetAt(0);
 
-            // Validate headers
-            sendProgress(job, 20, "Validating file structure...");
+            // Validate Trial Balance headers
+            sendProgress(job, 10, "Validating file structure...");
             validateHeaders(sheet);
 
-            // Parse and validate data
-            sendProgress(job, 30, "Validating data...");
-            Map<TrialBalanceEnum, ExcelRowDTO> rows = parseAndValidateData(sheet);
+            sendProgress(job, 15, "Reading ProfitAndLoss Excel file...");
+            workbook = new XSSFWorkbook(profitAndLoss.getInputStream());
+            Sheet plSheet = workbook.getSheetAt(0);
 
-            if (rows.isEmpty()) {
-                throw new RuntimeException("No valid data found in the Excel file");
+            sendProgress(job, 20, "Validating ProfitAndLoss file structure...");
+            validateHeaders(plSheet);
+
+            sendProgress(job, 25, "Reading BalanceSheet Excel file...");
+            workbook = new XSSFWorkbook(balanceSheet.getInputStream());
+            Sheet bsSheet = workbook.getSheetAt(0);
+
+            sendProgress(job, 30, "Validating BalanceSheet file structure...");
+            validateHeaders(bsSheet);
+
+            // Parse and validate data
+            sendProgress(job, 35, "Validating data...");
+            Map<TrialBalanceEnum, ExcelRowDTO> tbRows = parseAndValidateData(sheet);
+            if (tbRows.isEmpty()) {
+                throw new RuntimeException("No valid data found in the Trial Balance Excel file");
             }
 
+            Map<TrialBalanceEnum, ExcelRowDTO> plRows = parseAndValidateData(plSheet);
+            if (plRows.isEmpty()) {
+                throw new RuntimeException("No valid data found in the ProfitAndLoss Excel file");
+            }
+
+            Map<TrialBalanceEnum, ExcelRowDTO> bsRows = parseAndValidateData(bsSheet);
+            if (bsRows.isEmpty()) {
+                throw new RuntimeException("No valid data found in the BalanceSheet Excel file");
+            }
+
+            sendProgress(job, 40, "Combining data from all files...");
+            Map<TrialBalanceEnum, ExcelRowDTO> rows = new HashMap<>(tbRows);
+            plRows.forEach(rows::putIfAbsent);
+            bsRows.forEach(rows::putIfAbsent);
+
             // Create output directories
-            sendProgress(job, 40, "Preparing output directories...");
+            sendProgress(job, 45, "Preparing output directories...");
             createOutputDirectory(OUTPUT_EXCEL_DIRECTORY);
             createOutputDirectory(OUTPUT_POWERPOINT_DIRECTORY);
 

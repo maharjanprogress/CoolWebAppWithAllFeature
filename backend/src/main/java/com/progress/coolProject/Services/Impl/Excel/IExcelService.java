@@ -5,6 +5,11 @@ import com.progress.coolProject.Entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface IExcelService {
-    ProcessingJob startProcessing(MultipartFile file, User user);
+    ProcessingJob startProcessing(
+            MultipartFile trialBalance,
+            MultipartFile profitAndLoss,
+            MultipartFile balanceSheet,
+            User user
+    );
     ProcessingJob getActiveJob(User user);
 }

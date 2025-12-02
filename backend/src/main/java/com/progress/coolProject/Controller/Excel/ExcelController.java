@@ -20,8 +20,12 @@ public class ExcelController {
 
     @PostMapping("/upload")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<ResponseDTO> uploadExcel(@RequestParam("file") MultipartFile file) {
-        ProcessingJob job = excelService.startProcessing(file, currentUser.getCurrentUser());
+    public ResponseEntity<ResponseDTO> uploadExcel(
+            @RequestParam("trialBalance") MultipartFile trialBalance,
+            @RequestParam("profitAndLoss") MultipartFile profitAndLoss,
+            @RequestParam("balanceSheet") MultipartFile balanceSheet
+    ) {
+        ProcessingJob job = excelService.startProcessing(trialBalance, profitAndLoss, balanceSheet, currentUser.getCurrentUser());
         return ResponseEntity.ok(ResponseDTO.success("File uploaded successfully. Job ID: " + job.getId(), job));
     }
 
