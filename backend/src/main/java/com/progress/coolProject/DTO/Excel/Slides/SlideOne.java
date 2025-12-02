@@ -7,12 +7,8 @@ import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
 import lombok.experimental.UtilityClass;
-import org.apache.poi.sl.usermodel.VerticalAlignment;
 import org.apache.poi.xddf.usermodel.PresetColor;
-import org.apache.poi.xddf.usermodel.XDDFColor;
 import org.apache.poi.xddf.usermodel.text.TextAlignment;
-import org.apache.poi.xddf.usermodel.text.XDDFTextParagraph;
-import org.apache.poi.xddf.usermodel.text.XDDFTextRun;
 import org.apache.poi.xslf.usermodel.*;
 
 import java.awt.*;
@@ -188,27 +184,22 @@ public final class SlideOne {
         table.setAnchor(new Rectangle(20, 60, 680, 400));
 
         // Set column widths
-        table.setColumnWidth(0, 150); // Left - Description
-        table.setColumnWidth(1, 90);  // Left - Amount
+        table.setColumnWidth(0, 160); // Left - Description
+        table.setColumnWidth(1, 100);  // Left - Amount
         table.setColumnWidth(2, 80);  // Left - Percentage
-        table.setColumnWidth(3, 150); // Right - Description
-        table.setColumnWidth(4, 90);  // Right - Amount
+        table.setColumnWidth(3, 160); // Right - Description
+        table.setColumnWidth(4, 100);  // Right - Amount
         table.setColumnWidth(5, 80);  // Right - Percentage
 
         // ROW 0: Merged title row (merge all 6 cells)
+        Color headerBlue = new Color(79, 129, 189);
         XSLFTableCell mergedCell = table.getCell(0, 0);
-        mergedCell.setText(FIRST_ROW_TITLE);
-        mergedCell.setFillColor(new Color(79, 129, 189)); // Blue background
-        mergedCell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 
         table.mergeCells(0, 0, 0, 5); // (firstRow, lastRow, firstCol, lastCol)
-
-        XDDFTextParagraph mergedPara = mergedCell.getTextBody().getParagraphs().getFirst();
-        mergedPara.setTextAlignment(TextAlignment.CENTER);
-        XDDFTextRun mergedRun = mergedPara.getTextRuns().getFirst();
-        mergedRun.setBold(true);
-        mergedRun.setFontSize(14.0);
-        mergedRun.setFontColor(XDDFColor.from(255, 255, 255)); // White text
+        PPTUtils.setCellTextWithStyle(mergedCell,
+                FIRST_ROW_TITLE, TextAlignment.CENTER, PresetColor.BLACK,
+                14.0, true,
+                headerBlue, NORMAL_BORDER_COLOR);
 
         // Style for header cells (yellow background)
         Color headerYellow = new Color(255, 255, 0);
