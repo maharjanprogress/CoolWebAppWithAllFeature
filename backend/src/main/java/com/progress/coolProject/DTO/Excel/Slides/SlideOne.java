@@ -8,6 +8,7 @@ import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
 import lombok.experimental.UtilityClass;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.sl.usermodel.VerticalAlignment;
+import org.apache.poi.xddf.usermodel.PresetColor;
 import org.apache.poi.xddf.usermodel.XDDFColor;
 import org.apache.poi.xddf.usermodel.text.TextAlignment;
 import org.apache.poi.xddf.usermodel.text.XDDFTextParagraph;
@@ -48,6 +49,11 @@ public final class SlideOne {
     public static final String ROW_OTHER_ASSETS = "अन्य सम्पत्ति";
     public static final String ROW_PROFIT_LOSS_RIGHT = "नाफा (नोकसान)";
     public static final String ROW_TOTAL_RIGHT = "जम्मा रु.";
+
+
+    private static final double NORMAL_FONT_SIZE = 11.0;
+    private static final PresetColor NORMAL_FONT_COLOR = PresetColor.BLACK;
+    private static final Color NORMAL_BORDER_COLOR = Color.WHITE;
 
     public static Double getShareCapital(ExcelTrialBalanceExcelRowHelper excel) {
         return excel.getCredit(TrialBalanceEnum.SHARE_CAPITAL);
@@ -215,15 +221,10 @@ public final class SlideOne {
 
         for (int col = 0; col < numCols; col++) {
             XSLFTableCell cell = table.getCell(1, col);
-            cell.setText(headers[col]);
-            cell.setFillColor(headerYellow);
-            cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
-
-            XDDFTextParagraph para = cell.getTextBody().getParagraphs().getFirst();
-            para.setTextAlignment(TextAlignment.CENTER);
-            XDDFTextRun run = para.getTextRuns().getFirst();
-            run.setBold(true);
-            run.setFontSize(11.0);
+            PPTUtils.setCellTextWithStyle(cell,
+                    headers[col], TextAlignment.CENTER, PresetColor.BLACK,
+                    12.0, true,
+                    headerYellow, NORMAL_BORDER_COLOR);
         }
 
         // Data rows (alternating white and light blue)
@@ -235,50 +236,50 @@ public final class SlideOne {
         // Row 1: Share Capital
         int row = 2;
         fillLeftSection(table, row, ROW_SHARE_CAPITAL, getShareCapital(data),
-                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_CASH, getCash(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, lightBlue);
+        fillRightSection(table, row, ROW_CASH, getCash(data), totalRight, nepaliFormat, lightBlue);
 
         // Row 2: Reserve Fund
         row = 3;
         fillLeftSection(table, row, ROW_RESERVE_FUND, getReserveFund(data),
-                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_BANK, getBank(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, Color.WHITE);
+        fillRightSection(table, row, ROW_BANK, getBank(data), totalRight, nepaliFormat, Color.WHITE);
 
         // Row 3: Other Funds
         row = 4;
         fillLeftSection(table, row, ROW_OTHER_FUND, getOtherFunds(data),
-                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_INVESTMENT, getInvestment(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, lightBlue);
+        fillRightSection(table, row, ROW_INVESTMENT, getInvestment(data), totalRight, nepaliFormat, lightBlue);
 
         // Row 4: Savings Deposit
         row = 5;
         fillLeftSection(table, row, ROW_SAVINGS_DEPOSIT, getSavingsDeposit(data),
-                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_LOAN_TO_MEMBERS, getLoanToMembers(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, Color.WHITE);
+        fillRightSection(table, row, ROW_LOAN_TO_MEMBERS, getLoanToMembers(data), totalRight, nepaliFormat, Color.WHITE);
 
         // Row 5: Grant
         row = 6;
         fillLeftSection(table, row, ROW_GRANT, getGrant(data),
-                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_RECEIVABLE, getReceivable(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, lightBlue);
+        fillRightSection(table, row, ROW_RECEIVABLE, getReceivable(data), totalRight, nepaliFormat, lightBlue);
 
         // Row 6: Payable
         row = 7;
         fillLeftSection(table, row, ROW_PAYABLE, getPayable(data),
-                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_FIXED_ASSETS, getFixedAssets(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, Color.WHITE);
+        fillRightSection(table, row, ROW_FIXED_ASSETS, getFixedAssets(data), totalRight, nepaliFormat, Color.WHITE);
 
         // Row 7: Other Liability
         row = 8;
         fillLeftSection(table, row, ROW_OTHER_LIABILITY, getOtherLiability(data),
-                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_OTHER_ASSETS, getOtherAssets(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, lightBlue);
+        fillRightSection(table, row, ROW_OTHER_ASSETS, getOtherAssets(data), totalRight, nepaliFormat, lightBlue);
 
         // Row 8: Profit/Loss
         row = 9;
         fillLeftSection(table, row, ROW_PROFIT_LOSS_LEFT, getProfitLossLeft(data),
-                totalLeft, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
-        fillRightSection(table, row, ROW_PROFIT_LOSS_RIGHT, getProfitLossRight(data), totalRight, nepaliFormat, row % 2 == 0 ? Color.WHITE : lightBlue);
+                totalLeft, nepaliFormat, Color.WHITE);
+        fillRightSection(table, row, ROW_PROFIT_LOSS_RIGHT, getProfitLossRight(data), totalRight, nepaliFormat, Color.WHITE);
 
         // Row 9: Total (blue background)
         row = 10;
@@ -293,9 +294,10 @@ public final class SlideOne {
         for (int col = 0; col < numCols; col++) {
             XSLFTableCell cell = table.getCell(row, col);
             XDDFTextParagraph para = cell.getTextBody().getParagraphs().getFirst();
-            XDDFTextRun run = para.getTextRuns().getFirst();
-            run.setBold(true);
-            run.setFontColor(XDDFColor.from(255, 255, 255));
+            PPTUtils.setCellTextWithStyle(cell,
+                    cell.getText(), para.getTextAlignment(), PresetColor.WHITE,
+                    NORMAL_FONT_SIZE, true,
+                    totalBlue, NORMAL_BORDER_COLOR);
         }
     }
 
@@ -304,26 +306,25 @@ public final class SlideOne {
                                         Double amount, Double total, NumberFormat formatter, Color bgColor) {
         // Description
         XSLFTableCell cell0 = table.getCell(row, 0);
-        cell0.setText(description);
-        cell0.setFillColor(bgColor);
-        cell0.setVerticalAlignment(VerticalAlignment.MIDDLE);
+        PPTUtils.setCellTextWithStyle(cell0,
+                description, TextAlignment.LEFT, NORMAL_FONT_COLOR,
+                NORMAL_FONT_SIZE, false,
+                bgColor, NORMAL_BORDER_COLOR);
 
         // Amount
         XSLFTableCell cell1 = table.getCell(row, 1);
-        cell1.setText(formatter.format(amount));
-        cell1.setFillColor(bgColor);
-        cell1.setVerticalAlignment(VerticalAlignment.MIDDLE);
-        XDDFTextParagraph para1 = cell1.getTextBody().getParagraphs().getFirst();
-        para1.setTextAlignment(TextAlignment.RIGHT);
+        PPTUtils.setCellTextWithStyle(cell1,
+                formatter.format(amount), TextAlignment.RIGHT, NORMAL_FONT_COLOR,
+                NORMAL_FONT_SIZE, false,
+                bgColor, NORMAL_BORDER_COLOR);
 
         // Percentage
         XSLFTableCell cell2 = table.getCell(row, 2);
         double percentage = total != 0 ? (amount / total) * 100 : 0.0;
-        cell2.setText(formatter.format(percentage));
-        cell2.setFillColor(bgColor);
-        cell2.setVerticalAlignment(VerticalAlignment.MIDDLE);
-        XDDFTextParagraph para2 = cell2.getTextBody().getParagraphs().getFirst();
-        para2.setTextAlignment(TextAlignment.RIGHT);
+        PPTUtils.setCellTextWithStyle(cell2,
+                formatter.format(percentage), TextAlignment.RIGHT, NORMAL_FONT_COLOR,
+                NORMAL_FONT_SIZE, false,
+                bgColor, NORMAL_BORDER_COLOR);
     }
 
     // Helper method to fill right section (Assets)
@@ -331,25 +332,24 @@ public final class SlideOne {
                                          Double amount, Double total, NumberFormat formatter, Color bgColor) {
         // Description
         XSLFTableCell cell3 = table.getCell(row, 3);
-        cell3.setText(description);
-        cell3.setFillColor(bgColor);
-        cell3.setVerticalAlignment(VerticalAlignment.MIDDLE);
+        PPTUtils.setCellTextWithStyle(cell3,
+                description, TextAlignment.LEFT, NORMAL_FONT_COLOR,
+                NORMAL_FONT_SIZE, false,
+                bgColor, NORMAL_BORDER_COLOR);
 
         // Amount
         XSLFTableCell cell4 = table.getCell(row, 4);
-        cell4.setText(formatter.format(amount));
-        cell4.setFillColor(bgColor);
-        cell4.setVerticalAlignment(VerticalAlignment.MIDDLE);
-        XDDFTextParagraph para4 = cell4.getTextBody().getParagraphs().getFirst();
-        para4.setTextAlignment(TextAlignment.RIGHT);
+        PPTUtils.setCellTextWithStyle(cell4,
+                formatter.format(amount), TextAlignment.RIGHT, NORMAL_FONT_COLOR,
+                NORMAL_FONT_SIZE, false,
+                bgColor, NORMAL_BORDER_COLOR);
 
         // Percentage
         XSLFTableCell cell5 = table.getCell(row, 5);
         double percentage = total != 0 ? (amount / total) * 100 : 0.0;
-        cell5.setText(formatter.format(percentage));
-        cell5.setFillColor(bgColor);
-        cell5.setVerticalAlignment(VerticalAlignment.MIDDLE);
-        XDDFTextParagraph para5 = cell5.getTextBody().getParagraphs().getFirst();
-        para5.setTextAlignment(TextAlignment.RIGHT);
+        PPTUtils.setCellTextWithStyle(cell5,
+                formatter.format(percentage), TextAlignment.RIGHT, NORMAL_FONT_COLOR,
+                NORMAL_FONT_SIZE, false,
+                bgColor, NORMAL_BORDER_COLOR);
     }
 }
