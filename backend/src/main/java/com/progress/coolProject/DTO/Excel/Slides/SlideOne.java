@@ -6,7 +6,6 @@ import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
 import lombok.experimental.UtilityClass;
-import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.sl.usermodel.VerticalAlignment;
 import org.apache.poi.xddf.usermodel.PresetColor;
 import org.apache.poi.xddf.usermodel.XDDFColor;
