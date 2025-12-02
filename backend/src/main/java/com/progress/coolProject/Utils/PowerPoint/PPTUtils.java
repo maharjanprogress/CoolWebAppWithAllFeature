@@ -33,7 +33,9 @@ public final class PPTUtils {
                                              String text, TextAlignment alignment, PresetColor textColor,
                                              double fontSize, boolean isBold,
                                              Color bgColor, Color borderColor) {
-        cell.setText(text);
+        if (text != null) {
+            cell.setText(text);
+        }
         cell.setFillColor(bgColor);
         cell.setVerticalAlignment(VerticalAlignment.MIDDLE);
 
@@ -50,7 +52,9 @@ public final class PPTUtils {
         cell.setBorderColor(TableCell.BorderEdge.right, borderColor);
 
         XDDFTextParagraph para = cell.getTextBody().getParagraphs().getFirst();
-        para.setTextAlignment(alignment);
+        if (alignment != null){
+            para.setTextAlignment(alignment);
+        }
 
         XDDFTextRun run = para.getTextRuns().getFirst();
         run.setBold(isBold);

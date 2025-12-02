@@ -292,9 +292,8 @@ public final class SlideOne {
         // Make total row text white and bold
         for (int col = 0; col < numCols; col++) {
             XSLFTableCell cell = table.getCell(row, col);
-            XDDFTextParagraph para = cell.getTextBody().getParagraphs().getFirst();
             PPTUtils.setCellTextWithStyle(cell,
-                    cell.getText(), para.getTextAlignment(), PresetColor.WHITE,
+                    null, null, PresetColor.WHITE,
                     NORMAL_FONT_SIZE, true,
                     totalBlue, NORMAL_BORDER_COLOR);
         }
