@@ -1,10 +1,9 @@
 package com.progress.coolProject.Services.Excel;
 
-import com.ibm.icu.text.NumberFormat;
-import com.ibm.icu.util.ULocale;
 import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
 import com.progress.coolProject.DTO.Excel.Slides.SlideOne;
+import com.progress.coolProject.DTO.Excel.Slides.SlideThree;
 import com.progress.coolProject.DTO.Excel.Slides.SlideTwo;
 import com.progress.coolProject.DTO.ResponseDTO;
 import com.progress.coolProject.Entity.Excel.ProcessingJob;
@@ -20,8 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.sl.usermodel.TextParagraph;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xddf.usermodel.XDDFColor;
-import org.apache.poi.xddf.usermodel.text.XDDFTextRun;
 import org.apache.poi.xslf.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -29,7 +26,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -434,6 +430,8 @@ public class ExcelService implements IExcelService {
         SlideOne.createDataSlide(ppt, "२. पहिलो त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
 
         SlideTwo.createDataSlide(ppt, "२. पहिलो त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
+
+        SlideThree.createDataSlide(ppt, "२. पहिलो त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
