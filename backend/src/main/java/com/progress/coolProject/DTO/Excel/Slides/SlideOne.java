@@ -3,6 +3,7 @@ package com.progress.coolProject.DTO.Excel.Slides;
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
+import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
 import lombok.experimental.UtilityClass;
@@ -19,7 +20,7 @@ import java.awt.*;
 @UtilityClass
 public final class SlideOne {
     // Header
-    public static final String FIRST_ROW_TITLE = "२०८२ असोज मसान्तसम्मको वासालात";
+    public static final String FIRST_ROW_TITLE = StringConstants.CURRENT_YEAR +" "+ StringConstants.ASHOJ +" मसान्तसम्मको वासालात";
 
     // Column Headers
     public static final String COLUMN_CAPITAL_LIABILITY = "पूँजी तथा दायित्व";

@@ -5,6 +5,7 @@ import com.ibm.icu.util.ULocale;
 import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
 import com.progress.coolProject.DTO.Excel.Slides.SlideOne;
+import com.progress.coolProject.DTO.Excel.Slides.SlideTwo;
 import com.progress.coolProject.DTO.ResponseDTO;
 import com.progress.coolProject.Entity.Excel.ProcessingJob;
 import com.progress.coolProject.Entity.User;
@@ -411,13 +412,6 @@ public class ExcelService implements IExcelService {
 
         ExcelTrialBalanceExcelRowHelper excel = new ExcelTrialBalanceExcelRowHelper(rowsMap);
 
-//        todo: Remove this.... just for test
-        NumberFormat nf = NumberFormat.getInstance(new ULocale("ne_NP"));
-        nf.setMinimumFractionDigits(2);
-
-        String formatted = nf.format(SlideOne.getReserveFund(excel));
-        System.out.println(formatted);
-
         // Slide 1: Title Slide
         XSLFSlide titleSlide = ppt.createSlide();
         XSLFTextBox titleBox = titleSlide.createTextBox();
@@ -437,7 +431,9 @@ public class ExcelService implements IExcelService {
         subtitleRun.setText("Presented by Progress");
         subtitleRun.setFontSize(24.0);
 
-        SlideOne.createDataSlide(ppt, "पहिलो त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
+        SlideOne.createDataSlide(ppt, "२. पहिलो त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
+
+        SlideTwo.createDataSlide(ppt, "२. पहिलो त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -454,71 +450,6 @@ public class ExcelService implements IExcelService {
         }
 
         return Paths.get(StringConstants.FILE_ACCESS_URL, OUTPUT_POWERPOINT_DIRECTORY, fileName).toString();
-    }
-
-    /**
-     * Create a slide with table data
-     */
-    private void createDataSlide(XMLSlideShow ppt, String title,
-                                 List<Map.Entry<TrialBalanceEnum, ExcelRowDTO>> data) {
-        XSLFSlide slide = ppt.createSlide();
-
-        // Add title
-        XSLFTextBox titleBox = slide.createTextBox();
-        titleBox.setAnchor(new Rectangle(50, 20, 600, 50));
-        XSLFTextParagraph titlePara = titleBox.addNewTextParagraph();
-        titlePara.setTextAlign(TextParagraph.TextAlign.CENTER);
-        XSLFTextRun titleRun = titlePara.addNewTextRun();
-        titleRun.setText(title);
-        titleRun.setFontSize(32.0);
-        titleRun.setBold(true);
-
-        // Create table (4 columns: Ledger, Description, Debit, Credit)
-        int numRows = data.size() + 1; // +1 for header
-        int numCols = 4;
-        XSLFTable table = slide.createTable(numRows, numCols);
-        table.setAnchor(new Rectangle(50, 100, 600, 300));
-
-        // Set column widths
-        table.setColumnWidth(0, 80);  // Ledger
-        table.setColumnWidth(1, 300); // Description
-        table.setColumnWidth(2, 110); // Debit
-        table.setColumnWidth(3, 110); // Credit
-
-        // Header row
-        String[] headers = {"Ledger", "Description", "Debit", "Credit"};
-        for (int col = 0; col < numCols; col++) {
-            XSLFTableCell cell = table.getCell(0, col);
-            cell.setText(headers[col]);
-            cell.setFillColor(new Color(79, 129, 189));
-            XDDFTextRun run = cell.getTextBody().getParagraphs().getFirst().getTextRuns().getFirst();
-            run.setBold(true);
-            run.setFontColor(XDDFColor.from(125, 125, 125));
-        }
-
-        // Data rows
-        int rowIdx = 1;
-        for (Map.Entry<TrialBalanceEnum, ExcelRowDTO> entry : data) {
-            TrialBalanceEnum enumEntry = entry.getKey();
-            ExcelRowDTO dto = entry.getValue();
-
-            table.getCell(rowIdx, 0).setText(String.valueOf(dto.getLedgerNo()));
-            table.getCell(rowIdx, 1).setText(enumEntry.getDescriptionNp());
-
-            if (dto.getDebit() != null && dto.getDebit() > 0) {
-                table.getCell(rowIdx, 2).setText(String.format("%.2f", dto.getDebit()));
-            } else {
-                table.getCell(rowIdx, 2).setText("-");
-            }
-
-            if (dto.getCredit() != null && dto.getCredit() > 0) {
-                table.getCell(rowIdx, 3).setText(String.format("%.2f", dto.getCredit()));
-            } else {
-                table.getCell(rowIdx, 3).setText("-");
-            }
-
-            rowIdx++;
-        }
     }
 
     private void createOutputDirectory(String directoryName) throws IOException {
