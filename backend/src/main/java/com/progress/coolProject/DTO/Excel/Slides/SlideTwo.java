@@ -93,7 +93,9 @@ public final class SlideTwo {
 
     public static Double getMiscellaneousIncome(ExcelTrialBalanceExcelRowHelper excel) {
         return excel.getCreditSum(
-                TrialBalanceEnum.MISCELLANEOUS_INCOME
+                TrialBalanceEnum.MISCELLANEOUS_INCOME, TrialBalanceEnum.PASSBOOK_INCOME,
+                TrialBalanceEnum.FINE_AND_PENALTY, TrialBalanceEnum.MEMBERSHIP_FEES_INCOME,
+                TrialBalanceEnum.DISCOUNT_INCOME, TrialBalanceEnum.SERVICE_CHARGE
         );
     }
 

@@ -22,7 +22,7 @@ public enum TrialBalanceEnum {
     MISCELLANEOUS_EXPENSE(1035, "Miscellaneous Expenses", "विविध खर्च"),
     OFFICE_EXPENSE(1042, "Office Expenses", "कार्यालय खर्च"),
     AGM_EXPENSE(1044, "AGM Expenses", "वार्षिक साधारण सभा खर्च"),
-    FINE_AND_PENALTIES(1045, "Fine And Penalties Expenses", "जरिवाना तथा दण्ड"),
+    FINE_AND_PENALTIES_EXPENSES(1045, "Fine And Penalties Expenses", "जरिवाना तथा दण्ड"),
     MEMBERSHIP_FEES_INCOME(1051, "Membership Fees Income", "सदस्यता शुल्क आय"),
     DISCOUNT_INCOME(1053, "Discount Income", "छुट आय"),
     OFFICE_CLEANING(1064, "Office Cleaning Expenses", "कार्यालय सफाइ खर्च"),

@@ -2,6 +2,7 @@ package com.progress.coolProject.DTO.Excel.Slides;
 
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
+import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
@@ -44,57 +45,53 @@ public final class SlideThree {
 
     // Left Side Calculation Methods (Expenses/Debits)
     public static Double getLoanLossExpense(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
-        return 3300785.67;
+        return excel.getDebitSum(
+                TrialBalanceEnum.LOAN_LOSS_PROVISION_EXPENSES
+        );
     }
 
     public static Double getTotalExpenseK(ExcelTrialBalanceExcelRowHelper excel) {
-        // Total of all expenses from SlideTwo
-        return SlideTwo.getSavingsInterestExpense(excel) +
+        return getLoanLossExpense(excel) +
+                SlideTwo.getSavingsInterestExpense(excel) +
                 SlideTwo.getSeasonalInterestExpense(excel) +
                 SlideTwo.getEmployeeExpense(excel) +
-                SlideTwo.getAdministrativeExpense(excel) +
-                getLoanLossExpense(excel);
+                SlideTwo.getAdministrativeExpense(excel);
     }
 
     public static Double getTotalProfitKh(ExcelTrialBalanceExcelRowHelper excel) {
-        // This would be calculated as Total Income - Total Expenses (if positive)
-        double totalIncome = getTotalIncomeG(excel);
-        double totalExpense = getTotalExpenseK(excel);
-        double profit = totalIncome - totalExpense;
-        return profit > 0 ? profit : 0.0;
+        double totalIncomeG = getTotalIncomeG(excel);
+        double totalExpenseK = getTotalExpenseK(excel);
+        double profitKh = totalIncomeG - totalExpenseK;
+        return profitKh > 0 ? profitKh : 0.0;
     }
 
     public static Double getTotalSumKKh(ExcelTrialBalanceExcelRowHelper excel) {
-        // Sum of total expense and profit
         return getTotalExpenseK(excel) + getTotalProfitKh(excel);
     }
 
     // Right Side Calculation Methods (Income/Credits)
     public static Double getAccountClosed(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
-        return 1605.26;
+        return excel.getCreditSum(
+                TrialBalanceEnum.ACCOUNT_CLOSING_CHARGE
+        );
     }
 
     public static Double getTotalIncomeG(ExcelTrialBalanceExcelRowHelper excel) {
-        // Total of all income from SlideTwo
-        return SlideTwo.getBankInterestIncome(excel) +
+        return getAccountClosed(excel) +
+                SlideTwo.getBankInterestIncome(excel) +
                 SlideTwo.getFinancialInvestmentIncome(excel) +
-                SlideTwo.getLoanInvestmentIncome(excel) +
-                SlideTwo.getMiscellaneousIncome(excel) +
-                getAccountClosed(excel);
+                SlideTwo.getLoanInvestmentIncome(excel)+
+                SlideTwo.getMiscellaneousIncome(excel);
     }
 
     public static Double getTotalLossGh(ExcelTrialBalanceExcelRowHelper excel) {
-        // This would be calculated as Total Expenses - Total Income (if positive)
-        double totalIncome = getTotalIncomeG(excel);
-        double totalExpense = getTotalExpenseK(excel);
-        double loss = totalExpense - totalIncome;
-        return loss > 0 ? loss : 0.0;
+        double totalIncomeG = getTotalIncomeG(excel);
+        double totalExpenseK = getTotalExpenseK(excel);
+        double lossGh = totalExpenseK - totalIncomeG;
+        return lossGh > 0 ? lossGh : 0.0;
     }
 
     public static Double getTotalSumGGh(ExcelTrialBalanceExcelRowHelper excel) {
-        // Sum of total income and loss
         return getTotalIncomeG(excel) + getTotalLossGh(excel);
     }
 
@@ -112,15 +109,15 @@ public final class SlideThree {
         // Left: Expense Description | Amount
         // Right: Income Description | Amount
         int numRows = 6; // 1 title row + 1 header + 4 data rows
-        int numCols = 4;  // 2 columns for expenses + 2 columns for income
+        int numCols = 4; // 2 columns for expenses + 2 columns for income
 
         XSLFTable table = slide.createTable(numRows, numCols);
         table.setAnchor(new Rectangle(20, 60, 680, 350));
 
         // Set column widths
-        table.setColumnWidth(0, 210); // Expense Description
-        table.setColumnWidth(1, 130);  // Expense Amount
-        table.setColumnWidth(2, 210); // Income Description
+        table.setColumnWidth(0, 210);     // Expense Description
+        table.setColumnWidth(1, 130);    // Expense Amount
+        table.setColumnWidth(2, 210);   // Income Description
         table.setColumnWidth(3, 130);  // Income Amount
 
         // ROW 0: Merged title row (merge all 4 cells)
