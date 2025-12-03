@@ -2,6 +2,7 @@ package com.progress.coolProject.DTO.Excel.Slides;
 
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
+import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
@@ -44,44 +45,56 @@ public final class SlideTwo {
 
     // Left Side Calculation Methods (Expenses)
     public static Double getSavingsInterestExpense(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
-        return 0.0;
+        return excel.getDebitSum(TrialBalanceEnum.INTEREST_EXPENDITURE, TrialBalanceEnum.INTEREST_EXPENDITURE_2);
     }
 
     public static Double getSeasonalInterestExpense(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
         return 0.0;
     }
 
     public static Double getEmployeeExpense(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
-        return 0.0;
+        return excel.getDebitSum(
+                TrialBalanceEnum.SALARY, TrialBalanceEnum.PROVIDENT_EXP,
+                TrialBalanceEnum.DASHAIN_ALLOWANCE
+        );
     }
 
     public static Double getAdministrativeExpense(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
-        return 0.0;
+        return excel.getDebitSum(
+                TrialBalanceEnum.OFFICE_EXPENSE, TrialBalanceEnum.AUDIT_FEE_EXPENSE,
+                TrialBalanceEnum.TELEPHONE_EXPENSE, TrialBalanceEnum.ELECTRICITY_EXPENSE,
+                TrialBalanceEnum.WATER_EXPENSE, TrialBalanceEnum.STATIONARY_EXPENSE,
+                TrialBalanceEnum.PRINTING_EXPENSE, TrialBalanceEnum.TRAVELLING_EXPENSE,
+                TrialBalanceEnum.TIFFIN_EXPENSE, TrialBalanceEnum.GENERAL_MEETING,
+                TrialBalanceEnum.REPAIR_AND_MAINTENANCE_CHARGE, TrialBalanceEnum.AGM_EXPENSE,
+                TrialBalanceEnum.TRAINING_CHARGE_EXPENSE, TrialBalanceEnum.MISCELLANEOUS_EXPENSE,
+                TrialBalanceEnum.AMC_EXPENSE, TrialBalanceEnum.CLOUD_EXPENSE,
+                TrialBalanceEnum.RAHAT_KHARCHA, TrialBalanceEnum.SANTONA_KHARCHA,
+                TrialBalanceEnum.OFFICE_CLEANING
+        );
     }
 
     // Right Side Calculation Methods (Income)
     public static Double getBankInterestIncome(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
-        return 0.0;
+        return excel.getCreditSum(
+                TrialBalanceEnum.BANK_INTEREST_INCOME
+        );
     }
 
     public static Double getFinancialInvestmentIncome(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
         return 0.0;
     }
 
     public static Double getLoanInvestmentIncome(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
-        return 0.0;
+        return excel.getCreditSum(
+                TrialBalanceEnum.INTEREST_INCOME
+        );
     }
 
     public static Double getMiscellaneousIncome(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add actual calculation logic
-        return 0.0;
+        return excel.getCreditSum(
+                TrialBalanceEnum.MISCELLANEOUS_INCOME
+        );
     }
 
     public static void createDataSlide(XMLSlideShow ppt, String slideTitle,
