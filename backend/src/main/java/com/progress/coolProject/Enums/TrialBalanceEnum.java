@@ -77,7 +77,7 @@ public enum TrialBalanceEnum {
     DUBANTI_KOSH(5020, "Dubanti Kosh", "दुबन्ती कोष"),
     SANIMA_BANK(5025, "Sanima Bank", "सानिमा बैंक"),
     RSB_TIME_SAVING(5027, "RSB TIME SAVING", "आरएसके बैंकिङ"),
-    PUGITAT_JAGAEDA_KOSH(5858, "Pugigat Jagaeda Kosh", "पूंजीगत जगेडा कोष"),
+    PUGIGAT_JAGAEDA_KOSH(5858, "Pugigat Jagaeda Kosh", "पूंजीगत जगेडा कोष"),
     SAMAN_MAUJDAT(5859, "Saman Maujdat", "सामान मौज्दात"),
     INTEREST_TAX(6001, "Interest Tax", "ब्याज कर"),
     OTHER_PAYABLE(6666, "Other Payable", "अन्य तिर्नुपर्ने"),

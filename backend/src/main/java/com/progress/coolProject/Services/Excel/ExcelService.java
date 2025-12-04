@@ -3,6 +3,7 @@ package com.progress.coolProject.Services.Excel;
 import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
 import com.progress.coolProject.DTO.Excel.Slides.SlideOne;
+import com.progress.coolProject.DTO.Excel.Slides.SlideSeven;
 import com.progress.coolProject.DTO.Excel.Slides.SlideThree;
 import com.progress.coolProject.DTO.Excel.Slides.SlideTwo;
 import com.progress.coolProject.DTO.ResponseDTO;
@@ -432,6 +433,8 @@ public class ExcelService implements IExcelService {
         SlideTwo.createDataSlide(ppt, "२. पहिलो त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
 
         SlideThree.createDataSlide(ppt, "२. पहिलो त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
+
+        SlideSeven.createDataSlide(ppt, "५. संस्थाको प्राथमिक पूँजीकोष सम्बन्धी विवरण", excel);
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
