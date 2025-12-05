@@ -52,7 +52,7 @@ public final class SlideSeven {
 
     public static Double getGhataPurtiKosh(ExcelTrialBalanceExcelRowHelper excel) {
         return excel.getCreditSum(
-                TrialBalanceEnum.GHATA_PURTI_KOSH
+                TrialBalanceEnum.GHATA_PURTI_KOSH, TrialBalanceEnum.LOSS_FULFILMENT_FUND
         );
     }
 
@@ -75,8 +75,7 @@ public final class SlideSeven {
                 TrialBalanceEnum.JIBIKOPARCHAN_KOSH, TrialBalanceEnum.OTHER_RISK_MANAGEMENT_FUND,
                 TrialBalanceEnum.SAMUDAIYIK_BIKASH_KOSH, TrialBalanceEnum.STHIRKARAN_KOSH,
                 TrialBalanceEnum.DUBANTI_KOSH, TrialBalanceEnum.COOPERATIVE_DEVELOPMENT_FUND,
-                TrialBalanceEnum.LOSS_FULFILMENT_FUND, TrialBalanceEnum.COOPERATIVE_PROMOTION_FUND,
-                TrialBalanceEnum.PUGIGAT_JAGAEDA_KOSH
+                TrialBalanceEnum.COOPERATIVE_PROMOTION_FUND, TrialBalanceEnum.PUGIGAT_JAGAEDA_KOSH
         );
     }
 

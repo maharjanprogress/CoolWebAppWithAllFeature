@@ -1,6 +1,7 @@
 package com.progress.coolProject.Services.Excel;
 
 import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
+import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
 import com.progress.coolProject.DTO.Excel.Slides.SlideOne;
 import com.progress.coolProject.DTO.Excel.Slides.SlideSeven;
@@ -16,6 +17,7 @@ import com.progress.coolProject.Services.Impl.Excel.IExcelService;
 import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.Excel.ExcelUtil;
+import com.progress.coolProject.Utils.Excel.LoanAccountAgeingExcelUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.sl.usermodel.TextParagraph;
@@ -52,7 +54,11 @@ public class ExcelService implements IExcelService {
     private static final int DATA_START_ROW = 2;
 
     @Override
-    public ProcessingJob startProcessing(MultipartFile trialBalance, MultipartFile profitAndLoss, MultipartFile balanceSheet, User user) {
+    public ProcessingJob startProcessing(MultipartFile trialBalance,
+                                         MultipartFile profitAndLoss,
+                                         MultipartFile balanceSheet,
+                                         MultipartFile loanAgeingSheet,
+                                         User user) {
         // Check if user already has an active job
         Optional<ProcessingJob> existingJob = jobRepository.findFirstByUserAndStatusInOrderByCreatedAtDesc(
                 user,
@@ -63,7 +69,7 @@ public class ExcelService implements IExcelService {
             throw new RuntimeException("You already have a file being processed. Please wait.");
         }
 
-        String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(trialBalance, profitAndLoss, balanceSheet);
+        String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet);
 
         // Create job record
         ProcessingJob job = new ProcessingJob();
@@ -74,7 +80,7 @@ public class ExcelService implements IExcelService {
         job = jobRepository.save(job);
 
         // Process asynchronously
-        processExcelAsync(job, trialBalance, profitAndLoss, balanceSheet);
+        processExcelAsync(job, trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet);
 
         return job;
     }
@@ -90,7 +96,8 @@ public class ExcelService implements IExcelService {
     @Async
     public void processExcelAsync(ProcessingJob job, MultipartFile trialBalance,
                                   MultipartFile profitAndLoss,
-                                  MultipartFile balanceSheet) {
+                                  MultipartFile balanceSheet,
+                                  MultipartFile loanAgeingSheet) {
         Workbook workbook = null;
         try {
             // Update status to processing
@@ -121,6 +128,11 @@ public class ExcelService implements IExcelService {
             sendProgress(job, 30, "Validating BalanceSheet file structure...");
             validateHeaders(bsSheet);
 
+
+            sendProgress(job, 26, "Validating LoanAgeing Excel file...");
+            workbook = new XSSFWorkbook(loanAgeingSheet.getInputStream());
+            Sheet lASheet = workbook.getSheetAt(0);
+
             // Parse and validate data
             sendProgress(job, 35, "Validating data...");
             Map<TrialBalanceEnum, ExcelRowDTO> tbRows = parseAndValidateData(sheet);
@@ -137,6 +149,9 @@ public class ExcelService implements IExcelService {
             if (bsRows.isEmpty()) {
                 throw new RuntimeException("No valid data found in the BalanceSheet Excel file");
             }
+
+            HashMap<String, LoanAccountAgeingDTO> loanData =
+                    LoanAccountAgeingExcelUtil.extractLoanAccountAgeingData(lASheet);
 
             sendProgress(job, 40, "Combining data from all files...");
             Map<TrialBalanceEnum, ExcelRowDTO> rows = new HashMap<>(tbRows);
