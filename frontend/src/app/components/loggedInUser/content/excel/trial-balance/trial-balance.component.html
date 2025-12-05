@@ -29,6 +29,14 @@
       </app-file-upload>
     </div>
 
+    <div class="file-upload-group">
+      <label>Loan Account Ageing Sheet</label>
+      <app-file-upload #loanAgeingSheetUpload
+                       [onlyInclude]="allowedFileTypes"
+                       [singleFile]="true">
+      </app-file-upload>
+    </div>
+
     <button class="upload-btn" (click)="uploadFile()" [disabled]="uploading">
       {{ uploading ? 'Uploading...' : 'Upload and Process' }}
     </button>

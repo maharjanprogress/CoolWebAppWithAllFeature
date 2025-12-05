@@ -23,6 +23,7 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
   @ViewChild('trialBalanceUpload') trialBalanceUpload!: FileUploadComponent;
   @ViewChild('profitAndLossUpload') profitAndLossUpload!: FileUploadComponent;
   @ViewChild('balanceSheetUpload') balanceSheetUpload!: FileUploadComponent;
+  @ViewChild('loanAgeingSheetUpload') loanAgeingSheetUpload!: FileUploadComponent;
   @ViewChild('fileUpload') fileUpload!: FileUploadComponent;
 
   allowedFileTypes = [FileType.XLSX, FileType.XLS, FileType.CSV];
@@ -95,8 +96,9 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
     const trialBalance = this.trialBalanceUpload.getFile();
     const profitAndLoss = this.profitAndLossUpload.getFile();
     const balanceSheet = this.balanceSheetUpload.getFile();
+    const loanAgeingSheet = this.loanAgeingSheetUpload.getFile();
 
-    if (!trialBalance || !profitAndLoss || !balanceSheet) {
+    if (!trialBalance || !profitAndLoss || !balanceSheet || !loanAgeingSheet) {
       this.snackbar.show("Please select all three files to upload.", 'warning', 3);
       return;
     }
@@ -106,7 +108,7 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
     this.excelDownloadUrl = null;
     this.powerpointDownloadUrl = null;
 
-    this.excelService.uploadExcel(trialBalance, profitAndLoss, balanceSheet).subscribe({
+    this.excelService.uploadExcel(trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet).subscribe({
       next: (jobDetail) => {
         const job = jobDetail.detail;
         this.uploading = false;
