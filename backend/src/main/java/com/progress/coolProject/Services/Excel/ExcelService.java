@@ -8,10 +8,7 @@ import com.progress.coolProject.DTO.Excel.Slides.*;
 import com.progress.coolProject.DTO.ResponseDTO;
 import com.progress.coolProject.Entity.Excel.ProcessingJob;
 import com.progress.coolProject.Entity.User;
-import com.progress.coolProject.Enums.JobStatus;
-import com.progress.coolProject.Enums.LoanCategory;
-import com.progress.coolProject.Enums.SavingCategory;
-import com.progress.coolProject.Enums.TrialBalanceEnum;
+import com.progress.coolProject.Enums.*;
 import com.progress.coolProject.Repo.Excel.ProcessingJobRepository;
 import com.progress.coolProject.Services.Impl.Excel.IExcelService;
 import com.progress.coolProject.StringConstants;
@@ -161,13 +158,13 @@ public class ExcelService implements IExcelService {
                 throw new RuntimeException("No valid data found in the BalanceSheet Excel file");
             }
 
-            HashMap<String, LoanAccountAgeingDTO> loanData =
+            Map<String, LoanAccountAgeingDTO> loanData =
                     LoanAccountAgeingExcelUtil.extractLoanAccountAgeingData(lASheet);
 
-            HashMap<LoanCategory, AccountSummaryDTO> loanSummData =
+            Map<LoanCategory, AccountSummaryDTO> loanSummData =
                     LoanSummaryExcelUtil.extractLoanSummaryData(loanSummarySheet);
 
-            HashMap<SavingCategory, AccountSummaryDTO> savingSummData =
+            Map<SavingCategory, AccountSummaryDTO> savingSummData =
                     SavingSummaryExcelUtil.extractSavingSummaryData(savingSummarySheet);
 
             sendProgress(job, 40, "Combining data from all files...");
@@ -182,13 +179,19 @@ public class ExcelService implements IExcelService {
 
             // Generate Nepali Excel file with 3 sheets
             sendProgress(job, 50, "Generating Nepali translation with multiple sheets...");
-            String outputExcelPath = generateNepaliExcelWithSheets(rows, job.getUser().getUserName());
+            String outputExcelPath = generateNepaliExcelWithSheets(
+                    rows, loanData, loanSummData, savingSummData,
+                    job.getUser().getUserName()
+            );
             job.setProcessedExcelFilePath(outputExcelPath);
             sendProgress(job, 65, outputExcelPath);
 
             // Generate PowerPoint presentation
             sendProgress(job, 70, "Generating PowerPoint presentation...");
-            String outputPptPath = generatePowerPoint(rows, job.getUser().getUserName());
+            String outputPptPath = generatePowerPoint(
+                    rows, loanData, loanSummData, savingSummData,
+                    job.getUser().getUserName()
+            );
             job.setProcessedPowerpointFilePath(outputPptPath);
             sendProgress(job, 85, outputPptPath);
 
@@ -334,7 +337,13 @@ public class ExcelService implements IExcelService {
      * 2. Credit only rows
      * 3. Debit only rows
      */
-    private String generateNepaliExcelWithSheets(Map<TrialBalanceEnum, ExcelRowDTO> rowsMap, String username) throws IOException {
+    private String generateNepaliExcelWithSheets(
+            Map<TrialBalanceEnum, ExcelRowDTO> rowsMap,
+            Map<String, LoanAccountAgeingDTO> loanAgeingMap,
+            Map<LoanCategory, AccountSummaryDTO> loanSummaryMap,
+            Map<SavingCategory, AccountSummaryDTO> savingSummaryMap,
+            String username
+    ) throws IOException {
         Workbook workbook = new XSSFWorkbook();
 
         // Create header style
@@ -436,10 +445,21 @@ public class ExcelService implements IExcelService {
      * - Slide 2: First 5 rows from Credit sheet
      * - Slide 3: First 5 rows from Debit sheet
      */
-    private String generatePowerPoint(Map<TrialBalanceEnum, ExcelRowDTO> rowsMap, String username) throws IOException {
+    private String generatePowerPoint(
+            Map<TrialBalanceEnum, ExcelRowDTO> rowsMap,
+            Map<String, LoanAccountAgeingDTO> loanAgeingMap,
+            Map<LoanCategory, AccountSummaryDTO> loanSummaryMap,
+            Map<SavingCategory, AccountSummaryDTO> savingSummaryMap,
+            String username
+    ) throws IOException {
         XMLSlideShow ppt = new XMLSlideShow();
 
         ExcelTrialBalanceExcelRowHelper excel = new ExcelTrialBalanceExcelRowHelper(rowsMap);
+
+        ExcelLoanAgeingHelper loanAgeing = new ExcelLoanAgeingHelper(loanAgeingMap);
+
+        //todo:remove this
+        Map<String, LoanAccountAgeingDTO> test = loanAgeing.getFilteredPayCategory(LoanPayerCategory.ONE_TO_THREE_MONTHS,LoanPayerCategory.UPTO_ONE_MONTH);
 
         // Slide 1: Title Slide
         XSLFSlide titleSlide = ppt.createSlide();

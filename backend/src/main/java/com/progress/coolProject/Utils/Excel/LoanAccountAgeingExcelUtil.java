@@ -3,7 +3,6 @@ package com.progress.coolProject.Utils.Excel;
 
 import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
 import com.progress.coolProject.Enums.LoanCategory;
-import com.progress.coolProject.Enums.LoanPayerCategory;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -163,27 +162,7 @@ public class LoanAccountAgeingExcelUtil {
         // Column 10: Balance Amount
         dto.setBalanceAmount(getCellValueAsDouble(row.getCell(10)));
 
-        for(int i = 11 ; i <=18 ; i++){
-            Double balanceAmount = getCellValueAsDouble(row.getCell(i));
-            if (balanceAmount == null) {
-                continue;
-            } else if (!balanceAmount.equals(dto.getBalanceAmount())) {
-                throw new Exception("Invalid balance amount: " + balanceAmount + " Expected: " + dto.getBalanceAmount()
-                + " , In the account Number: " + dto.getAccountNo());
-            }
-
-            switch (i) {
-                case 11 -> dto.setPaymentType(LoanPayerCategory.UPTO_ONE_MONTH);
-                case 12 -> dto.setPaymentType(LoanPayerCategory.ONE_TO_THREE_MONTHS);
-                case 13 -> dto.setPaymentType(LoanPayerCategory.THREE_TO_SIX_MONTHS);
-                case 14 -> dto.setPaymentType(LoanPayerCategory.SIX_TO_NINE_MONTHS);
-                case 15 -> dto.setPaymentType(LoanPayerCategory.NINE_TO_TWELVE_MONTHS);
-                case 16 -> dto.setPaymentType(LoanPayerCategory.ONE_TO_TWO_YEARS);
-                case 17 -> dto.setPaymentType(LoanPayerCategory.ABOVE_TWO_YEARS);
-                case 18 -> dto.setPaymentType(LoanPayerCategory.BELOW_ONE);
-                default -> throw new Exception("Invalid column number for loan payers category: " + i);
-            }
-        }
+        dto.calculatePaymentType();
         return dto;
     }
 

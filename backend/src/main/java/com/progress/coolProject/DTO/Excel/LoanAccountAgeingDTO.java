@@ -26,6 +26,35 @@ public class LoanAccountAgeingDTO {
     private Double balanceAmount;
     private LoanPayerCategory paymentType;
 
+    /**
+     * Calculate and set payment type based on lapsed days
+     * Call this after setting lapsedDays
+     */
+    public void calculatePaymentType() {
+        if (lapsedDays == null) {
+            this.paymentType = null;
+            return;
+        }
+
+        if (lapsedDays < 0) {
+            this.paymentType = LoanPayerCategory.BELOW_ONE;
+        } else if (lapsedDays <= 30) {
+            this.paymentType = LoanPayerCategory.UPTO_ONE_MONTH;
+        } else if (lapsedDays <= 90) {
+            this.paymentType = LoanPayerCategory.ONE_TO_THREE_MONTHS;
+        } else if (lapsedDays <= 180) {
+            this.paymentType = LoanPayerCategory.THREE_TO_SIX_MONTHS;
+        } else if (lapsedDays <= 270) {
+            this.paymentType = LoanPayerCategory.SIX_TO_NINE_MONTHS;
+        } else if (lapsedDays <= 365) {
+            this.paymentType = LoanPayerCategory.NINE_TO_TWELVE_MONTHS;
+        } else if (lapsedDays <= 730) {
+            this.paymentType = LoanPayerCategory.ONE_TO_TWO_YEARS;
+        } else {
+            this.paymentType = LoanPayerCategory.ABOVE_TWO_YEARS;
+        }
+    }
+
     // Validation method
     public boolean isValid() {
         return accountNo != null && !accountNo.trim().isEmpty()
