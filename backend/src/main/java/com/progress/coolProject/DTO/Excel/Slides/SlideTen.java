@@ -27,7 +27,7 @@ public final class SlideTen {
     // Column Header
     public static final String COLUMN_AMOUNT = "रकम रु";
 
-    private static final double NORMAL_FONT_SIZE = 11.0;
+    private static final double NORMAL_FONT_SIZE = 24.0;
     private static final PresetColor NORMAL_FONT_COLOR = PresetColor.BLACK;
     private static final Color NORMAL_BORDER_COLOR = Color.BLACK;
 
@@ -77,14 +77,14 @@ public final class SlideTen {
         XSLFTableCell headerCell0 = table.getCell(0, 0);
         PPTUtils.setCellTextWithStyle(headerCell0,
                 ROW_1_TOP_30_BORROWERS, TextAlignment.LEFT, PresetColor.WHITE,
-                12.0, true,
+                28.0, true,
                 headerBlue, NORMAL_BORDER_COLOR);
 
         // Second column header
         XSLFTableCell headerCell1 = table.getCell(0, 1);
         PPTUtils.setCellTextWithStyle(headerCell1,
                 COLUMN_AMOUNT, TextAlignment.CENTER, PresetColor.WHITE,
-                12.0, true,
+                28.0, true,
                 headerBlue, NORMAL_BORDER_COLOR);
 
         // Data rows (alternating white and light blue)
@@ -124,7 +124,7 @@ public final class SlideTen {
         // Amount column
         XSLFTableCell cell1 = table.getCell(row, 1);
         String amountText = (amount != null) ? formatter.format(amount) : "";
-        if (row == 3 || row == 4){
+        if ((row == 3 || row == 4) && !amountText.isEmpty()){
             amountText = amountText + "%";
         }
 

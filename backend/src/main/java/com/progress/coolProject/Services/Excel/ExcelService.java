@@ -180,7 +180,7 @@ public class ExcelService implements IExcelService {
             // Generate Nepali Excel file with 3 sheets
             sendProgress(job, 50, "Generating Nepali translation with multiple sheets...");
             String outputExcelPath = generateNepaliExcelWithSheets(
-                    rows, loanData, loanSummData, savingSummData,
+                    rows,
                     job.getUser().getUserName()
             );
             job.setProcessedExcelFilePath(outputExcelPath);
@@ -339,9 +339,6 @@ public class ExcelService implements IExcelService {
      */
     private String generateNepaliExcelWithSheets(
             Map<TrialBalanceEnum, ExcelRowDTO> rowsMap,
-            Map<String, LoanAccountAgeingDTO> loanAgeingMap,
-            Map<LoanCategory, AccountSummaryDTO> loanSummaryMap,
-            Map<SavingCategory, AccountSummaryDTO> savingSummaryMap,
             String username
     ) throws IOException {
         Workbook workbook = new XSSFWorkbook();
@@ -491,6 +488,10 @@ public class ExcelService implements IExcelService {
         SlideEight.createDataSlide(ppt, excel);
 
         SlideTen.createDataSlide(ppt, "९. कूल ऋण लगानीमा अधिकतम ऋण लिने ३० जना सदस्यहरुको ऋण रकम%", loanAgeing);
+
+        SlideEleven.createDataSlide(ppt,
+                "१०. धितो जमानत र विना धितोमा ऋण लगानी (कुल ऋणी संख्या)",
+                loanAgeing);
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
