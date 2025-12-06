@@ -25,14 +25,6 @@ public class LoanAccountAgeingDTO {
     private Double loanAmount;
     private Double balanceAmount;
     private LoanPayerCategory paymentType;
-    private Double amount1To30;
-    private Double amount31To90;
-    private Double amount91To180;
-    private Double amount181To270;
-    private Double amount271To365;
-    private Double amount366To730;
-    private Double amountAbove730;
-    private Double amountBelow1;
 
     // Validation method
     public boolean isValid() {

@@ -5,15 +5,15 @@ import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
 import com.progress.coolProject.Enums.LoanCategory;
 import com.progress.coolProject.Enums.LoanPayerCategory;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.time.ZoneId;
+import java.util.*;
 
 @UtilityClass
+@Slf4j
 public class LoanAccountAgeingExcelUtil {
 
     private static final int HEADER_ROW_INDEX = 1; // Row 2 in Excel (0-indexed)
@@ -258,9 +258,33 @@ public class LoanAccountAgeingExcelUtil {
             if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
                 return cell.getLocalDateTimeCellValue().toLocalDate();
             } else if (cell.getCellType() == CellType.STRING) {
-                //todo: check if this hits...
-                // Handle string date format if needed
+                //todo: make a robust way to do nepali calender... this is just a temporary solution
                 String dateStr = cell.getStringCellValue().trim();
+                String[] parts = dateStr.split("/");
+
+                if (parts.length == 3) {
+                    int year = Integer.parseInt(parts[0]);
+                    int month = Integer.parseInt(parts[1]);
+                    int day = Integer.parseInt(parts[2]);
+
+                    // Clamp day to max 31
+                    if (day > 31) {
+                        log.error("Invalid date format: " + dateStr);
+                        day = 31;
+                    }
+
+                    // Rebuild the corrected date string
+                    dateStr = String.format("%04d/%02d/%02d", year, month, day);
+                }
+                try {
+                    Date convertedDate = DateUtil.parseYYYYMMDDDate(dateStr);
+                    return convertedDate.toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate();
+                }catch (Exception e){
+                    log.error(e.getMessage());
+                    log.error("Error parsing date: " + dateStr);
+                }
                 // You can add custom date parsing logic here if needed
                 return null;
             }
