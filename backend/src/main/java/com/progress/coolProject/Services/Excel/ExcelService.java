@@ -497,6 +497,10 @@ public class ExcelService implements IExcelService {
                 "११. कुल ऋण लगानीमा संचालक, लेखा सु. समिति र कर्मचारीले लिएको ऋणको %",
                 loanAgeing);
 
+        SlideThirteen.createDataSlide(ppt,
+                "१२. ऋण जोखिम व्यवस्था विश्लेषण (कुल ऋणी संख्या)",
+                loanAgeing);
+
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String fileName = username + "_trial_balance_" + timestamp + ".pptx";
