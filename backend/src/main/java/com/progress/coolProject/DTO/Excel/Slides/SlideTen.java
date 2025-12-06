@@ -2,7 +2,8 @@ package com.progress.coolProject.DTO.Excel.Slides;
 
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
-import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
+import com.progress.coolProject.Enums.LoanPayerCategory;
+import com.progress.coolProject.Utils.Excel.ExcelLoanAgeingHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
 import lombok.experimental.UtilityClass;
 import org.apache.poi.xddf.usermodel.PresetColor;
@@ -30,28 +31,25 @@ public final class SlideTen {
     private static final PresetColor NORMAL_FONT_COLOR = PresetColor.BLACK;
     private static final Color NORMAL_BORDER_COLOR = Color.BLACK;
 
-    public static Double getTop30LoanAmount(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add calculation - Sum of top 30 borrowers' loan amounts
-        return 0.0;
+    public static Double getTop30LoanAmount(ExcelLoanAgeingHelper excel) {
+        return excel.getTotalBalanceByCategory(30);
+    }
+    public static Double getTotalLoanInvestment(ExcelLoanAgeingHelper excel) {
+        return excel.getTotalBalance();
     }
 
-    public static Double getTotalLoanInvestment(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add calculation - Total loan investment amount
-        return 0.0;
+    public static Double getPercentageTop30(ExcelLoanAgeingHelper excel) {
+        return (getTop30LoanAmount(excel) / getTotalLoanInvestment(excel)) * 100;
     }
 
-    public static Double getPercentageTop30(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add calculation - (top30LoanAmount / totalLoanInvestment) * 100
-        return 0.0;
-    }
-
-    public static Double getTop30RecoveryRate(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: Add calculation - Recovery rate for top 30 borrowers
-        return 0.0;
+    public static Double getTop30RecoveryRate(ExcelLoanAgeingHelper excel) {
+        Double nicePeopleTotalBalance = excel.getTotalBalanceByCategory(30, LoanPayerCategory.BELOW_ONE, LoanPayerCategory.UPTO_ONE_MONTH, LoanPayerCategory.ONE_TO_THREE_MONTHS);
+        Double total30LoanAmount = getTotalLoanInvestment(excel);
+        return (nicePeopleTotalBalance / total30LoanAmount) * 100;
     }
 
     public static void createDataSlide(XMLSlideShow ppt, String slideTitle,
-                                       ExcelTrialBalanceExcelRowHelper data) {
+                                       ExcelLoanAgeingHelper data) {
         XSLFSlide slide = ppt.createSlide();
 
         // Configure Nepali number formatter
@@ -62,7 +60,7 @@ public final class SlideTen {
 
         // Create table structure: 2 columns (Description | Amount)
         // 1 header row + 5 data rows = 6 rows
-        int numRows = 6;
+        int numRows = 5;
         int numCols = 2;
 
         XSLFTable table = slide.createTable(numRows, numCols);
@@ -78,7 +76,7 @@ public final class SlideTen {
         // First column header is empty
         XSLFTableCell headerCell0 = table.getCell(0, 0);
         PPTUtils.setCellTextWithStyle(headerCell0,
-                "", TextAlignment.LEFT, PresetColor.WHITE,
+                ROW_1_TOP_30_BORROWERS, TextAlignment.LEFT, PresetColor.WHITE,
                 12.0, true,
                 headerBlue, NORMAL_BORDER_COLOR);
 
@@ -93,64 +91,48 @@ public final class SlideTen {
         Color white = Color.WHITE;
         Color lightBlue = new Color(217, 225, 242);
 
-        // Row 1: 30 जना ठूला ऋणीहरु (label only, no amount)
-        fillDataRow(table, 1, ROW_1_TOP_30_BORROWERS, null,
-                nepaliFormat, headerBlue, true);
+        // Row 1: 30 जना ठूला ऋणीहरुले लिएको ऋण रकम रु
+        fillDataRow(table, 1, ROW_2_TOP_30_LOAN_AMOUNT, getTop30LoanAmount(data),
+                nepaliFormat, lightBlue);
 
-        // Row 2: 30 जना ठूला ऋणीहरुले लिएको ऋण रकम रु
-        fillDataRow(table, 2, ROW_2_TOP_30_LOAN_AMOUNT, getTop30LoanAmount(data),
-                nepaliFormat, lightBlue, false);
+        // Row 2: कूल ऋण लगानी रकम रु.
+        fillDataRow(table, 2, ROW_3_TOTAL_LOAN_INVESTMENT, getTotalLoanInvestment(data),
+                nepaliFormat, white);
 
-        // Row 3: कूल ऋण लगानी रकम रु.
-        fillDataRow(table, 3, ROW_3_TOTAL_LOAN_INVESTMENT, getTotalLoanInvestment(data),
-                nepaliFormat, white, false);
+        // Row 3: कूल ऋण लगानीमा ३० जना ऋणीले लिएको ऋणको प्रतिशत
+        fillDataRow(table, 3, ROW_4_PERCENTAGE, getPercentageTop30(data),
+                nepaliFormat, lightBlue);
 
-        // Row 4: कूल ऋण लगानीमा ३० जना ऋणीले लिएको ऋणको प्रतिशत
-        fillDataRow(table, 4, ROW_4_PERCENTAGE, getPercentageTop30(data),
-                nepaliFormat, lightBlue, false);
-
-        // Row 5: ३० जना ऋणीको ऋण असुली दर
-        fillDataRow(table, 5, ROW_5_ACTUAL_INTEREST_RATE, getTop30RecoveryRate(data),
-                nepaliFormat, white, false);
+        // Row 4: ३० जना ऋणीको ऋण असुली दर
+        fillDataRow(table, 4, ROW_5_ACTUAL_INTEREST_RATE, getTop30RecoveryRate(data),
+                nepaliFormat, white);
     }
 
     // Helper method to fill a data row
     private static void fillDataRow(XSLFTable table, int row, String description,
                                     Double amount, NumberFormat formatter,
-                                    Color bgColor, boolean isBlueRow) {
+                                    Color bgColor) {
         // Description column
         XSLFTableCell cell0 = table.getCell(row, 0);
 
-        if (isBlueRow) {
-            // Blue row with white text
-            PPTUtils.setCellTextWithStyle(cell0,
-                    description, TextAlignment.LEFT, PresetColor.WHITE,
-                    NORMAL_FONT_SIZE, false,
-                    bgColor, NORMAL_BORDER_COLOR);
-        } else {
-            // Normal row with black text
-            PPTUtils.setCellTextWithStyle(cell0,
-                    description, TextAlignment.LEFT, NORMAL_FONT_COLOR,
-                    NORMAL_FONT_SIZE, false,
-                    bgColor, NORMAL_BORDER_COLOR);
-        }
+        // Normal row with black text
+        PPTUtils.setCellTextWithStyle(cell0,
+                description, TextAlignment.LEFT, NORMAL_FONT_COLOR,
+                NORMAL_FONT_SIZE, false,
+                bgColor, NORMAL_BORDER_COLOR);
 
         // Amount column
         XSLFTableCell cell1 = table.getCell(row, 1);
         String amountText = (amount != null) ? formatter.format(amount) : "";
-
-        if (isBlueRow) {
-            // Blue row with white text
-            PPTUtils.setCellTextWithStyle(cell1,
-                    amountText, TextAlignment.RIGHT, PresetColor.WHITE,
-                    NORMAL_FONT_SIZE, false,
-                    bgColor, NORMAL_BORDER_COLOR);
-        } else {
-            // Normal row with black text
-            PPTUtils.setCellTextWithStyle(cell1,
-                    amountText, TextAlignment.RIGHT, NORMAL_FONT_COLOR,
-                    NORMAL_FONT_SIZE, false,
-                    bgColor, NORMAL_BORDER_COLOR);
+        if (row == 3 || row == 4){
+            amountText = amountText + "%";
         }
+
+        // Normal row with black text
+        PPTUtils.setCellTextWithStyle(cell1,
+                amountText, TextAlignment.RIGHT, NORMAL_FONT_COLOR,
+                NORMAL_FONT_SIZE, false,
+                bgColor, NORMAL_BORDER_COLOR);
+
     }
 }

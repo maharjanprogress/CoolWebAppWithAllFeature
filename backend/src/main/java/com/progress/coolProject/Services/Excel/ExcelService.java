@@ -490,6 +490,8 @@ public class ExcelService implements IExcelService {
 
         SlideEight.createDataSlide(ppt, excel);
 
+        SlideTen.createDataSlide(ppt, "९. कूल ऋण लगानीमा अधिकतम ऋण लिने ३० जना सदस्यहरुको ऋण रकम%", loanAgeing);
+
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String fileName = username + "_trial_balance_" + timestamp + ".pptx";
