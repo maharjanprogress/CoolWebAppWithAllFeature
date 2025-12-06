@@ -10,6 +10,8 @@ public interface IExcelService {
             MultipartFile profitAndLoss,
             MultipartFile balanceSheet,
             MultipartFile loanAgeingSheet,
+            MultipartFile loanSummary,
+            MultipartFile savingSummary,
             User user
     );
     ProcessingJob getActiveJob(User user);

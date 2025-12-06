@@ -1,5 +1,6 @@
 package com.progress.coolProject.Services.Excel;
 
+import com.progress.coolProject.DTO.Excel.AccountSummaryDTO;
 import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
@@ -8,13 +9,13 @@ import com.progress.coolProject.DTO.ResponseDTO;
 import com.progress.coolProject.Entity.Excel.ProcessingJob;
 import com.progress.coolProject.Entity.User;
 import com.progress.coolProject.Enums.JobStatus;
+import com.progress.coolProject.Enums.LoanCategory;
+import com.progress.coolProject.Enums.SavingCategory;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Repo.Excel.ProcessingJobRepository;
 import com.progress.coolProject.Services.Impl.Excel.IExcelService;
 import com.progress.coolProject.StringConstants;
-import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
-import com.progress.coolProject.Utils.Excel.ExcelUtil;
-import com.progress.coolProject.Utils.Excel.LoanAccountAgeingExcelUtil;
+import com.progress.coolProject.Utils.Excel.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.sl.usermodel.TextParagraph;
@@ -55,6 +56,8 @@ public class ExcelService implements IExcelService {
                                          MultipartFile profitAndLoss,
                                          MultipartFile balanceSheet,
                                          MultipartFile loanAgeingSheet,
+                                         MultipartFile loanSummary,
+                                         MultipartFile savingSummary,
                                          User user) {
         // Check if user already has an active job
         Optional<ProcessingJob> existingJob = jobRepository.findFirstByUserAndStatusInOrderByCreatedAtDesc(
@@ -77,7 +80,8 @@ public class ExcelService implements IExcelService {
         job = jobRepository.save(job);
 
         // Process asynchronously
-        processExcelAsync(job, trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet);
+        processExcelAsync(job, trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet,
+                loanSummary, savingSummary);
 
         return job;
     }
@@ -94,7 +98,9 @@ public class ExcelService implements IExcelService {
     public void processExcelAsync(ProcessingJob job, MultipartFile trialBalance,
                                   MultipartFile profitAndLoss,
                                   MultipartFile balanceSheet,
-                                  MultipartFile loanAgeingSheet) {
+                                  MultipartFile loanAgeingSheet,
+                                  MultipartFile loanSummary,
+                                  MultipartFile savingSummary) {
         Workbook workbook = null;
         try {
             // Update status to processing
@@ -130,6 +136,14 @@ public class ExcelService implements IExcelService {
             workbook = new XSSFWorkbook(loanAgeingSheet.getInputStream());
             Sheet lASheet = workbook.getSheetAt(0);
 
+            sendProgress(job, 27, "Validating loan summary Excel file...");
+            workbook = new XSSFWorkbook(loanSummary.getInputStream());
+            Sheet loanSummarySheet = workbook.getSheetAt(0);
+
+            sendProgress(job, 28, "Validating saving summary Excel file...");
+            workbook = new XSSFWorkbook(savingSummary.getInputStream());
+            Sheet savingSummarySheet = workbook.getSheetAt(0);
+
             // Parse and validate data
             sendProgress(job, 35, "Validating data...");
             Map<TrialBalanceEnum, ExcelRowDTO> tbRows = parseAndValidateData(sheet);
@@ -149,6 +163,12 @@ public class ExcelService implements IExcelService {
 
             HashMap<String, LoanAccountAgeingDTO> loanData =
                     LoanAccountAgeingExcelUtil.extractLoanAccountAgeingData(lASheet);
+
+            HashMap<LoanCategory, AccountSummaryDTO> loanSummData =
+                    LoanSummaryExcelUtil.extractLoanSummaryData(loanSummarySheet);
+
+            HashMap<SavingCategory, AccountSummaryDTO> savingSummData =
+                    SavingSummaryExcelUtil.extractSavingSummaryData(savingSummarySheet);
 
             sendProgress(job, 40, "Combining data from all files...");
             Map<TrialBalanceEnum, ExcelRowDTO> rows = new HashMap<>(tbRows);

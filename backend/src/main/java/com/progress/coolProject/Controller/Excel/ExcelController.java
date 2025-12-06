@@ -24,11 +24,14 @@ public class ExcelController {
             @RequestParam("trialBalance") MultipartFile trialBalance,
             @RequestParam("profitAndLoss") MultipartFile profitAndLoss,
             @RequestParam("balanceSheet") MultipartFile balanceSheet,
-            @RequestParam("loanAgeingSheet") MultipartFile loanAgeingSheet
+            @RequestParam("loanAgeingSheet") MultipartFile loanAgeingSheet,
+            @RequestParam("loanSummary") MultipartFile loanSummary,
+            @RequestParam("savingSummary") MultipartFile savingSummary
     ) {
         ProcessingJob job = excelService.startProcessing(
                 trialBalance, profitAndLoss,
                 balanceSheet, loanAgeingSheet,
+                loanSummary, savingSummary,
                 currentUser.getCurrentUser()
         );
         return ResponseEntity.ok(ResponseDTO.success("File uploaded successfully. Job ID: " + job.getId(), job));
