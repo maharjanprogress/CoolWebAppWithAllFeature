@@ -1,6 +1,9 @@
 package com.progress.coolProject.Utils.Excel;
 
 import lombok.experimental.UtilityClass;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
 import org.springframework.web.multipart.MultipartFile;
 
 @UtilityClass
@@ -31,5 +34,63 @@ public final class ExcelUtil {
         }
         combinedFileNames.delete(combinedFileNames.length() - 2, combinedFileNames.length());
         return combinedFileNames.toString();
+    }
+
+    public static boolean isRowEmpty(Row row) {
+        for (int i = 0; i < 4; i++) {
+            Cell cell = row.getCell(i);
+            if (cell != null && !isCellEmpty(cell)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isCellEmpty(Cell cell) {
+        if (cell == null) return true;
+        if (cell.getCellType() == CellType.BLANK) return true;
+        if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty()) return true;
+        return false;
+    }
+
+    public static String getCellValueAsString(Cell cell) {
+        if (cell == null) return "";
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue().trim();
+            case NUMERIC -> String.valueOf((int) cell.getNumericCellValue());
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            case FORMULA -> cell.getCellFormula();
+            default -> "";
+        };
+    }
+
+    public static Integer getCellValueAsInteger(Cell cell) throws Exception {
+        if (cell == null) return null;
+        try {
+            if (cell.getCellType() == CellType.NUMERIC) {
+                return (int) cell.getNumericCellValue();
+            } else if (cell.getCellType() == CellType.STRING) {
+                String value = cell.getStringCellValue().trim();
+                return value.isEmpty() ? null : Integer.parseInt(value);
+            }
+        } catch (NumberFormatException e) {
+            throw new Exception("Invalid ledger number format: " + getCellValueAsString(cell));
+        }
+        return null;
+    }
+
+    public static Double getCellValueAsDouble(Cell cell) throws Exception {
+        if (cell == null) return null;
+        try {
+            if (cell.getCellType() == CellType.NUMERIC) {
+                return cell.getNumericCellValue();
+            } else if (cell.getCellType() == CellType.STRING) {
+                String value = cell.getStringCellValue().trim();
+                return value.isEmpty() ? null : Double.parseDouble(value);
+            }
+        } catch (NumberFormatException e) {
+            throw new Exception("Invalid number format: " + getCellValueAsString(cell));
+        }
+        return null;
     }
 }

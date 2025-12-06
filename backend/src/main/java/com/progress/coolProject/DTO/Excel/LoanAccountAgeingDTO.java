@@ -1,7 +1,8 @@
 package com.progress.coolProject.DTO.Excel;
 
 
-import com.progress.coolProject.Enums.LoanType;
+import com.progress.coolProject.Enums.LoanCategory;
+import com.progress.coolProject.Enums.LoanPayerCategory;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import java.time.LocalDate;
 public class LoanAccountAgeingDTO {
     private String accountNo;
     private String description;
-    private LoanType accountName;
+    private LoanCategory accountName;
     private String period;
     private LocalDate openingDate;
     private LocalDate maturedDate;
@@ -23,6 +24,7 @@ public class LoanAccountAgeingDTO {
     private Integer lapsedDays;
     private Double loanAmount;
     private Double balanceAmount;
+    private LoanPayerCategory paymentType;
     private Double amount1To30;
     private Double amount31To90;
     private Double amount91To180;

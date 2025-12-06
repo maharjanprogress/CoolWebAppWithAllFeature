@@ -2,7 +2,8 @@ package com.progress.coolProject.Utils.Excel;
 
 
 import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
-import com.progress.coolProject.Enums.LoanType;
+import com.progress.coolProject.Enums.LoanCategory;
+import com.progress.coolProject.Enums.LoanPayerCategory;
 import lombok.experimental.UtilityClass;
 import org.apache.poi.ss.usermodel.*;
 
@@ -132,7 +133,7 @@ public class LoanAccountAgeingExcelUtil {
 
         // Column 2: Account Name (LoanType)
         String loanTypeName = getCellValueAsString(row.getCell(2));
-        Optional<LoanType> loanType = LoanType.findByLoanTypeName(loanTypeName);
+        Optional<LoanCategory> loanType = LoanCategory.findByLoanTypeName(loanTypeName);
         if (loanType.isEmpty()) {
             throw new Exception("Invalid loan type: " + loanTypeName);
         }
@@ -162,30 +163,27 @@ public class LoanAccountAgeingExcelUtil {
         // Column 10: Balance Amount
         dto.setBalanceAmount(getCellValueAsDouble(row.getCell(10)));
 
-        // Column 11: 1-30
-        dto.setAmount1To30(getCellValueAsDouble(row.getCell(11)));
+        for(int i = 11 ; i <=18 ; i++){
+            Double balanceAmount = getCellValueAsDouble(row.getCell(i));
+            if (balanceAmount == null) {
+                continue;
+            } else if (!balanceAmount.equals(dto.getBalanceAmount())) {
+                throw new Exception("Invalid balance amount: " + balanceAmount + " Expected: " + dto.getBalanceAmount()
+                + " , In the account Number: " + dto.getAccountNo());
+            }
 
-        // Column 12: 31-90
-        dto.setAmount31To90(getCellValueAsDouble(row.getCell(12)));
-
-        // Column 13: 91-180
-        dto.setAmount91To180(getCellValueAsDouble(row.getCell(13)));
-
-        // Column 14: 181-270
-        dto.setAmount181To270(getCellValueAsDouble(row.getCell(14)));
-
-        // Column 15: 271-365
-        dto.setAmount271To365(getCellValueAsDouble(row.getCell(15)));
-
-        // Column 16: 366-730
-        dto.setAmount366To730(getCellValueAsDouble(row.getCell(16)));
-
-        // Column 17: Above 730
-        dto.setAmountAbove730(getCellValueAsDouble(row.getCell(17)));
-
-        // Column 18: Below 1
-        dto.setAmountBelow1(getCellValueAsDouble(row.getCell(18)));
-
+            switch (i) {
+                case 11 -> dto.setPaymentType(LoanPayerCategory.UPTO_ONE_MONTH);
+                case 12 -> dto.setPaymentType(LoanPayerCategory.ONE_TO_THREE_MONTHS);
+                case 13 -> dto.setPaymentType(LoanPayerCategory.THREE_TO_SIX_MONTHS);
+                case 14 -> dto.setPaymentType(LoanPayerCategory.SIX_TO_NINE_MONTHS);
+                case 15 -> dto.setPaymentType(LoanPayerCategory.NINE_TO_TWELVE_MONTHS);
+                case 16 -> dto.setPaymentType(LoanPayerCategory.ONE_TO_TWO_YEARS);
+                case 17 -> dto.setPaymentType(LoanPayerCategory.ABOVE_TWO_YEARS);
+                case 18 -> dto.setPaymentType(LoanPayerCategory.BELOW_ONE);
+                default -> throw new Exception("Invalid column number for loan payers category: " + i);
+            }
+        }
         return dto;
     }
 
@@ -260,6 +258,7 @@ public class LoanAccountAgeingExcelUtil {
             if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
                 return cell.getLocalDateTimeCellValue().toLocalDate();
             } else if (cell.getCellType() == CellType.STRING) {
+                //todo: check if this hits...
                 // Handle string date format if needed
                 String dateStr = cell.getStringCellValue().trim();
                 // You can add custom date parsing logic here if needed

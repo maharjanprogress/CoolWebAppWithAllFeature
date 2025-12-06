@@ -211,10 +211,10 @@ public class ExcelService implements IExcelService {
 
         for (int i = 0; i < expectedHeaders.length; i++) {
             Cell cell = headerRow.getCell(i);
-            if (cell == null || !getCellValueAsString(cell).trim().equalsIgnoreCase(expectedHeaders[i])) {
+            if (cell == null || !ExcelUtil.getCellValueAsString(cell).trim().equalsIgnoreCase(expectedHeaders[i])) {
                 throw new Exception("Invalid header at column " + (i + 1) +
                         ". Expected: " + expectedHeaders[i] + ", Found: " +
-                        (cell != null ? getCellValueAsString(cell) : "null"));
+                        (cell != null ? ExcelUtil.getCellValueAsString(cell) : "null"));
             }
         }
     }
@@ -227,7 +227,7 @@ public class ExcelService implements IExcelService {
 
         for (int i = DATA_START_ROW; i < lastRowNum; i++) {
             Row row = sheet.getRow(i);
-            if (row == null || isRowEmpty(row)) {
+            if (row == null || ExcelUtil.isRowEmpty(row)) {
                 continue; // Skip empty rows
             }
 
@@ -284,25 +284,25 @@ public class ExcelService implements IExcelService {
         // Ledger No (Column 0)
         Cell ledgerCell = row.getCell(0);
         if (ledgerCell != null) {
-            dto.setLedgerNo(getCellValueAsInteger(ledgerCell));
+            dto.setLedgerNo(ExcelUtil.getCellValueAsInteger(ledgerCell));
         }
 
         // Description (Column 1)
         Cell descCell = row.getCell(1);
         if (descCell != null) {
-            dto.setLedgerDescription(getCellValueAsString(descCell));
+            dto.setLedgerDescription(ExcelUtil.getCellValueAsString(descCell));
         }
 
         // Debit (Column 2)
         Cell debitCell = row.getCell(2);
-        if (debitCell != null && !isCellEmpty(debitCell)) {
-            dto.setDebit(getCellValueAsDouble(debitCell));
+        if (debitCell != null && !ExcelUtil.isCellEmpty(debitCell)) {
+            dto.setDebit(ExcelUtil.getCellValueAsDouble(debitCell));
         }
 
         // Credit (Column 3)
         Cell creditCell = row.getCell(3);
-        if (creditCell != null && !isCellEmpty(creditCell)) {
-            dto.setCredit(getCellValueAsDouble(creditCell));
+        if (creditCell != null && !ExcelUtil.isCellEmpty(creditCell)) {
+            dto.setCredit(ExcelUtil.getCellValueAsDouble(creditCell));
         }
 
         return dto;
@@ -474,64 +474,6 @@ public class ExcelService implements IExcelService {
             Files.createDirectories(path);
             log.info("Created output directory: {}", path);
         }
-    }
-
-    private boolean isRowEmpty(Row row) {
-        for (int i = 0; i < 4; i++) {
-            Cell cell = row.getCell(i);
-            if (cell != null && !isCellEmpty(cell)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean isCellEmpty(Cell cell) {
-        if (cell == null) return true;
-        if (cell.getCellType() == CellType.BLANK) return true;
-        if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty()) return true;
-        return false;
-    }
-
-    private String getCellValueAsString(Cell cell) {
-        if (cell == null) return "";
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue().trim();
-            case NUMERIC -> String.valueOf((int) cell.getNumericCellValue());
-            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-            case FORMULA -> cell.getCellFormula();
-            default -> "";
-        };
-    }
-
-    private Integer getCellValueAsInteger(Cell cell) throws Exception {
-        if (cell == null) return null;
-        try {
-            if (cell.getCellType() == CellType.NUMERIC) {
-                return (int) cell.getNumericCellValue();
-            } else if (cell.getCellType() == CellType.STRING) {
-                String value = cell.getStringCellValue().trim();
-                return value.isEmpty() ? null : Integer.parseInt(value);
-            }
-        } catch (NumberFormatException e) {
-            throw new Exception("Invalid ledger number format: " + getCellValueAsString(cell));
-        }
-        return null;
-    }
-
-    private Double getCellValueAsDouble(Cell cell) throws Exception {
-        if (cell == null) return null;
-        try {
-            if (cell.getCellType() == CellType.NUMERIC) {
-                return cell.getNumericCellValue();
-            } else if (cell.getCellType() == CellType.STRING) {
-                String value = cell.getStringCellValue().trim();
-                return value.isEmpty() ? null : Double.parseDouble(value);
-            }
-        } catch (NumberFormatException e) {
-            throw new Exception("Invalid number format: " + getCellValueAsString(cell));
-        }
-        return null;
     }
 
     private void sendProgress(ProcessingJob job, int progress, String message) {
