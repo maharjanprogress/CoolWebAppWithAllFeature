@@ -493,6 +493,10 @@ public class ExcelService implements IExcelService {
                 "१०. धितो जमानत र विना धितोमा ऋण लगानी (कुल ऋणी संख्या)",
                 loanAgeing);
 
+        SlideTwelve.createDataSlide(ppt,
+                "११. कुल ऋण लगानीमा संचालक, लेखा सु. समिति र कर्मचारीले लिएको ऋणको %",
+                loanAgeing);
+
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
         String fileName = username + "_trial_balance_" + timestamp + ".pptx";
