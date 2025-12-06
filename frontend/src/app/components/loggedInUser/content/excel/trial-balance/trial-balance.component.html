@@ -37,6 +37,22 @@
       </app-file-upload>
     </div>
 
+    <div class="file-upload-group">
+      <label>Loan Summary Sheet</label>
+      <app-file-upload #loanSummarySheetUpload
+                       [onlyInclude]="allowedFileTypes"
+                       [singleFile]="true">
+      </app-file-upload>
+    </div>
+
+    <div class="file-upload-group">
+      <label>Saving Summary Sheet</label>
+      <app-file-upload #savingSummarySheetUpload
+                       [onlyInclude]="allowedFileTypes"
+                       [singleFile]="true">
+      </app-file-upload>
+    </div>
+
     <button class="upload-btn" (click)="uploadFile()" [disabled]="uploading">
       {{ uploading ? 'Uploading...' : 'Upload and Process' }}
     </button>
