@@ -497,9 +497,15 @@ public class ExcelService implements IExcelService {
                 "११. कुल ऋण लगानीमा संचालक, लेखा सु. समिति र कर्मचारीले लिएको ऋणको %",
                 loanAgeing);
 
+        Double loanLossProvision = excel.getCredit(TrialBalanceEnum.LOAN_LOSS_PROVISION);
+
+        if (loanLossProvision == 0.0) {
+            throw new IllegalArgumentException("Loan lossProvision is 0");
+        }
+
         SlideThirteen.createDataSlide(ppt,
                 "१२. ऋण जोखिम व्यवस्था विश्लेषण (कुल ऋणी संख्या)",
-                loanAgeing);
+                loanAgeing, loanLossProvision);
 
         SlideFourteen.createDataSlide(ppt,
                 SlideFourteen.FIRST_ROW_TITLE);

@@ -2,6 +2,8 @@ package com.progress.coolProject.DTO.Excel.Slides;
 
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
+import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
+import com.progress.coolProject.Enums.LoanPayerCategory;
 import com.progress.coolProject.Utils.Excel.ExcelLoanAgeingHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
 import lombok.experimental.UtilityClass;
@@ -33,19 +35,28 @@ public final class SlideThirteen {
     public static final String ROW_WATCH_LIST_LOAN = "असल ऋण";
     public static final String ROW_TOTAL = "कूल जम्मा";
 
-    private static final double NORMAL_FONT_SIZE = 20.0;
+    private static final double NORMAL_FONT_SIZE = 17.0;
     private static final PresetColor NORMAL_FONT_COLOR = PresetColor.BLACK;
     private static final Color NORMAL_BORDER_COLOR = Color.BLACK;
 
+    private static Double remainingLoanLossProvision;
+
     // Bad Loan (खराब ऋण) Calculation Methods
     public static Integer getBadLoanBorrowerCount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - count of bad loan borrowers
-        return 0;
+        return loanHelper.getFilteredPayCategory(
+                LoanPayerCategory.ONE_TO_TWO_YEARS,
+                LoanPayerCategory.ABOVE_TWO_YEARS
+        ).size();
     }
 
     public static Double getBadLoanAmount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - total bad loan amount
-        return 0.0;
+        return loanHelper.getFilteredPayCategory(
+                LoanPayerCategory.ONE_TO_TWO_YEARS,
+                LoanPayerCategory.ABOVE_TWO_YEARS
+        )
+                .values().stream()
+                .mapToDouble(LoanAccountAgeingDTO::getBalanceAmount)
+                .sum();
     }
 
     public static String getBadLoanRiskRate() {
@@ -53,29 +64,35 @@ public final class SlideThirteen {
     }
 
     public static Double getBadLoanAffectedRiskAmount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - bad loan amount * 100%
-        return 0.0;
+        return getBadLoanAmount(loanHelper);
     }
 
     public static Double getBadLoanInstitutionalManagement(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - institutional risk management for bad loans
-        return 0.0;
+        Double compareNumber = getBadLoanAffectedRiskAmount(loanHelper);
+        return compareWithRemainingBalance(compareNumber);
     }
 
     public static Double getBadLoanRemainingRisk(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - remaining/excess risk amount
-        return 0.0;
+        remainingLoanLossProvision = remainingLoanLossProvision - getBadLoanAffectedRiskAmount(loanHelper);
+        return remainingLoanLossProvision;
     }
 
     // Doubtful Loan (शंकास्पद ऋण) Calculation Methods
     public static Integer getDoubtfulLoanBorrowerCount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - count of doubtful loan borrowers
-        return 0;
+        return loanHelper.getFilteredPayCategory(
+                LoanPayerCategory.SIX_TO_NINE_MONTHS,
+                LoanPayerCategory.NINE_TO_TWELVE_MONTHS
+        ).size();
     }
 
     public static Double getDoubtfulLoanAmount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - total doubtful loan amount
-        return 0.0;
+        return loanHelper.getFilteredPayCategory(
+                        LoanPayerCategory.SIX_TO_NINE_MONTHS,
+                        LoanPayerCategory.NINE_TO_TWELVE_MONTHS
+                )
+                .values().stream()
+                .mapToDouble(LoanAccountAgeingDTO::getBalanceAmount)
+                .sum();
     }
 
     public static String getDoubtfulLoanRiskRate() {
@@ -83,29 +100,33 @@ public final class SlideThirteen {
     }
 
     public static Double getDoubtfulLoanAffectedRiskAmount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - doubtful loan amount * 50%
-        return 0.0;
+        return 0.5 * getBadLoanAmount(loanHelper);
     }
 
     public static Double getDoubtfulLoanInstitutionalManagement(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - institutional risk management for doubtful loans
-        return 0.0;
+        Double compareNumber = getDoubtfulLoanAffectedRiskAmount(loanHelper);
+        return compareWithRemainingBalance(compareNumber);
     }
 
     public static Double getDoubtfulLoanRemainingRisk(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - remaining/excess risk amount
-        return 0.0;
+        remainingLoanLossProvision = remainingLoanLossProvision - getDoubtfulLoanAffectedRiskAmount(loanHelper);
+        return  remainingLoanLossProvision;
     }
 
     // Substandard Loan (कमसल ऋण) Calculation Methods
     public static Integer getSubstandardLoanBorrowerCount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - count of substandard loan borrowers
-        return 0;
+        return loanHelper.getFilteredPayCategory(
+                LoanPayerCategory.THREE_TO_SIX_MONTHS
+        ).size();
     }
 
     public static Double getSubstandardLoanAmount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - total substandard loan amount
-        return 0.0;
+        return loanHelper.getFilteredPayCategory(
+                        LoanPayerCategory.THREE_TO_SIX_MONTHS
+                )
+                .values().stream()
+                .mapToDouble(LoanAccountAgeingDTO::getBalanceAmount)
+                .sum();
     }
 
     public static String getSubstandardLoanRiskRate() {
@@ -113,29 +134,37 @@ public final class SlideThirteen {
     }
 
     public static Double getSubstandardLoanAffectedRiskAmount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - substandard loan amount * 25%
-        return 0.0;
+        return 0.25 * getSubstandardLoanAmount(loanHelper);
     }
 
     public static Double getSubstandardLoanInstitutionalManagement(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - institutional risk management for substandard loans
-        return 0.0;
+        Double compareNumber = getSubstandardLoanAffectedRiskAmount(loanHelper);
+        return compareWithRemainingBalance(compareNumber);
     }
 
     public static Double getSubstandardLoanRemainingRisk(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - remaining/excess risk amount
-        return 0.0;
+        remainingLoanLossProvision = remainingLoanLossProvision - getSubstandardLoanAffectedRiskAmount(loanHelper);
+        return remainingLoanLossProvision;
     }
 
     // Watch List Loan (असल ऋण) Calculation Methods
     public static Integer getWatchListLoanBorrowerCount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - count of watch list loan borrowers
-        return 0;
+        return loanHelper.getFilteredPayCategory(
+                LoanPayerCategory.BELOW_ONE,
+                LoanPayerCategory.UPTO_ONE_MONTH,
+                LoanPayerCategory.ONE_TO_THREE_MONTHS
+        ).size();
     }
 
     public static Double getWatchListLoanAmount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - total watch list loan amount
-        return 0.0;
+        return loanHelper.getFilteredPayCategory(
+                        LoanPayerCategory.BELOW_ONE,
+                        LoanPayerCategory.UPTO_ONE_MONTH,
+                        LoanPayerCategory.ONE_TO_THREE_MONTHS
+                )
+                .values().stream()
+                .mapToDouble(LoanAccountAgeingDTO::getBalanceAmount)
+                .sum();
     }
 
     public static String getWatchListLoanRiskRate() {
@@ -143,18 +172,17 @@ public final class SlideThirteen {
     }
 
     public static Double getWatchListLoanAffectedRiskAmount(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - watch list loan amount * 1%
-        return 0.0;
+        return 0.01 * getWatchListLoanAmount(loanHelper);
     }
 
     public static Double getWatchListLoanInstitutionalManagement(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - institutional risk management for watch list loans
-        return 0.0;
+        Double compareNumber = getWatchListLoanAffectedRiskAmount(loanHelper);
+        return compareWithRemainingBalance(compareNumber);
     }
 
     public static Double getWatchListLoanRemainingRisk(ExcelLoanAgeingHelper loanHelper) {
-        // TODO: Add calculation - remaining/excess risk amount
-        return 0.0;
+        remainingLoanLossProvision = remainingLoanLossProvision - getWatchListLoanAffectedRiskAmount(loanHelper);
+        return remainingLoanLossProvision;
     }
 
     // Total Calculation Methods
@@ -177,18 +205,12 @@ public final class SlideThirteen {
                 + getSubstandardLoanAffectedRiskAmount(loanHelper) + getWatchListLoanAffectedRiskAmount(loanHelper);
     }
 
-    public static Double getTotalInstitutionalManagement(ExcelLoanAgeingHelper loanHelper) {
-        return getBadLoanInstitutionalManagement(loanHelper) + getDoubtfulLoanInstitutionalManagement(loanHelper)
-                + getSubstandardLoanInstitutionalManagement(loanHelper) + getWatchListLoanInstitutionalManagement(loanHelper);
-    }
-
-    public static Double getTotalRemainingRisk(ExcelLoanAgeingHelper loanHelper) {
-        return getBadLoanRemainingRisk(loanHelper) + getDoubtfulLoanRemainingRisk(loanHelper)
-                + getSubstandardLoanRemainingRisk(loanHelper) + getWatchListLoanRemainingRisk(loanHelper);
-    }
-
     public static void createDataSlide(XMLSlideShow ppt, String slideTitle,
-                                       ExcelLoanAgeingHelper loanHelper) {
+                                       ExcelLoanAgeingHelper loanHelper,
+                                       Double loanLossProvison
+    ) {
+
+        remainingLoanLossProvision = loanLossProvison;
         XSLFSlide slide = ppt.createSlide();
 
         // Configure Nepali number formatter
@@ -236,54 +258,64 @@ public final class SlideThirteen {
         Color white = Color.WHITE;
         Color lightBlue = new Color(217, 225, 242);
 
+        Double badLoanInstitutionalManagement = getBadLoanInstitutionalManagement(loanHelper);
+        Double badLoanRemainingRisk = getBadLoanRemainingRisk(loanHelper);
         // Row 1: Bad Loan (खराब ऋण)
         fillDataRow(table, 1, ROW_BAD_LOAN,
                 getBadLoanBorrowerCount(loanHelper),
                 getBadLoanAmount(loanHelper),
                 getBadLoanRiskRate(),
                 getBadLoanAffectedRiskAmount(loanHelper),
-                getBadLoanInstitutionalManagement(loanHelper),
-                getBadLoanRemainingRisk(loanHelper),
+                badLoanInstitutionalManagement,
+                badLoanRemainingRisk,
                 nepaliFormat, lightBlue);
 
+        Double doubtfulInstutionalManagement = getDoubtfulLoanInstitutionalManagement(loanHelper);
+        Double doubtfulLoanRemainingRisk = getDoubtfulLoanRemainingRisk(loanHelper);
         // Row 2: Doubtful Loan (शंकास्पद ऋण)
         fillDataRow(table, 2, ROW_DOUBTFUL_LOAN,
                 getDoubtfulLoanBorrowerCount(loanHelper),
                 getDoubtfulLoanAmount(loanHelper),
                 getDoubtfulLoanRiskRate(),
                 getDoubtfulLoanAffectedRiskAmount(loanHelper),
-                getDoubtfulLoanInstitutionalManagement(loanHelper),
-                getDoubtfulLoanRemainingRisk(loanHelper),
+                doubtfulInstutionalManagement,
+                doubtfulLoanRemainingRisk,
                 nepaliFormat, white);
 
+        Double substandardInstitutionalManagement = getSubstandardLoanInstitutionalManagement(loanHelper);
+        Double substandardLoanRemainingRisk = getSubstandardLoanRemainingRisk(loanHelper);
         // Row 3: Substandard Loan (कमसल ऋण)
         fillDataRow(table, 3, ROW_SUBSTANDARD_LOAN,
                 getSubstandardLoanBorrowerCount(loanHelper),
                 getSubstandardLoanAmount(loanHelper),
                 getSubstandardLoanRiskRate(),
                 getSubstandardLoanAffectedRiskAmount(loanHelper),
-                getSubstandardLoanInstitutionalManagement(loanHelper),
-                getSubstandardLoanRemainingRisk(loanHelper),
+                substandardInstitutionalManagement,
+                substandardLoanRemainingRisk,
                 nepaliFormat, lightBlue);
 
+        Double watchListInstitutionalManagement = getWatchListLoanInstitutionalManagement(loanHelper);
+        Double watchListLoanRemainingRisk = getWatchListLoanRemainingRisk(loanHelper);
         // Row 4: Watch List Loan (असल ऋण)
         fillDataRow(table, 4, ROW_WATCH_LIST_LOAN,
                 getWatchListLoanBorrowerCount(loanHelper),
                 getWatchListLoanAmount(loanHelper),
                 getWatchListLoanRiskRate(),
                 getWatchListLoanAffectedRiskAmount(loanHelper),
-                getWatchListLoanInstitutionalManagement(loanHelper),
-                getWatchListLoanRemainingRisk(loanHelper),
+                watchListInstitutionalManagement,
+                watchListLoanRemainingRisk,
                 nepaliFormat, white);
 
         // Row 5: Total (कूल जम्मा)
+        Double totalInstutionalManagement = badLoanInstitutionalManagement + doubtfulInstutionalManagement + substandardInstitutionalManagement + watchListInstitutionalManagement;
+        Double totalRemainingRisk = badLoanRemainingRisk + doubtfulLoanRemainingRisk + substandardLoanRemainingRisk  + watchListLoanRemainingRisk;
         fillDataRow(table, 5, ROW_TOTAL,
                 getTotalBorrowerCount(loanHelper),
                 getTotalLoanAmount(loanHelper),
                 getTotalRiskRate(),
                 getTotalAffectedRiskAmount(loanHelper),
-                getTotalInstitutionalManagement(loanHelper),
-                getTotalRemainingRisk(loanHelper),
+                totalInstutionalManagement,
+                totalRemainingRisk,
                 nepaliFormat, lightBlue);
 
         // Make total row bold
@@ -356,5 +388,16 @@ public final class SlideThirteen {
                 remainingText, TextAlignment.RIGHT, NORMAL_FONT_COLOR,
                 NORMAL_FONT_SIZE, false,
                 bgColor, NORMAL_BORDER_COLOR);
+    }
+
+    private static Double compareWithRemainingBalance(Double amount){
+        Double remainingBalance = remainingLoanLossProvision;
+        if (amount >= remainingBalance) {
+            if (remainingBalance <= 0.0) {
+                return 0.0;
+            }
+            return remainingBalance;
+        }
+        return amount;
     }
 }
