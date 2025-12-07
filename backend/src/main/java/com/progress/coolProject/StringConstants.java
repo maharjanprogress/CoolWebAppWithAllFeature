@@ -20,4 +20,14 @@ public class StringConstants {
     public static final String FALGUN = "फागुन";
     public static final String CHAITRA = "चैत";
 
+    public static String getMonths(String... months){
+        StringBuilder sb = new StringBuilder();
+        for (String month : months) {
+            sb.append(month);
+            sb.append(" ,");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
 }

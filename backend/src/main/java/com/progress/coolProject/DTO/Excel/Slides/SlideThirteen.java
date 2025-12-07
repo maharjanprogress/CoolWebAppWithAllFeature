@@ -16,8 +16,6 @@ import java.awt.*;
 
 @UtilityClass
 public final class SlideThirteen {
-    // Header
-    public static final String FIRST_ROW_TITLE = "१२. ऋण जोखिम व्यवस्था विश्लेषण (कुल ऋणी संख्या)";
 
     // Column Headers
     public static final String COLUMN_LOAN_PLAN = "ऋण योजनाहरुद";
