@@ -18,7 +18,8 @@ public final class OfficeConstants {
     );
 
     public static final Set<String> auditCommitteeMembers = Set.of(
-//            "Ram Maya Maharjan",  //another member with the same name has the lone so commented
+            "NIRMALA SHRESTHA",
+            "ANJU MAHARJAN",
             "BUDDHA LAXMI MAHARJAN"
     );
 
