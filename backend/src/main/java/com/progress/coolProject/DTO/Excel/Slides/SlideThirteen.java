@@ -100,7 +100,7 @@ public final class SlideThirteen {
     }
 
     public static Double getDoubtfulLoanAffectedRiskAmount(ExcelLoanAgeingHelper loanHelper) {
-        return 0.5 * getBadLoanAmount(loanHelper);
+        return 0.5 * getDoubtfulLoanAmount(loanHelper);
     }
 
     public static Double getDoubtfulLoanInstitutionalManagement(ExcelLoanAgeingHelper loanHelper) {
