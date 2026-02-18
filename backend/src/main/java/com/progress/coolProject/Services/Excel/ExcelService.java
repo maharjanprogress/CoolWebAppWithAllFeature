@@ -5,6 +5,7 @@ import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
 import com.progress.coolProject.DTO.Excel.Slides.*;
+import com.progress.coolProject.DTO.Excel.Slides.fortyto50.SlideFourtyOne;
 import com.progress.coolProject.DTO.ResponseDTO;
 import com.progress.coolProject.Entity.Excel.ProcessingJob;
 import com.progress.coolProject.Entity.User;
@@ -509,6 +510,8 @@ public class ExcelService implements IExcelService {
 
         SlideFourteen.createDataSlide(ppt,
                 SlideFourteen.FIRST_ROW_TITLE);
+
+        SlideFourtyOne.createDataSlide(ppt,"१७.(क) सुरक्षण (Protection)", loanAgeing, excel);
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
