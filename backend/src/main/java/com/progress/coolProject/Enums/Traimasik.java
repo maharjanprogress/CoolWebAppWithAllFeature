@@ -21,7 +21,6 @@ public enum Traimasik {
     public static Traimasik getCurrent() {
         NepaliDate nepaliDate = NepaliDate.now();
         int currentMonth = nepaliDate.getMonth();
-        System.out.println(currentMonth);
 
         // Determine which quarter we're in
         for (Traimasik quarter : values()) {

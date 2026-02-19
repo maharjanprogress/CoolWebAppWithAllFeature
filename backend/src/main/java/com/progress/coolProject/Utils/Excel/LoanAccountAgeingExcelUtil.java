@@ -3,12 +3,10 @@ package com.progress.coolProject.Utils.Excel;
 
 import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
 import com.progress.coolProject.Enums.LoanCategory;
+import com.progress.coolProject.Utils.date.NepaliDate;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.*;
 
 @UtilityClass
@@ -142,16 +140,16 @@ public class LoanAccountAgeingExcelUtil {
         dto.setPeriod(getCellValueAsString(row.getCell(3)));
 
         // Column 4: Opening Date
-        dto.setOpeningDate(getCellValueAsDate(row.getCell(4)));
+        dto.setOpeningDate(getCellValueAsNepaliDate(row.getCell(4)));
 
         // Column 5: Matured Date
-        dto.setMaturedDate(getCellValueAsDate(row.getCell(5)));
+        dto.setMaturedDate(getCellValueAsNepaliDate(row.getCell(5)));
 
         // Column 6: Last Repayment Date
-        dto.setLastRepaymentDate(getCellValueAsDate(row.getCell(6)));
+        dto.setLastRepaymentDate(getCellValueAsNepaliDate(row.getCell(6)));
 
         // Column 7: Current Date
-        dto.setCurrentDate(getCellValueAsDate(row.getCell(7)));
+        dto.setCurrentDate(getCellValueAsNepaliDate(row.getCell(7)));
 
         // Column 8: Lapsed Days
         dto.setLapsedDays(getCellValueAsInteger(row.getCell(8)));
@@ -231,35 +229,15 @@ public class LoanAccountAgeingExcelUtil {
         return null;
     }
 
-    private static LocalDate getCellValueAsDate(Cell cell) throws Exception {
+    private static NepaliDate getCellValueAsNepaliDate(Cell cell) throws Exception {
         if (cell == null || isCellEmpty(cell)) return null;
         try {
             if (cell.getCellType() == CellType.NUMERIC && DateUtil.isCellDateFormatted(cell)) {
-                return cell.getLocalDateTimeCellValue().toLocalDate();
+                return NepaliDate.convertLocalDate(cell.getLocalDateTimeCellValue().toLocalDate());
             } else if (cell.getCellType() == CellType.STRING) {
-                //todo: make a robust way to do nepali calender... this is just a temporary solution
                 String dateStr = cell.getStringCellValue().trim();
-                String[] parts = dateStr.split("/");
-
-                if (parts.length == 3) {
-                    int year = Integer.parseInt(parts[0]);
-                    int month = Integer.parseInt(parts[1]);
-                    int day = Integer.parseInt(parts[2]);
-
-                    // Clamp day to max 31
-                    if (day > 31) {
-                        log.error("Invalid date format: " + dateStr);
-                        day = 31;
-                    }
-
-                    // Rebuild the corrected date string
-                    dateStr = String.format("%04d/%02d/%02d", year, month, day);
-                }
                 try {
-                    Date convertedDate = DateUtil.parseYYYYMMDDDate(dateStr);
-                    return convertedDate.toInstant()
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate();
+                    return new NepaliDate(dateStr);
                 }catch (Exception e){
                     log.error(e.getMessage());
                     log.error("Error parsing date: " + dateStr);
