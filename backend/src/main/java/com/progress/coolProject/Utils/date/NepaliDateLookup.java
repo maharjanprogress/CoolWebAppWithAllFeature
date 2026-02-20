@@ -41,9 +41,9 @@ public class NepaliDateLookup {
         daysInMonths.put(1972, new int[]{31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30});
         daysInMonths.put(1973, new int[]{30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31});
         daysInMonths.put(1974, new int[]{31, 31, 32, 30, 31, 31, 30, 29, 30, 29, 30, 30});
-        daysInMonths.put(1975, new int[]{31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30});
+        daysInMonths.put(1975, new int[]{31, 31, 32, 32, 30, 31, 30, 29, 30, 29, 30, 30});
         daysInMonths.put(1976, new int[]{31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31});
-        daysInMonths.put(1977, new int[]{30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31});
+        daysInMonths.put(1977, new int[]{30, 32, 31, 32, 31, 31, 29, 30, 29, 30, 29, 31});
         daysInMonths.put(1978, new int[]{31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30});
         daysInMonths.put(1979, new int[]{31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30});
         daysInMonths.put(1980, new int[]{31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31});
