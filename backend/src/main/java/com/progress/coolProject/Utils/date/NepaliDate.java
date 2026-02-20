@@ -3,12 +3,15 @@ package com.progress.coolProject.Utils.date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
+@Slf4j
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,620 +20,6 @@ public class NepaliDate implements Comparable<NepaliDate> {
     private int month;
     private int day;
 
-    // Nepali calendar data: days in each month for years 2000 BS to 2099 BS
-    private static final int[][] NEPALI_CALENDAR = {
-            // Year 1900 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 30},
-            // Year 1901 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1902 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1903 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1904 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 1905 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1906 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1907 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1908 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31},
-            // Year 1909 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1910 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1911 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1912 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 1913 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1914 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1915 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1916 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 1917 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1918 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1919 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 1920 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1921 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1922 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 1923 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 1924 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1925 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1926 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1927 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 1928 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1929 BS
-            {31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1930 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1931 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 1932 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1933 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1934 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1935 BS
-            {30, 32, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31},
-            // Year 1936 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1937 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1938 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1939 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 1940 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1941 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1942 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1943 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 1944 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1945 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1946 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1947 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1948 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1949 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 1950 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 1951 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1952 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1953 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 1954 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 1955 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1956 BS
-            {31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1957 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1958 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 1959 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1960 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1961 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1962 BS
-            {30, 32, 31, 32, 31, 31, 29, 30, 29, 30, 29, 31},
-            // Year 1963 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1964 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1965 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1966 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31},
-            // Year 1967 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1968 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1969 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1970 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1971 BS
-            {31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1972 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 1973 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 1974 BS
-            {31, 31, 32, 30, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1975 BS
-            {31, 31, 32, 32, 30, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1976 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1977 BS
-            {30, 32, 31, 32, 31, 31, 29, 30, 29, 30, 29, 31},
-            // Year 1978 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1979 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1980 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1981 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 1982 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1983 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1984 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1985 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 1986 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1987 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1988 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 1989 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1990 BS
-            {30, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1991 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 1992 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 30},
-            // Year 1993 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1994 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1995 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1996 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1997 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1998 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 1999 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2000 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 29, 31},
-            // Year 2001 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2002 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2003 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2004 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2005 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2006 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2007 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2008 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31},
-            // Year 2009 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2010 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2011 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2012 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2013 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2014 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2015 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2016 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2017 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2018 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2019 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2020 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2021 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2022 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2023 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2024 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2025 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2026 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2027 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2028 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2029 BS
-            {31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2030 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2031 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2032 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2033 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2034 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2035 BS
-            {30, 32, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31},
-            // Year 2036 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2037 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2038 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2039 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2040 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2041 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2042 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2043 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2044 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2045 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2046 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2047 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2048 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2049 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2050 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2051 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2052 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2053 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2054 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2055 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2056 BS
-            {31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2057 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2058 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2059 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2060 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2061 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2062 BS
-            {30, 32, 31, 32, 31, 31, 29, 30, 29, 30, 29, 31},
-            // Year 2063 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2064 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2065 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2066 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31},
-            // Year 2067 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2068 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2069 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2070 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2071 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2072 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2073 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2074 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2075 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2076 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2077 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2078 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2079 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2080 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2081BS
-            {31, 31, 32, 32, 31, 30, 30, 30, 29, 30, 30, 31},
-            // Year 2082 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2083 BS
-            {31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30},
-            // Year 2084 BS
-            {31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30},
-            // Year 2085 BS
-            {31, 32, 31, 32, 31, 31, 30, 30, 29, 30, 30, 30},
-            // Year 2086 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30},
-            // Year 2087 BS
-            {31, 31, 32, 31, 31, 31, 30, 30, 29, 30, 30, 30},
-            // Year 2088 BS
-            {30, 31, 32, 32, 30, 31, 30, 30, 29, 30, 30, 30},
-            // Year 2089 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30},
-            // Year 2090 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30},
-            // Year 2091 BS
-            {31, 31, 32, 31, 31, 31, 30, 30, 29, 30, 30, 30},
-            // Year 2092 BS
-            {31, 31, 32, 32, 31, 30, 30, 30, 29, 30, 30, 30},
-            // Year 2093 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30},
-            // Year 2094 BS
-            {31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 30, 30},
-            // Year 2095 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 30, 30, 30},
-            // Year 2096 BS
-            {30, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2097 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30},
-            // Year 2098 BS
-            {31, 31, 32, 31, 31, 31, 29, 30, 29, 30, 30, 31},
-            // Year 2099 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30},
-            // Year 2100 BS
-            {31, 32, 31, 32, 30, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2101 BS (projected pattern-based values)
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2102 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2103 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2104 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2105 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2106 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2107 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2108 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2109 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2110 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2111 BS
-            {31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2112 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2113 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2114 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2115 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2116 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2117 BS
-            {30, 32, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31},
-            // Year 2118 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2119 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2120 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2121 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2122 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2123 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2124 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2125 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2126 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2127 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2128 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2129 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2130 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2131 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2132 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2133 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2134 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2135 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2136 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2137 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2138 BS
-            {31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2139 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2140 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2141 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2142 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2143 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2144 BS
-            {30, 32, 31, 32, 31, 31, 29, 30, 29, 30, 29, 31},
-            // Year 2145 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2146 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2147 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2148 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31},
-            // Year 2149 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2150 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2151 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2152 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2153 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2154 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2155 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2156 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2157 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2158 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2159 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2160 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2161 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2162 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2163 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2164 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2165 BS
-            {31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2166 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2167 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2168 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2169 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2170 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2171 BS
-            {30, 32, 31, 32, 31, 31, 29, 30, 29, 30, 29, 31},
-            // Year 2172 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2173 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2174 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2175 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 29, 31},
-            // Year 2176 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2177 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2178 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2179 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2180 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2181 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2182 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2183 BS
-            {31, 31, 31, 32, 31, 31, 29, 30, 30, 29, 30, 30},
-            // Year 2184 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2185 BS
-            {31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2186 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2187 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2188 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2189 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2190 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2191 BS
-            {31, 31, 31, 32, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2192 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2193 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 30},
-            // Year 2194 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2195 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2196 BS
-            {31, 31, 32, 31, 32, 30, 30, 29, 30, 29, 30, 30},
-            // Year 2197 BS
-            {31, 32, 31, 32, 31, 30, 30, 30, 29, 29, 30, 31},
-            // Year 2198 BS
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31},
-            // Year 2199 BS
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            // Year 2200 BS
-            {31, 31, 32, 32, 31, 30, 30, 29, 30, 29, 30, 30}
-    };
-
-    private static final int MIN_YEAR = 1900;
-    private static final int MAX_YEAR = 2200;
-
-    // Reference date: 1900/01/01 BS = 1843/04/13 AD
-    private static final LocalDate REFERENCE_AD_DATE = LocalDate.of(1843, 4, 20);
-    private static final int REFERENCE_BS_YEAR = 1900;
-    private static final int REFERENCE_BS_MONTH = 1;
-    private static final int REFERENCE_BS_DAY = 1;
 
     /**
      * Constructor from string in "YYYY/MM/DD" or "YYYY-MM-DD" format
@@ -672,7 +61,7 @@ public class NepaliDate implements Comparable<NepaliDate> {
      * Validate if the given Nepali date is valid
      */
     public static boolean isValidDate(int year, int month, int day) {
-        if (year < MIN_YEAR || year > MAX_YEAR) {
+        if (!NepaliDateLookup.hasDataForYear(year)) {
             return false;
         }
         if (month < 1 || month > 12) {
@@ -682,52 +71,83 @@ public class NepaliDate implements Comparable<NepaliDate> {
             return false;
         }
 
-        int daysInMonth = getDaysInMonth(year, month);
-        return day <= daysInMonth;
+        try {
+            int daysInMonth = NepaliDateLookup.getDaysInMonth(year, month);
+            return day <= daysInMonth;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     /**
      * Get number of days in a specific month of a year
      */
     public static int getDaysInMonth(int year, int month) {
-        if (year < MIN_YEAR || year > MAX_YEAR || month < 1 || month > 12) {
-            throw new IllegalArgumentException("Invalid year or month");
-        }
-        return NEPALI_CALENDAR[year - MIN_YEAR][month - 1];
+        return NepaliDateLookup.getDaysInMonth(year, month);
     }
 
     /**
      * Convert AD (Gregorian) LocalDate to Nepali Date
+     * Uses optimized HashMap lookup for O(1) access
      */
     public static NepaliDate convertLocalDate(LocalDate adDate) {
         if (adDate == null) {
             throw new IllegalArgumentException("AD date cannot be null");
         }
 
-        if (adDate.isBefore(REFERENCE_AD_DATE)) {
-            throw new IllegalArgumentException("Date is before the supported range (before 2000/01/01 BS)");
+        // Find the closest Baisakh 1 (New Year) that is <= adDate
+        int closestBsYear = -1;
+        LocalDate closestBaisakhFirst = null;
+
+        // Binary search would be more efficient, but for now iterate
+        for (int bsYear = NepaliDateLookup.MIN_YEAR; bsYear <= NepaliDateLookup.MAX_YEAR; bsYear++) {
+            try {
+                LocalDate baisakhFirst = NepaliDateLookup.getBaisakhFirstAD(bsYear);
+                if (!baisakhFirst.isAfter(adDate)) {
+                    closestBsYear = bsYear;
+                    closestBaisakhFirst = baisakhFirst;
+                } else {
+                    break; // Found the year, no need to continue
+                }
+            } catch (IllegalArgumentException e) {
+                // No data for this year, continue
+                log.debug("No data for year: " + bsYear);
+                continue;
+            }
         }
 
-        long daysDifference = java.time.temporal.ChronoUnit.DAYS.between(REFERENCE_AD_DATE, adDate);
+        if (closestBsYear == -1) {
+            throw new IllegalArgumentException("Date is before the supported range");
+        }
 
-        int bsYear = REFERENCE_BS_YEAR;
-        int bsMonth = REFERENCE_BS_MONTH;
-        int bsDay = REFERENCE_BS_DAY;
+        // Calculate days difference from Baisakh 1
+        long daysDifference = ChronoUnit.DAYS.between(closestBaisakhFirst, adDate);
 
-        bsDay += (int) daysDifference;
+        // Now add days to Baisakh 1 of closestBsYear
+        int bsYear = closestBsYear;
+        int bsMonth = 1; // Baisakh
+        int bsDay = 1;
 
-        // Adjust for days overflow
-        while (bsDay > getDaysInMonth(bsYear, bsMonth)) {
-            bsDay -= getDaysInMonth(bsYear, bsMonth);
-            bsMonth++;
+        while (daysDifference > 0) {
+            int daysInCurrentMonth = NepaliDateLookup.getDaysInMonth(bsYear, bsMonth);
+            int daysRemainingInMonth = daysInCurrentMonth - bsDay + 1;
 
-            if (bsMonth > 12) {
-                bsMonth = 1;
-                bsYear++;
-            }
+            if (daysDifference < daysRemainingInMonth) {
+                bsDay += (int) daysDifference;
+                daysDifference = 0;
+            } else {
+                daysDifference -= daysRemainingInMonth;
+                bsDay = 1;
+                bsMonth++;
 
-            if (bsYear > MAX_YEAR) {
-                throw new IllegalArgumentException("Date is beyond supported range (after 2099/12/30 BS)");
+                if (bsMonth > 12) {
+                    bsMonth = 1;
+                    bsYear++;
+
+                    if (!NepaliDateLookup.hasDataForYear(bsYear)) {
+                        throw new IllegalArgumentException("Date is beyond supported range");
+                    }
+                }
             }
         }
 
@@ -761,6 +181,7 @@ public class NepaliDate implements Comparable<NepaliDate> {
 
     /**
      * Convert Nepali Date to AD (Gregorian) LocalDate
+     * Uses optimized HashMap lookup
      */
     public static LocalDate convertToLocalDate(NepaliDate nepaliDate) {
         if (nepaliDate == null) {
@@ -771,23 +192,21 @@ public class NepaliDate implements Comparable<NepaliDate> {
             throw new IllegalArgumentException("Invalid Nepali date");
         }
 
-        // Calculate total days from reference BS date to given BS date
-        int totalDays = 0;
+        // Get the Baisakh 1 AD equivalent for this year
+        LocalDate baisakhFirst = NepaliDateLookup.getBaisakhFirstAD(nepaliDate.year);
 
-        // Add days for complete years
-        for (int year = REFERENCE_BS_YEAR; year < nepaliDate.year; year++) {
-            totalDays += getTotalDaysInYear(year);
-        }
+        // Calculate days to add from Baisakh 1
+        int daysToAdd = 0;
 
-        // Add days for complete months in the target year
+        // Add days from complete months
         for (int month = 1; month < nepaliDate.month; month++) {
-            totalDays += getDaysInMonth(nepaliDate.year, month);
+            daysToAdd += NepaliDateLookup.getDaysInMonth(nepaliDate.year, month);
         }
 
-        // Add remaining days
-        totalDays += nepaliDate.day - REFERENCE_BS_DAY;
+        // Add remaining days in current month
+        daysToAdd += nepaliDate.day - 1; // -1 because Baisakh 1 is day 1
 
-        return REFERENCE_AD_DATE.plusDays(totalDays);
+        return baisakhFirst.plusDays(daysToAdd);
     }
 
     /**
@@ -801,15 +220,7 @@ public class NepaliDate implements Comparable<NepaliDate> {
      * Get total days in a Nepali year
      */
     public static int getTotalDaysInYear(int year) {
-        if (year < MIN_YEAR || year > MAX_YEAR) {
-            throw new IllegalArgumentException("Year out of range: " + year);
-        }
-
-        int total = 0;
-        for (int month = 1; month <= 12; month++) {
-            total += getDaysInMonth(year, month);
-        }
-        return total;
+        return NepaliDateLookup.getTotalDaysInYear(year);
     }
 
     /**
