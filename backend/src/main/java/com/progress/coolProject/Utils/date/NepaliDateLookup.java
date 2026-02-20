@@ -24,8 +24,8 @@ public class NepaliDateLookup {
      */
     static final Map<Integer, int[]> daysInMonths = new HashMap<>();
 
-    static final int MIN_YEAR = 1900;
-    static final int MAX_YEAR = 2200;
+    static final int MIN_YEAR = 1970;
+    static final int MAX_YEAR = 2100;
 
     static {
         // Initialize Baisakh 1 AD equivalents
