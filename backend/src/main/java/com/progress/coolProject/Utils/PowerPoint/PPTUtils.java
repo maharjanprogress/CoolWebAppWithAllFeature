@@ -12,6 +12,7 @@ import org.apache.poi.xddf.usermodel.text.XDDFTextRun;
 import org.apache.poi.xslf.usermodel.*;
 
 import java.awt.*;
+import java.util.List;
 
 @UtilityClass
 public final class PPTUtils {
@@ -51,14 +52,17 @@ public final class PPTUtils {
         cell.setBorderColor(TableCell.BorderEdge.left, borderColor);
         cell.setBorderColor(TableCell.BorderEdge.right, borderColor);
 
-        XDDFTextParagraph para = cell.getTextBody().getParagraphs().getFirst();
-        if (alignment != null){
-            para.setTextAlignment(alignment);
-        }
+        List<XDDFTextParagraph> paras = cell.getTextBody().getParagraphs();
 
-        XDDFTextRun run = para.getTextRuns().getFirst();
-        run.setBold(isBold);
-        run.setFontSize(fontSize);
-        run.setFontColor(XDDFColor.from(textColor));
+        for (XDDFTextParagraph para: paras){
+            if (alignment != null){
+                para.setTextAlignment(alignment);
+            }
+            for (XDDFTextRun run : para.getTextRuns()){
+                run.setBold(isBold);
+                run.setFontSize(fontSize);
+                run.setFontColor(XDDFColor.from(textColor));
+            }
+        }
     }
 }
