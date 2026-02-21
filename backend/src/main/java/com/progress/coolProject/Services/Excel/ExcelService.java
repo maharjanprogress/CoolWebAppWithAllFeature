@@ -5,10 +5,7 @@ import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
 import com.progress.coolProject.DTO.Excel.Slides.*;
-import com.progress.coolProject.DTO.Excel.Slides.fortyto50.SlideFourtyFour;
-import com.progress.coolProject.DTO.Excel.Slides.fortyto50.SlideFourtyOne;
-import com.progress.coolProject.DTO.Excel.Slides.fortyto50.SlideFourtyThree;
-import com.progress.coolProject.DTO.Excel.Slides.fortyto50.SlideFourtyTwo;
+import com.progress.coolProject.DTO.Excel.Slides.fortyto50.*;
 import com.progress.coolProject.DTO.ResponseDTO;
 import com.progress.coolProject.Entity.Excel.ProcessingJob;
 import com.progress.coolProject.Entity.User;
@@ -521,6 +518,8 @@ public class ExcelService implements IExcelService {
         SlideFourtyThree.createDataSlide(ppt, "१७.(ख) प्र.वित्तिय संरचना (Effective Financial Structure)", excel);
 
         SlideFourtyFour.createDataSlide(ppt, "१७.(ग) सम्पत्तिको गुणस्तर (Asset Quality)", loanAgeing, excel);
+
+        SlideFourtyFive.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", excel);
 
 
         // Generate output file path
