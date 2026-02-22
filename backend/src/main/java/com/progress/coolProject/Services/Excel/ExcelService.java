@@ -190,7 +190,7 @@ public class ExcelService implements IExcelService {
             // Generate PowerPoint presentation
             sendProgress(job, 70, "Generating PowerPoint presentation...");
             String outputPptPath = generatePowerPoint(
-                    rows, loanData, loanSummData, savingSummData,
+                    rows,bsRows, loanData, loanSummData, savingSummData,
                     job.getUser().getUserName()
             );
             job.setProcessedPowerpointFilePath(outputPptPath);
@@ -445,6 +445,7 @@ public class ExcelService implements IExcelService {
      */
     private String generatePowerPoint(
             Map<TrialBalanceEnum, ExcelRowDTO> rowsMap,
+            Map<TrialBalanceEnum, ExcelRowDTO> bsRowsMap,
             Map<String, LoanAccountAgeingDTO> loanAgeingMap,
             Map<LoanCategory, AccountSummaryDTO> loanSummaryMap,
             Map<SavingCategory, AccountSummaryDTO> savingSummaryMap,
@@ -453,6 +454,8 @@ public class ExcelService implements IExcelService {
         XMLSlideShow ppt = new XMLSlideShow();
 
         ExcelTrialBalanceExcelRowHelper excel = new ExcelTrialBalanceExcelRowHelper(rowsMap);
+
+        ExcelTrialBalanceExcelRowHelper bsExcel = new ExcelTrialBalanceExcelRowHelper(bsRowsMap);
 
         ExcelLoanAgeingHelper loanAgeing = new ExcelLoanAgeingHelper(loanAgeingMap);
 
@@ -513,7 +516,7 @@ public class ExcelService implements IExcelService {
 
         SlideFourtyOne.createDataSlide(ppt,"१७.(क) सुरक्षण (Protection)", loanAgeing, excel);
 
-        SlideFourtyTwo.createDataSlide(ppt, "१७.(ख) प्र.वित्तिय संरचना (Effective Financial Structure)", loanAgeing, excel);
+        SlideFourtyTwo.createDataSlide(ppt, "१७.(ख) प्र.वित्तिय संरचना (Effective Financial Structure)", loanAgeing, bsExcel);
 
         SlideFourtyThree.createDataSlide(ppt, "१७.(ख) प्र.वित्तिय संरचना (Effective Financial Structure)", excel);
 

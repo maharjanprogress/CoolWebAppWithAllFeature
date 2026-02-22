@@ -2,6 +2,8 @@ package com.progress.coolProject.DTO.Excel.Slides.fortyto50;
 
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
+import com.progress.coolProject.DTO.Excel.Slides.SlideOne;
+import com.progress.coolProject.DTO.Excel.Slides.SlideThirteen;
 import com.progress.coolProject.Enums.Traimasik;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Utils.Excel.ExcelLoanAgeingHelper;
@@ -59,7 +61,7 @@ public class SlideFourtyTwo {
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
                                        ExcelLoanAgeingHelper loanHelper,
-                                       ExcelTrialBalanceExcelRowHelper excel) {
+                                       ExcelTrialBalanceExcelRowHelper bsExcel) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -113,16 +115,16 @@ public class SlideFourtyTwo {
         // ── Calculate values for current quarter only ────────────────────
         //
         // E1: खूद ऋण लगानी  = (Total Loan - LLP) / Total Assets × 100
-        double e1Value = calcE1(excel);
+        double e1Value = calcE1(bsExcel, loanHelper);
 
         // E2: तरल सम्पत्ति  = Bank balances eligible for interest / Total Assets × 100
-        double e2Value = calcE2(excel);
+        double e2Value = calcE2(bsExcel);
 
         // E3: वित्तिय लगानी = Shares + Fixed deposits / Total Assets × 100
-        double e3Value = calcE3(excel);
+        double e3Value = calcE3(bsExcel);
 
         // E5: बचत निक्षेप   = Total Member Savings / Total Assets × 100
-        double e5Value = calcE5(excel);
+        double e5Value = calcE5(bsExcel);
 
         // ── Fill data rows ───────────────────────────────────────────────
         fillRow(table, 1, ROW_E1_IND, ROW_E1_DET, ROW_E1_DESC, ROW_E1_TGT,
@@ -141,46 +143,43 @@ public class SlideFourtyTwo {
     // ── Calculation helpers ──────────────────────────────────────────────────
     //    Adjust TrialBalanceEnum entries to whatever your enum actually exposes.
 
-    private static double calcE1(ExcelTrialBalanceExcelRowHelper excel) {
+    private static double calcE1(ExcelTrialBalanceExcelRowHelper bsExcel, ExcelLoanAgeingHelper loanHelper) {
         // (Total Loan portfolio − Loan Loss Provision) ÷ Total Assets × 100
-        double totalLoan = 100000000;          // adjust key
-        double llp       = excel.getCredit(TrialBalanceEnum.LOAN_LOSS_PROVISION);
-        double totalAssets = getTotalAssets(excel);
+
+        double totalLoan = bsExcel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);          // adjust key
+        double llp       = SlideThirteen.getTotalAffectedRiskAmount(loanHelper);
+        double totalAssets = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return ((totalLoan - llp) / totalAssets) * 100.0;
     }
 
-    private static double calcE2(ExcelTrialBalanceExcelRowHelper excel) {
+    private static double calcE2(ExcelTrialBalanceExcelRowHelper bsExcel) {
         // Bank / financial institution balances earning interest ÷ Total Assets × 100
-        double bankBalances = excel.getDebit(TrialBalanceEnum.KRISHI_BIKASH_BANK)
-                + excel.getDebit(TrialBalanceEnum.NEPAL_INV_BANK)
-                + excel.getDebit(TrialBalanceEnum.NATIONAL_COOPERATIVE);          // adjust as needed
-        double totalAssets = getTotalAssets(excel);
+        double bankBalances = SlideOne.getBank(bsExcel) + SlideOne.getCash(bsExcel);
+        double totalAssets = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return (bankBalances / totalAssets) * 100.0;
     }
 
-    private static double calcE3(ExcelTrialBalanceExcelRowHelper excel) {
+    private static double calcE3(ExcelTrialBalanceExcelRowHelper bsExcel) {
         // Shares + fixed deposits ÷ Total Assets × 100
-        double financialInv = excel.getDebit(TrialBalanceEnum.BANK_DEVIDEND_SAVING); // adjust as needed
-        double totalAssets = getTotalAssets(excel);
+        double financialInv = bsExcel.getDebitSum(TrialBalanceEnum.SHARE_INVEST_NCBL, TrialBalanceEnum.SHARE_JILLA_SAHAKARI, TrialBalanceEnum.SHARE_NEFSCUN); // adjust as needed
+        double totalAssets = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return (financialInv / totalAssets) * 100.0;
     }
 
-    private static double calcE5(ExcelTrialBalanceExcelRowHelper excel) {
+    private static double calcE5(ExcelTrialBalanceExcelRowHelper bsExcel) {
         // Total member savings ÷ Total Assets × 100
-        double totalSavings = excel.getCredit(TrialBalanceEnum.KASKUN_REGULAR_SAVING)
-                + excel.getCredit(TrialBalanceEnum.KASKUN_DAINIK);                // adjust as needed
-        double totalAssets = getTotalAssets(excel);
+        double totalSavings = bsExcel.getCredit(TrialBalanceEnum.SAVING_ACCOUNT);
+        double totalAssets = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return (totalSavings / totalAssets) * 100.0;
     }
 
-    /** Shared total-assets calculation — adjust enum keys to your actual total-assets ledger */
-    private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper excel) {
-        // TODO: replace with the correct TrialBalanceEnum entry for Total Assets
-        return 100000000;  // adjust key
+    /** Shared total-assets calculation  */
+    private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        return bsExcel.getTotalCredit();  // adjust key
     }
 
     // ── Row filler ───────────────────────────────────────────────────────────
