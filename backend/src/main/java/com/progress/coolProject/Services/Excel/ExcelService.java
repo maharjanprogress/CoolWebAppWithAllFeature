@@ -518,7 +518,7 @@ public class ExcelService implements IExcelService {
 
         SlideFourtyTwo.createDataSlide(ppt, "१७.(ख) प्र.वित्तिय संरचना (Effective Financial Structure)", loanAgeing, bsExcel);
 
-        SlideFourtyThree.createDataSlide(ppt, "१७.(ख) प्र.वित्तिय संरचना (Effective Financial Structure)", excel);
+        SlideFourtyThree.createDataSlide(ppt, "१७.(ख) प्र.वित्तिय संरचना (Effective Financial Structure)", bsExcel);
 
         SlideFourtyFour.createDataSlide(ppt, "१७.(ग) सम्पत्तिको गुणस्तर (Asset Quality)", loanAgeing, excel);
 

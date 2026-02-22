@@ -54,7 +54,7 @@ public class SlideFourtyThree {
 
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
-                                       ExcelTrialBalanceExcelRowHelper excel) {
+                                       ExcelTrialBalanceExcelRowHelper bsExcel) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -100,9 +100,9 @@ public class SlideFourtyThree {
         // ── Current quarter only ──────────────────────────────────────────────
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double e6Value = calcE6(excel);
-        double e7Value = calcE7(excel);
-        double e8Value = calcE8(excel);
+        double e6Value = calcE6(bsExcel);
+        double e7Value = calcE7(bsExcel);
+        double e8Value = calcE8(bsExcel);
 
         fillRow(table, 1, ROW_E6_IND, ROW_E6_DET, ROW_E6_DESC, ROW_E6_TGT,
                 currentQuarter, e6Value, nepFmt, lightOrange);
@@ -118,11 +118,10 @@ public class SlideFourtyThree {
 
     /**
      * E6: बाह्य ऋण — External borrowings taken by the institution ÷ Total Assets × 100
-     * TODO: replace with the correct TrialBalanceEnum key for external borrowings
      */
-    private static double calcE6(ExcelTrialBalanceExcelRowHelper excel) {
-        double externalLoan = excel.getCredit(TrialBalanceEnum.LOAN_LOSS_PROVISION); // adjust key
-        double totalAssets  = getTotalAssets(excel);
+    private static double calcE6(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        double externalLoan = 0; // todo: if there is a ever a ledger number then dont forget to put this
+        double totalAssets  = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return (externalLoan / totalAssets) * 100.0;
     }
@@ -131,9 +130,9 @@ public class SlideFourtyThree {
      * E7: शेयर पुँजी — Member share capital ÷ Total Assets × 100
      * TODO: replace with the correct TrialBalanceEnum key for share capital
      */
-    private static double calcE7(ExcelTrialBalanceExcelRowHelper excel) {
-        double shareCapital = excel.getCredit(TrialBalanceEnum.SHARE_CAPITAL); // adjust key
-        double totalAssets  = getTotalAssets(excel);
+    private static double calcE7(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        double shareCapital = bsExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL); // adjust key
+        double totalAssets  = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return (shareCapital / totalAssets) * 100.0;
     }
@@ -143,21 +142,23 @@ public class SlideFourtyThree {
      *                      + Capital grants + Unspent funds ÷ Total Assets × 100
      * TODO: replace with the correct TrialBalanceEnum keys for each reserve/fund ledger
      */
-    private static double calcE8(ExcelTrialBalanceExcelRowHelper excel) {
-        double institutionalCapital =
-                excel.getCredit(TrialBalanceEnum.RESERVE_FUND)           // जगेडाकोष
-                        + excel.getCredit(TrialBalanceEnum.LOAN_LOSS_PROVISION)     // घाटा पूर्तिकोष
-                        + excel.getCredit(TrialBalanceEnum.LAND_AND_BUILDING)      // घरजग्गाकोष
-                        + excel.getCredit(TrialBalanceEnum.SHARE_CAPITAL)           // पूँजीगत अनुदान
-                        + excel.getCredit(TrialBalanceEnum.LOSS_FULFILMENT_FUND);           // खर्च भएर नजाने कोष
-        double totalAssets = getTotalAssets(excel);
+    private static double calcE8(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        double institutionalCapital = bsExcel.getCreditSum(
+                TrialBalanceEnum.RESERVE_FUND, TrialBalanceEnum.DUBANTI_KOSH,
+                TrialBalanceEnum.GHATA_PURTI_KOSH, TrialBalanceEnum.PUGIGAT_JAGAEDA_KOSH,
+                TrialBalanceEnum.LOSS_FULFILMENT_FUND, TrialBalanceEnum.COOPERATIVE_PROMOTION_FUND,
+                TrialBalanceEnum.COOPERATIVE_DEVELOPMENT_FUND, TrialBalanceEnum.STHIRKARAN_KOSH,
+                TrialBalanceEnum.SAMUDAIYIK_BIKASH_KOSH, TrialBalanceEnum.JIBIKOPARCHAN_KOSH,
+                TrialBalanceEnum.OTHER_RISK_MANAGEMENT_FUND
+        );
+        System.out.println(String.valueOf(institutionalCapital));
+        double totalAssets = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return (institutionalCapital / totalAssets) * 100.0;
     }
 
-    /** TODO: replace with your actual Total Assets ledger enum key */
-    private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper excel) {
-        return excel.getDebit(TrialBalanceEnum.CASH); // adjust key
+    private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        return bsExcel.getTotalCredit(); // adjust key
     }
 
     // ── Row/cell helpers ─────────────────────────────────────────────────────
