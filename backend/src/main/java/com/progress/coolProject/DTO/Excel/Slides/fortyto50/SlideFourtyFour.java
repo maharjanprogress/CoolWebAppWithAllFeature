@@ -50,7 +50,7 @@ public class SlideFourtyFour {
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
                                        ExcelLoanAgeingHelper loanHelper,
-                                       ExcelTrialBalanceExcelRowHelper excel) {
+                                       ExcelTrialBalanceExcelRowHelper bsExcel) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -93,8 +93,8 @@ public class SlideFourtyFour {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double a1Value = calcA1(loanHelper, excel);
-        double a2Value = calcA2(excel);
+        double a1Value = calcA1(loanHelper);
+        double a2Value = calcA2(bsExcel);
 
         fillRow(table, 1, ROW_A1_IND, ROW_A1_DET, ROW_A1_DESC, ROW_A1_TGT,
                 currentQuarter, a1Value, nepFmt, lightOrange);
@@ -115,8 +115,7 @@ public class SlideFourtyFour {
      *   Doubtful     → SIX_TO_NINE_MONTHS, NINE_TO_TWELVE_MONTHS
      *   Bad          → ONE_TO_TWO_YEARS, ABOVE_TWO_YEARS
      */
-    private static double calcA1(ExcelLoanAgeingHelper loanHelper,
-                                 ExcelTrialBalanceExcelRowHelper excel) {
+    private static double calcA1(ExcelLoanAgeingHelper loanHelper) {
         double nonPerformingLoans = loanHelper.getTotalBalanceByCategory(
                 null,
                 LoanPayerCategory.THREE_TO_SIX_MONTHS,
@@ -176,46 +175,9 @@ public class SlideFourtyFour {
      * Using bank balances + loan portfolio + fixed assets + cash + receivables.
      * Adjust if you have a dedicated total-assets ledger entry.
      */
-    private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper excel) {
-        double bankBalances = excel.getDebitSum(
-                TrialBalanceEnum.KRISHI_BIKASH_BANK,
-                TrialBalanceEnum.NEPAL_INV_BANK,
-                TrialBalanceEnum.NATIONAL_COOPERATIVE,
-                TrialBalanceEnum.KASKUN_REGULAR_SAVING,
-                TrialBalanceEnum.KASKUN_DAINIK,
-                TrialBalanceEnum.KASKUN_TIME_SAVING,
-                TrialBalanceEnum.BANK_DEVIDEND_SAVING,
-                TrialBalanceEnum.SANIMA_BANK,
-                TrialBalanceEnum.RSB_TIME_SAVING,
-                TrialBalanceEnum.SHARE_INVEST_NCBL
-        );
+    private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper bsExcel) {
 
-        double loans = excel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
-
-        double fixedAssets = excel.getDebitSum(
-                TrialBalanceEnum.LAND,
-                TrialBalanceEnum.BUILDING,
-                TrialBalanceEnum.FURNITURE,
-                TrialBalanceEnum.PRINTER,
-                TrialBalanceEnum.OFFICE_GOODS,
-                TrialBalanceEnum.LAND_AND_BUILDING,
-                TrialBalanceEnum.OFFICE_EQUIPMENTS
-        );
-
-        double cash = excel.getDebit(TrialBalanceEnum.CASH);
-
-        double receivables = excel.getDebitSum(
-                TrialBalanceEnum.ADVANCES_RECEIVABLES,
-                TrialBalanceEnum.TDS_RECEIVABLES_ADVANCE_TAX,
-                TrialBalanceEnum.TDS_ON_INTEREST_RECEIVABLE
-        );
-
-        double other = excel.getDebitSum(
-                TrialBalanceEnum.SAMAN_MAUJDAT,
-                TrialBalanceEnum.PUGIGAT_JAGAEDA_KOSH
-        );
-
-        return bankBalances + loans + fixedAssets + cash + receivables + other;
+        return bsExcel.getTotalCredit();
     }
 
     // ── Row / cell helpers ────────────────────────────────────────────────────
