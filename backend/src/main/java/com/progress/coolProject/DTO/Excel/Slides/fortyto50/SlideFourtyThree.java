@@ -151,7 +151,6 @@ public class SlideFourtyThree {
                 TrialBalanceEnum.SAMUDAIYIK_BIKASH_KOSH, TrialBalanceEnum.JIBIKOPARCHAN_KOSH,
                 TrialBalanceEnum.OTHER_RISK_MANAGEMENT_FUND
         );
-        System.out.println(String.valueOf(institutionalCapital));
         double totalAssets = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return (institutionalCapital / totalAssets) * 100.0;

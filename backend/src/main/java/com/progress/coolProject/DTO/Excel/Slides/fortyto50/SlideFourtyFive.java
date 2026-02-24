@@ -54,7 +54,7 @@ public class SlideFourtyFive {
 
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
-                                       ExcelTrialBalanceExcelRowHelper excel) {
+                                       ExcelTrialBalanceExcelRowHelper bsExcel) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -98,9 +98,9 @@ public class SlideFourtyFive {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double r1Value = calcR1(excel);
-        double r2Value = calcR2(excel);
-        double r3Value = calcR3(excel);
+        double r1Value = calcR1(bsExcel);
+        double r2Value = calcR2(bsExcel);
+        double r3Value = calcR3(bsExcel);
 
         fillRow(table, 1, ROW_R1_IND, ROW_R1_DET, ROW_R1_DESC, ROW_R1_TGT,
                 currentQuarter, r1Value, nepFmt, lightOrange);
@@ -121,9 +121,9 @@ public class SlideFourtyFive {
      * Numerator:   INTEREST_INCOME (3010) — all income earned from lending
      * Denominator: LOAN_ACCOUNT (3001)    — total loan portfolio balance
      */
-    private static double calcR1(ExcelTrialBalanceExcelRowHelper excel) {
-        double interestIncome = excel.getCredit(TrialBalanceEnum.INTEREST_INCOME);
-        double totalLoan      = excel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
+    private static double calcR1(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        double interestIncome = bsExcel.getCredit(TrialBalanceEnum.INTEREST_INCOME);
+        double totalLoan      = bsExcel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
         if (totalLoan == 0) return 0;
         return (interestIncome / totalLoan) * 100.0;
     }
@@ -136,13 +136,13 @@ public class SlideFourtyFive {
      *            + KRISHI_BIKASH_SPECIAL_FD_INTEREST (3642)
      * Denominator: All bank/liquid balances
      */
-    private static double calcR2(ExcelTrialBalanceExcelRowHelper excel) {
-        double bankInterestIncome = excel.getCreditSum(
+    private static double calcR2(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        double bankInterestIncome = bsExcel.getCreditSum(
                 TrialBalanceEnum.BANK_INTEREST_INCOME,
                 TrialBalanceEnum.KRISHI_BIKASH_SPECIAL_FD_INTEREST
         );
 
-        double totalBankBalances = excel.getDebitSum(
+        double totalBankBalances = bsExcel.getDebitSum(
                 TrialBalanceEnum.KRISHI_BIKASH_BANK,
                 TrialBalanceEnum.NEPAL_INV_BANK,
                 TrialBalanceEnum.NATIONAL_COOPERATIVE,
@@ -166,13 +166,13 @@ public class SlideFourtyFive {
      *            + MISCELLANEOUS_INCOME (1023) — for share dividends if booked here
      * Denominator: Financial investment balances (shares + FDs)
      */
-    private static double calcR3(ExcelTrialBalanceExcelRowHelper excel) {
-        double financialIncome = excel.getCreditSum(
+    private static double calcR3(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        double financialIncome = bsExcel.getCreditSum(
                 TrialBalanceEnum.KRISHI_BIKASH_SPECIAL_FD_INTEREST,  // मुद्ति व्याज
                 TrialBalanceEnum.SHARE_DIVIDEND_FUND                  // शेयर लाभांश
         );
 
-        double financialInvestments = excel.getDebitSum(
+        double financialInvestments = bsExcel.getDebitSum(
                 TrialBalanceEnum.SHARE_INVEST_NCBL,        // शेयर लगानी
                 TrialBalanceEnum.SHARE_JILLA_SAHAKARI,     // जिल्ला सहकारी शेयर
                 TrialBalanceEnum.SHARE_NEFSCUN,            // NEFSCUN शेयर
