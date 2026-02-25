@@ -54,7 +54,9 @@ public class SlideFourtyFive {
 
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
-                                       ExcelTrialBalanceExcelRowHelper bsExcel) {
+                                       ExcelTrialBalanceExcelRowHelper plExcel,
+                                       ExcelTrialBalanceExcelRowHelper bsExcel
+    ) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -98,9 +100,11 @@ public class SlideFourtyFive {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double r1Value = calcR1(bsExcel);
-        double r2Value = calcR2(bsExcel);
-        double r3Value = calcR3(bsExcel);
+        double bsTotal = bsExcel.getTotalCredit();
+
+        double r1Value = calcR1(plExcel,bsTotal);
+        double r2Value = calcR2(plExcel, bsTotal);
+        double r3Value = calcR3(plExcel, bsTotal);
 
         fillRow(table, 1, ROW_R1_IND, ROW_R1_DET, ROW_R1_DESC, ROW_R1_TGT,
                 currentQuarter, r1Value, nepFmt, lightOrange);
@@ -121,9 +125,8 @@ public class SlideFourtyFive {
      * Numerator:   INTEREST_INCOME (3010) — all income earned from lending
      * Denominator: LOAN_ACCOUNT (3001)    — total loan portfolio balance
      */
-    private static double calcR1(ExcelTrialBalanceExcelRowHelper bsExcel) {
-        double interestIncome = bsExcel.getCredit(TrialBalanceEnum.INTEREST_INCOME);
-        double totalLoan      = bsExcel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
+    private static double calcR1(ExcelTrialBalanceExcelRowHelper plExcel, double totalLoan) {
+        double interestIncome = plExcel.getCreditSum(TrialBalanceEnum.INTEREST_INCOME, TrialBalanceEnum.SERVICE_CHARGE);
         if (totalLoan == 0) return 0;
         return (interestIncome / totalLoan) * 100.0;
     }
@@ -136,25 +139,13 @@ public class SlideFourtyFive {
      *            + KRISHI_BIKASH_SPECIAL_FD_INTEREST (3642)
      * Denominator: All bank/liquid balances
      */
-    private static double calcR2(ExcelTrialBalanceExcelRowHelper bsExcel) {
-        double bankInterestIncome = bsExcel.getCreditSum(
-                TrialBalanceEnum.BANK_INTEREST_INCOME,
-                TrialBalanceEnum.KRISHI_BIKASH_SPECIAL_FD_INTEREST
+    private static double calcR2(ExcelTrialBalanceExcelRowHelper plExcel, double bsTotal) {
+        double bankInterestIncome = plExcel.getCredit(
+                TrialBalanceEnum.BANK_INTEREST_INCOME
         );
 
-        double totalBankBalances = bsExcel.getDebitSum(
-                TrialBalanceEnum.KRISHI_BIKASH_BANK,
-                TrialBalanceEnum.NEPAL_INV_BANK,
-                TrialBalanceEnum.NATIONAL_COOPERATIVE,
-                TrialBalanceEnum.KASKUN_REGULAR_SAVING,
-                TrialBalanceEnum.KASKUN_DAINIK,
-                TrialBalanceEnum.KASKUN_TIME_SAVING,
-                TrialBalanceEnum.SANIMA_BANK,
-                TrialBalanceEnum.RSB_TIME_SAVING
-        );
-
-        if (totalBankBalances == 0) return 0;
-        return (bankInterestIncome / totalBankBalances) * 100.0;
+        if (bsTotal == 0) return 0;
+        return (bankInterestIncome / bsTotal) * 100.0;
     }
 
     /**
@@ -166,22 +157,11 @@ public class SlideFourtyFive {
      *            + MISCELLANEOUS_INCOME (1023) — for share dividends if booked here
      * Denominator: Financial investment balances (shares + FDs)
      */
-    private static double calcR3(ExcelTrialBalanceExcelRowHelper bsExcel) {
-        double financialIncome = bsExcel.getCreditSum(
-                TrialBalanceEnum.KRISHI_BIKASH_SPECIAL_FD_INTEREST,  // मुद्ति व्याज
-                TrialBalanceEnum.SHARE_DIVIDEND_FUND                  // शेयर लाभांश
-        );
+    private static double calcR3(ExcelTrialBalanceExcelRowHelper plExcel, double bsTotal) {
+        double financialIncome = 0; //if dividend comes then only this will not be 0... but since the share owner doesn't get dividend it is 0
 
-        double financialInvestments = bsExcel.getDebitSum(
-                TrialBalanceEnum.SHARE_INVEST_NCBL,        // शेयर लगानी
-                TrialBalanceEnum.SHARE_JILLA_SAHAKARI,     // जिल्ला सहकारी शेयर
-                TrialBalanceEnum.SHARE_NEFSCUN,            // NEFSCUN शेयर
-                TrialBalanceEnum.SHARE_KASKUN,             // KASKUN शेयर
-                TrialBalanceEnum.BANK_DEVIDEND_SAVING      // बैंक लाभांश/मुद्ति
-        );
-
-        if (financialInvestments == 0) return 0;
-        return (financialIncome / financialInvestments) * 100.0;
+        if (bsTotal == 0) return 0;
+        return (financialIncome / bsTotal) * 100.0;
     }
 
     // ── Row / cell helpers ────────────────────────────────────────────────────

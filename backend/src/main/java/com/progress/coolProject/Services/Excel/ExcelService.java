@@ -190,7 +190,8 @@ public class ExcelService implements IExcelService {
             // Generate PowerPoint presentation
             sendProgress(job, 70, "Generating PowerPoint presentation...");
             String outputPptPath = generatePowerPoint(
-                    rows,bsRows, loanData, loanSummData, savingSummData,
+                    rows,bsRows, plRows,
+                    loanData, loanSummData, savingSummData,
                     job.getUser().getUserName()
             );
             job.setProcessedPowerpointFilePath(outputPptPath);
@@ -446,6 +447,7 @@ public class ExcelService implements IExcelService {
     private String generatePowerPoint(
             Map<TrialBalanceEnum, ExcelRowDTO> rowsMap,
             Map<TrialBalanceEnum, ExcelRowDTO> bsRowsMap,
+            Map<TrialBalanceEnum, ExcelRowDTO> plRows,
             Map<String, LoanAccountAgeingDTO> loanAgeingMap,
             Map<LoanCategory, AccountSummaryDTO> loanSummaryMap,
             Map<SavingCategory, AccountSummaryDTO> savingSummaryMap,
@@ -456,6 +458,8 @@ public class ExcelService implements IExcelService {
         ExcelTrialBalanceExcelRowHelper excel = new ExcelTrialBalanceExcelRowHelper(rowsMap);
 
         ExcelTrialBalanceExcelRowHelper bsExcel = new ExcelTrialBalanceExcelRowHelper(bsRowsMap);
+
+        ExcelTrialBalanceExcelRowHelper plExcel = new ExcelTrialBalanceExcelRowHelper(plRows);
 
         ExcelLoanAgeingHelper loanAgeing = new ExcelLoanAgeingHelper(loanAgeingMap);
 
@@ -522,7 +526,7 @@ public class ExcelService implements IExcelService {
 
         SlideFourtyFour.createDataSlide(ppt, "१७.(ग) सम्पत्तिको गुणस्तर (Asset Quality)", loanAgeing, bsExcel);
 
-        SlideFourtyFive.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", excel);
+        SlideFourtyFive.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)",plExcel, bsExcel);
 
         SlideFourtySix.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", excel);
 
