@@ -1,6 +1,5 @@
 package com.progress.coolProject.DTO.Excel.Slides.fortyto50;
 
-import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Enums.Traimasik;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
@@ -102,8 +101,8 @@ public class SlideFourtyNine {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double g10Value = calcG10(previousYearMembers, currentYearMembers);
-        double g11Value = calcG11(excel, previousYearAssets);
+        double g10Value = calcS10(previousYearMembers, currentYearMembers);
+        double g11Value = calcS11(excel, previousYearAssets);
 
         fillRow(table, 1, ROW_G10_IND, ROW_G10_DET, ROW_G10_DESC, ROW_G10_TGT,
                 currentQuarter, g10Value, nepFmt, lightOrange);
@@ -115,74 +114,29 @@ public class SlideFourtyNine {
     // ── Calculations ──────────────────────────────────────────────────────────
 
     /**
-     * G10: सदस्य वृद्धिदर
+     * S10: सदस्य वृद्धिदर
      * = (Current Year Members − Previous Year Members) ÷ Previous Year Members × 100
      * <p>
      * Member counts are NOT in the trial balance — they must be passed in
      * from your membership register / database.
      */
-    private static double calcG10(long previousYearMembers, long currentYearMembers) {
+    private static double calcS10(long previousYearMembers, long currentYearMembers) {
         if (previousYearMembers == 0) return 0;
         return ((double)(currentYearMembers - previousYearMembers) / previousYearMembers) * 100.0;
     }
 
     /**
-     * G11: कूल सम्पत्ति वृद्धिदर
+     * S11: कूल सम्पत्ति वृद्धिदर
      * = (Current Total Assets − Previous Year Total Assets) ÷ Previous Year Total Assets × 100
      * <p>
      * Current total assets are derived from trial balance.
      * Previous year total assets must be passed in (prior year closing balance sheet).
      */
-    private static double calcG11(ExcelTrialBalanceExcelRowHelper excel,
+    private static double calcS11(ExcelTrialBalanceExcelRowHelper bsExcel,
                                   double previousYearAssets) {
         if (previousYearAssets == 0) return 0;
-        double currentAssets = getTotalAssets(excel);
+        double currentAssets = bsExcel.getTotalCredit();
         return ((currentAssets - previousYearAssets) / previousYearAssets) * 100.0;
-    }
-
-    /**
-     * Total Assets — consistent with previous slides.
-     */
-    private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper excel) {
-        double bankBalances = excel.getDebitSum(
-                TrialBalanceEnum.KRISHI_BIKASH_BANK,
-                TrialBalanceEnum.NEPAL_INV_BANK,
-                TrialBalanceEnum.NATIONAL_COOPERATIVE,
-                TrialBalanceEnum.KASKUN_REGULAR_SAVING,
-                TrialBalanceEnum.KASKUN_DAINIK,
-                TrialBalanceEnum.KASKUN_TIME_SAVING,
-                TrialBalanceEnum.BANK_DEVIDEND_SAVING,
-                TrialBalanceEnum.SANIMA_BANK,
-                TrialBalanceEnum.RSB_TIME_SAVING,
-                TrialBalanceEnum.SHARE_INVEST_NCBL
-        );
-
-        double loans = excel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
-
-        double fixedAssets = excel.getDebitSum(
-                TrialBalanceEnum.LAND,
-                TrialBalanceEnum.BUILDING,
-                TrialBalanceEnum.FURNITURE,
-                TrialBalanceEnum.PRINTER,
-                TrialBalanceEnum.OFFICE_GOODS,
-                TrialBalanceEnum.LAND_AND_BUILDING,
-                TrialBalanceEnum.OFFICE_EQUIPMENTS
-        );
-
-        double cash = excel.getDebit(TrialBalanceEnum.CASH);
-
-        double receivables = excel.getDebitSum(
-                TrialBalanceEnum.ADVANCES_RECEIVABLES,
-                TrialBalanceEnum.TDS_RECEIVABLES_ADVANCE_TAX,
-                TrialBalanceEnum.TDS_ON_INTEREST_RECEIVABLE
-        );
-
-        double other = excel.getDebitSum(
-                TrialBalanceEnum.SAMAN_MAUJDAT,
-                TrialBalanceEnum.PUGIGAT_JAGAEDA_KOSH
-        );
-
-        return bankBalances + loans + fixedAssets + cash + receivables + other;
     }
 
     // ── Row / cell helpers ────────────────────────────────────────────────────

@@ -557,12 +557,13 @@ public class ExcelService implements IExcelService {
 
         SlideFourtyEight.createDataSlide(ppt, "१७.(ङ) तरलता (Liquidity)", bsExcel);
 
+//      todo: make a DTO to take all the necessary inputs like previous year members, current Year Members.
         SlideFourtyNine.createDataSlide(ppt,
                 "१७.(च) वृद्धिको संकेत (Sign of Growth)",
-                excel,
-                100,   // e.g. fetch from your DB/entity
-                200,    // e.g. fetch from your DB/entity
-                300     // e.g. stored from last year's closing balance sheet
+                bsExcel,
+                1008,
+                1014,
+                previousMonthTotalBalanceSheetCredit
         );
 
 
