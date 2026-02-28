@@ -20,6 +20,18 @@ public class StringConstants {
     public static final String FALGUN = "फागुन";
     public static final String CHAITRA = "चैत";
 
+    public static final String[] months = {
+            "Baisakh", "Jestha", "Ashadh", "Shrawan",
+            "Bhadra", "Ashwin", "Kartik", "Mangsir",
+            "Poush", "Magh", "Falgun", "Chaitra"
+    };
+
+    public static final String[] nepaliMonths = {
+            "बैशाख", "जेष्ठ", "आषाढ", "श्रावण",
+            "भाद्र", "आश्विन", "कार्तिक", "मंसिर",
+            "पौष", "माघ", "फाल्गुन", "चैत्र"
+    };
+
     public static String getMonths(String... months){
         StringBuilder sb = new StringBuilder();
         for (String month : months) {

@@ -1,5 +1,8 @@
 package com.progress.coolProject.Utils.date;
 
+import com.ibm.icu.text.NumberFormat;
+import com.ibm.icu.util.ULocale;
+import com.progress.coolProject.StringConstants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -290,24 +293,21 @@ public class NepaliDate implements Comparable<NepaliDate> {
      * Get month name in English
      */
     public String getMonthName() {
-        String[] months = {
-                "Baisakh", "Jestha", "Ashadh", "Shrawan",
-                "Bhadra", "Ashwin", "Kartik", "Mangsir",
-                "Poush", "Magh", "Falgun", "Chaitra"
-        };
-        return months[month - 1];
+        return StringConstants.months[month - 1];
     }
 
     /**
      * Get month name in Nepali
      */
     public String getMonthNameNepali() {
-        String[] months = {
-                "बैशाख", "जेष्ठ", "आषाढ", "श्रावण",
-                "भाद्र", "आश्विन", "कार्तिक", "मंसिर",
-                "पौष", "माघ", "फाल्गुन", "चैत्र"
-        };
-        return months[month - 1];
+        return StringConstants.nepaliMonths[month - 1];
+    }
+
+    public String getYearInNepali(){
+        NumberFormat nepaliFormat = NumberFormat.getInstance(new ULocale("ne_NP"));
+        nepaliFormat.setGroupingUsed(false);
+        nepaliFormat.setMinimumFractionDigits(0);
+        return nepaliFormat.format(year);
     }
 
     /**
