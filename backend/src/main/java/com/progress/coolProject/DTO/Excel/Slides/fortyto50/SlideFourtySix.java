@@ -170,9 +170,6 @@ public class SlideFourtySix {
     private static double calcR7(ExcelTrialBalanceExcelRowHelper bsExcel, double previousMonthShareCapital) {
         double dividendPaid  = bsExcel.getCredit(TrialBalanceEnum.SHARE_DIVIDEND_FUND);
         double averageShareCapital = (bsExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL) + previousMonthShareCapital)/2;
-        System.out.println("Share Divident Fund : " + dividendPaid);
-        System.out.println("Share Capital : " + bsExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL));
-        System.out.println("Previous Share Capital : " + previousMonthShareCapital);
         if (averageShareCapital == 0) return 0;
         return (dividendPaid / averageShareCapital) * 100.0;
     }
