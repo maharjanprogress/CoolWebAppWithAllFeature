@@ -551,6 +551,9 @@ public class ExcelService implements IExcelService {
         double previousMonthShareCapital = pTbExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL);
         SlideFourtySix.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", plExcel, bsExcel, previousMonthShareCapital);
 
+        double previousMonthTotalBalanceSheetCredit = pTbExcel.getTotalCredit();
+        SlideFourtySeven.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", plExcel, bsExcel, previousMonthTotalBalanceSheetCredit);
+
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
