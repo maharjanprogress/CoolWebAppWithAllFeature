@@ -1,5 +1,6 @@
 package com.progress.coolProject.Enums;
 
+import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.date.NepaliDate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,16 +24,8 @@ public enum Traimasik {
         int currentMonth = nepaliDate.getMonth();
 
         // Determine which quarter we're in
-        for (Traimasik quarter : values()) {
-            for (int month : quarter.months) {
-                if (month == currentMonth) {
-                    return quarter;
-                }
-            }
-        }
+        return getTraimasikForMonth(currentMonth);
 
-        // Default to first quarter if something goes wrong
-        return PAHILO;
     }
 
     /**
@@ -45,5 +38,31 @@ public enum Traimasik {
             result[i] = Traimasik.values()[i];
         }
         return result;
+    }
+
+    public static Traimasik getTraimasikForMonth(int exactMonth){
+        for (Traimasik quarter : values()) {
+            for (int month : quarter.months) {
+                if (month == exactMonth) {
+                    return quarter;
+                }
+            }
+        }
+
+        // Default to first quarter if something goes wrong
+        return PAHILO;
+    }
+
+    public static String getmonthBetweenTraimasikofPlusmonth(int plusMonth){
+        NepaliDate nepaliDate = NepaliDate.now().plusMonths(plusMonth);
+        int previousMonth = nepaliDate.getMonth();
+
+        Traimasik previousQuarter = getTraimasikForMonth(previousMonth);
+
+        if (previousMonth == previousQuarter.getMonths()[0]){
+            return StringConstants.nepaliMonths[previousQuarter.getMonths()[0]-1];
+        }
+
+        return StringConstants.nepaliMonths[previousQuarter.getMonths()[0]-1] + " देखि " + nepaliDate.getMonthNameNepali();
     }
 }

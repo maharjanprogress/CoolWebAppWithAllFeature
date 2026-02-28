@@ -2,10 +2,11 @@ package com.progress.coolProject.DTO.Excel.Slides;
 
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
+import com.progress.coolProject.Enums.Traimasik;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
-import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
+import com.progress.coolProject.Utils.date.NepaliDate;
 import lombok.experimental.UtilityClass;
 import org.apache.poi.xddf.usermodel.PresetColor;
 import org.apache.poi.xddf.usermodel.text.TextAlignment;
@@ -19,7 +20,7 @@ import java.awt.*;
 @UtilityClass
 public final class SlideTwo {
     // Header
-    public static final String FIRST_ROW_TITLE = StringConstants.CURRENT_YEAR + " " + StringConstants.SHRAWAN + " देखि " + StringConstants.KARTIK + " मसान्तसम्मको नाफा नोक्सान हिसाब विवरण";
+    public static final String FIRST_ROW_TITLE = NepaliDate.now().getYearInNepali() + " " + Traimasik.getmonthBetweenTraimasikofPlusmonth(-1) + " मसान्तसम्मको नाफा नोक्सान हिसाब विवरण";
 
     // Column Headers
     public static final String COLUMN_EXPENSE_DESCRIPTION = "खर्च डे.";
