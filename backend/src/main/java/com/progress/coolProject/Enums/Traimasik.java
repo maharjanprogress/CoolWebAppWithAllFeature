@@ -5,6 +5,9 @@ import com.progress.coolProject.Utils.date.NepaliDate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @RequiredArgsConstructor
 public enum Traimasik {
@@ -64,5 +67,25 @@ public enum Traimasik {
         }
 
         return StringConstants.nepaliMonths[previousQuarter.getMonths()[0]-1] + " देखि " + nepaliDate.getMonthNameNepali();
+    }
+
+    public static String getmonthBetweenTraimasikofPlusmonthConcatenated(int plusMonth){
+        NepaliDate nepaliDate = NepaliDate.now().plusMonths(plusMonth);
+        int previousMonth = nepaliDate.getMonth();
+
+        Traimasik previousQuarter = getTraimasikForMonth(previousMonth);
+
+
+        List<Integer> validMonths = new ArrayList<>();
+
+        for (int month : previousQuarter.getMonths()) {
+            if (month <= previousMonth) {
+                validMonths.add(month);
+            }
+        }
+
+        int[] monthsArray = validMonths.stream().mapToInt(i -> i).toArray();
+
+        return StringConstants.getMonthsConcatenated(monthsArray);
     }
 }

@@ -16,7 +16,7 @@ import java.awt.*;
 @UtilityClass
 public final class SlideOne {
     // Header
-    public static final String FIRST_ROW_TITLE = NepaliDate.now().getYearInNepali() +" "+ NepaliDate.now().plusMonths(-1).getMonthNameNepali() +" मसान्तसम्मको वासालात";
+    public static final String FIRST_ROW_TITLE = NepaliDate.now().plusMonths(-1).getYearInNepali() +" "+ NepaliDate.now().plusMonths(-1).getMonthNameNepali() +" मसान्तसम्मको वासालात";
 
     // Column Headers
     public static final String COLUMN_CAPITAL_LIABILITY = "पूँजी तथा दायित्व";

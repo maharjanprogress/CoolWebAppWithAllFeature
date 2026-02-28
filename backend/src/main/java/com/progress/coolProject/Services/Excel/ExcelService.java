@@ -14,6 +14,7 @@ import com.progress.coolProject.Repo.Excel.ProcessingJobRepository;
 import com.progress.coolProject.Services.Impl.Excel.IExcelService;
 import com.progress.coolProject.StringConstants;
 import com.progress.coolProject.Utils.Excel.*;
+import com.progress.coolProject.Utils.date.NepaliDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.sl.usermodel.TextParagraph;
@@ -505,11 +506,11 @@ public class ExcelService implements IExcelService {
         subtitleRun.setText("Presented by Progress");
         subtitleRun.setFontSize(24.0);
 
-        SlideOne.createDataSlide(ppt, "२. "+ Traimasik.getCurrent().getLocale() +" त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
+        SlideOne.createDataSlide(ppt, "२. "+ Traimasik.getTraimasikForMonth(NepaliDate.now().plusMonths(-1).getMonth()).getLocale() +" त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
 
-        SlideTwo.createDataSlide(ppt, "२. "+ Traimasik.getCurrent().getLocale() +" त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
+        SlideTwo.createDataSlide(ppt, "२. "+ Traimasik.getTraimasikForMonth(NepaliDate.now().plusMonths(-1).getMonth()).getLocale() +" त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
 
-        SlideThree.createDataSlide(ppt, "२. "+ Traimasik.getCurrent().getLocale() +" त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
+        SlideThree.createDataSlide(ppt, "२. "+ Traimasik.getTraimasikForMonth(NepaliDate.now().plusMonths(-1).getMonth()).getLocale() +" त्रैमासिकसम्म सहकारी संस्थाको वित्तिय विवरण", excel);
 
         SlideSeven.createDataSlide(ppt, "५. संस्थाको प्राथमिक पूँजीकोष सम्बन्धी विवरण", excel);
 

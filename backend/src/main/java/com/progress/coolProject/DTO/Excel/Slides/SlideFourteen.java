@@ -3,8 +3,9 @@ package com.progress.coolProject.DTO.Excel.Slides;
 
 import com.ibm.icu.text.NumberFormat;
 import com.ibm.icu.util.ULocale;
-import com.progress.coolProject.StringConstants;
+import com.progress.coolProject.Enums.Traimasik;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
+import com.progress.coolProject.Utils.date.NepaliDate;
 import lombok.experimental.UtilityClass;
 import org.apache.poi.xddf.usermodel.PresetColor;
 import org.apache.poi.xddf.usermodel.text.TextAlignment;
@@ -18,7 +19,7 @@ import java.awt.*;
 @UtilityClass
 public final class SlideFourteen {
     // Header
-    public static final String FIRST_ROW_TITLE = "१३. प्रथम त्रैमासिक प्रगति समिक्षा ("+ StringConstants.getMonths(StringConstants.ASHOJ, StringConstants.KARTIK, StringConstants.MANGSIR) +") " + StringConstants.CURRENT_YEAR;
+    public static final String FIRST_ROW_TITLE = "१३. " + Traimasik.getTraimasikForMonth(NepaliDate.now().plusMonths(-1).getMonth()).getLocale() + " त्रैमासिक प्रगति समिक्षा ("+ Traimasik.getmonthBetweenTraimasikofPlusmonthConcatenated(-1) +") " + NepaliDate.now().plusMonths(-1).getYearInNepali();
     public static final String SECOND_ROW_SUBTITLE = "• सञ्चालक समिति, लेखा, उपसमिति र कर्मचारीहरुको बैठक (वार्षिक बजेटमा आधारित)";
 
     // Column Headers

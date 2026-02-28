@@ -20,7 +20,7 @@ import java.awt.*;
 @UtilityClass
 public final class SlideTwo {
     // Header
-    public static final String FIRST_ROW_TITLE = NepaliDate.now().getYearInNepali() + " " + Traimasik.getmonthBetweenTraimasikofPlusmonth(-1) + " मसान्तसम्मको नाफा नोक्सान हिसाब विवरण";
+    public static final String FIRST_ROW_TITLE = NepaliDate.now().plusMonths(-1).getYearInNepali() + " " + Traimasik.getmonthBetweenTraimasikofPlusmonth(-1) + " मसान्तसम्मको नाफा नोक्सान हिसाब विवरण";
 
     // Column Headers
     public static final String COLUMN_EXPENSE_DESCRIPTION = "खर्च डे.";
