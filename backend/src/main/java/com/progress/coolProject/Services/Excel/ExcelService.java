@@ -56,6 +56,7 @@ public class ExcelService implements IExcelService {
                                          MultipartFile loanAgeingSheet,
                                          MultipartFile loanSummary,
                                          MultipartFile savingSummary,
+                                         MultipartFile previousTrialBalance,
                                          User user) {
         // Check if user already has an active job
         Optional<ProcessingJob> existingJob = jobRepository.findFirstByUserAndStatusInOrderByCreatedAtDesc(
@@ -67,7 +68,7 @@ public class ExcelService implements IExcelService {
             throw new RuntimeException("You already have a file being processed. Please wait.");
         }
 
-        String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet);
+        String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet, previousTrialBalance);
 
         // Create job record
         ProcessingJob job = new ProcessingJob();
@@ -79,7 +80,7 @@ public class ExcelService implements IExcelService {
 
         // Process asynchronously
         processExcelAsync(job, trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet,
-                loanSummary, savingSummary);
+                loanSummary, savingSummary, previousTrialBalance);
 
         return job;
     }
@@ -98,7 +99,9 @@ public class ExcelService implements IExcelService {
                                   MultipartFile balanceSheet,
                                   MultipartFile loanAgeingSheet,
                                   MultipartFile loanSummary,
-                                  MultipartFile savingSummary) {
+                                  MultipartFile savingSummary,
+                                  MultipartFile previousTrialBalance
+    ) {
         Workbook workbook = null;
         try {
             // Update status to processing
@@ -126,24 +129,31 @@ public class ExcelService implements IExcelService {
             workbook = new XSSFWorkbook(balanceSheet.getInputStream());
             Sheet bsSheet = workbook.getSheetAt(0);
 
-            sendProgress(job, 30, "Validating BalanceSheet file structure...");
+            sendProgress(job, 26, "Validating BalanceSheet file structure...");
             validateHeaders(bsSheet);
 
+            sendProgress(job, 27, "Reading Previous Trial Balance Excel file...");
+            workbook = new XSSFWorkbook(previousTrialBalance.getInputStream());
+            Sheet pTBSheet = workbook.getSheetAt(0);
 
-            sendProgress(job, 26, "Validating LoanAgeing Excel file...");
+            sendProgress(job, 28, "Validating Previous Trial Balance file structure...");
+            validateHeaders(pTBSheet);
+
+
+            sendProgress(job, 29, "Validating LoanAgeing Excel file...");
             workbook = new XSSFWorkbook(loanAgeingSheet.getInputStream());
             Sheet lASheet = workbook.getSheetAt(0);
 
-            sendProgress(job, 27, "Validating loan summary Excel file...");
+            sendProgress(job, 30, "Validating loan summary Excel file...");
             workbook = new XSSFWorkbook(loanSummary.getInputStream());
             Sheet loanSummarySheet = workbook.getSheetAt(0);
 
-            sendProgress(job, 28, "Validating saving summary Excel file...");
+            sendProgress(job, 31, "Validating saving summary Excel file...");
             workbook = new XSSFWorkbook(savingSummary.getInputStream());
             Sheet savingSummarySheet = workbook.getSheetAt(0);
 
             // Parse and validate data
-            sendProgress(job, 35, "Validating data...");
+            sendProgress(job, 32, "Validating data...");
             Map<TrialBalanceEnum, ExcelRowDTO> tbRows = parseAndValidateData(sheet);
             if (tbRows.isEmpty()) {
                 throw new RuntimeException("No valid data found in the Trial Balance Excel file");
@@ -157,6 +167,11 @@ public class ExcelService implements IExcelService {
             Map<TrialBalanceEnum, ExcelRowDTO> bsRows = parseAndValidateData(bsSheet);
             if (bsRows.isEmpty()) {
                 throw new RuntimeException("No valid data found in the BalanceSheet Excel file");
+            }
+
+            Map<TrialBalanceEnum, ExcelRowDTO> pTbRows = parseAndValidateData(pTBSheet);
+            if (pTbRows.isEmpty()) {
+                throw new RuntimeException("No valid data found in the Previous Trial Balance Excel file");
             }
 
             Map<String, LoanAccountAgeingDTO> loanData =
@@ -191,6 +206,7 @@ public class ExcelService implements IExcelService {
             sendProgress(job, 70, "Generating PowerPoint presentation...");
             String outputPptPath = generatePowerPoint(
                     rows,bsRows, plRows,
+                    pTbRows,
                     loanData, loanSummData, savingSummData,
                     job.getUser().getUserName()
             );
@@ -448,6 +464,7 @@ public class ExcelService implements IExcelService {
             Map<TrialBalanceEnum, ExcelRowDTO> rowsMap,
             Map<TrialBalanceEnum, ExcelRowDTO> bsRowsMap,
             Map<TrialBalanceEnum, ExcelRowDTO> plRows,
+            Map<TrialBalanceEnum, ExcelRowDTO> pTbRows,
             Map<String, LoanAccountAgeingDTO> loanAgeingMap,
             Map<LoanCategory, AccountSummaryDTO> loanSummaryMap,
             Map<SavingCategory, AccountSummaryDTO> savingSummaryMap,
@@ -460,6 +477,9 @@ public class ExcelService implements IExcelService {
         ExcelTrialBalanceExcelRowHelper bsExcel = new ExcelTrialBalanceExcelRowHelper(bsRowsMap);
 
         ExcelTrialBalanceExcelRowHelper plExcel = new ExcelTrialBalanceExcelRowHelper(plRows);
+
+        ExcelTrialBalanceExcelRowHelper pTbExcel = new ExcelTrialBalanceExcelRowHelper(pTbRows);
+
 
         ExcelLoanAgeingHelper loanAgeing = new ExcelLoanAgeingHelper(loanAgeingMap);
 
@@ -528,7 +548,8 @@ public class ExcelService implements IExcelService {
 
         SlideFourtyFive.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)",plExcel, bsExcel);
 
-        SlideFourtySix.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", excel);
+        double previousMonthShareCapital = pTbExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL);
+        SlideFourtySix.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", plExcel, bsExcel, previousMonthShareCapital);
 
 
         // Generate output file path

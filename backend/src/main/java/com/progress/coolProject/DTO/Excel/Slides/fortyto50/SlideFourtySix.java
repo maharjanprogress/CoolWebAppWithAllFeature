@@ -54,7 +54,10 @@ public class SlideFourtySix {
 
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
-                                       ExcelTrialBalanceExcelRowHelper excel) {
+                                       ExcelTrialBalanceExcelRowHelper plExcel,
+                                       ExcelTrialBalanceExcelRowHelper bsExcel,
+                                       double previousMonthShareCapital
+    ) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -98,9 +101,11 @@ public class SlideFourtySix {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double r5Value = calcR5(excel);
-        double r6Value = calcR6(excel);
-        double r7Value = calcR7(excel);
+        double bsTotal = bsExcel.getTotalCredit();
+
+        double r5Value = calcR5(plExcel, bsTotal);
+        double r6Value = calcR6(plExcel, bsTotal);
+        double r7Value = calcR7(bsExcel, previousMonthShareCapital);
 
         fillRow(table, 1, ROW_R5_IND, ROW_R5_DET, ROW_R5_DESC, ROW_R5_TGT,
                 currentQuarter, r5Value, nepFmt, lightOrange);
@@ -122,15 +127,14 @@ public class SlideFourtySix {
      *              — all interest paid out on saving accounts
      * Denominator: SAVING_ACCOUNT (4001) — total member saving deposits
      */
-    private static double calcR5(ExcelTrialBalanceExcelRowHelper excel) {
-        double interestPaid = excel.getDebitSum(
+    private static double calcR5(ExcelTrialBalanceExcelRowHelper plExcel, double bsTotal) {
+        double interestPaid = plExcel.getDebitSum(
                 TrialBalanceEnum.INTEREST_EXPENDITURE,
                 TrialBalanceEnum.INTEREST_EXPENDITURE_2
         );
 
-        double totalSavings = excel.getCredit(TrialBalanceEnum.SAVING_ACCOUNT);
-        if (totalSavings == 0) return 0;
-        return (interestPaid / totalSavings) * 100.0;
+        if (bsTotal == 0) return 0;
+        return (interestPaid / bsTotal) * 100.0;
     }
 
     /**
@@ -146,14 +150,14 @@ public class SlideFourtySix {
      * <p>
      * Note: If the institution has no external loan (balance = 0), this correctly returns 0.00
      */
-    private static double calcR6(ExcelTrialBalanceExcelRowHelper excel) {
+    private static double calcR6(ExcelTrialBalanceExcelRowHelper plExcel, double bsTotal) {
         // Interest payable on external loan (accrued but not yet paid)
-        double externalInterest = excel.getDebit(TrialBalanceEnum.BYAG_MULTABI_HISAB);
+        double externalInterest = 0; //they have not taken loan from external source so this is zero
+
 
         // Total external borrowing principal
-        double externalLoan = excel.getCredit(TrialBalanceEnum.NATIONAL_COOPERATIVE);
-        if (externalLoan == 0) return 0;
-        return (externalInterest / externalLoan) * 100.0;
+        if (bsTotal == 0) return 0;
+        return (externalInterest / bsTotal) * 100.0;
     }
 
     /**
@@ -163,11 +167,14 @@ public class SlideFourtySix {
      * Numerator:   SHARE_DIVIDEND_FUND (9991) — dividend declared/paid to members
      * Denominator: SHARE_CAPITAL (9009)       — total member share capital
      */
-    private static double calcR7(ExcelTrialBalanceExcelRowHelper excel) {
-        double dividendPaid  = excel.getCredit(TrialBalanceEnum.SHARE_DIVIDEND_FUND);
-        double shareCapital  = excel.getCredit(TrialBalanceEnum.SHARE_CAPITAL);
-        if (shareCapital == 0) return 0;
-        return (dividendPaid / shareCapital) * 100.0;
+    private static double calcR7(ExcelTrialBalanceExcelRowHelper bsExcel, double previousMonthShareCapital) {
+        double dividendPaid  = bsExcel.getCredit(TrialBalanceEnum.SHARE_DIVIDEND_FUND);
+        double averageShareCapital = (bsExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL) + previousMonthShareCapital)/2;
+        System.out.println("Share Divident Fund : " + dividendPaid);
+        System.out.println("Share Capital : " + bsExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL));
+        System.out.println("Previous Share Capital : " + previousMonthShareCapital);
+        if (averageShareCapital == 0) return 0;
+        return (dividendPaid / averageShareCapital) * 100.0;
     }
 
     // ── Row / cell helpers ────────────────────────────────────────────────────
