@@ -554,6 +554,8 @@ public class ExcelService implements IExcelService {
         double previousMonthTotalBalanceSheetCredit = pTbExcel.getTotalCredit();
         SlideFourtySeven.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", plExcel, bsExcel, previousMonthTotalBalanceSheetCredit);
 
+        SlideFourtyEight.createDataSlide(ppt, "१७.(ङ) तरलता (Liquidity)", excel);
+
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
