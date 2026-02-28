@@ -17,7 +17,7 @@ import org.apache.poi.xslf.usermodel.XSLFTableCell;
 import java.awt.*;
 
 @UtilityClass
-public class SlideFourtyEight {
+public class SlideFourtyNine {
 
     // Column headers
     private static final String COLUMN_INDICATOR = "संकेतहरु";
@@ -29,26 +29,37 @@ public class SlideFourtyEight {
     private static final String COLUMN_Q2        = "दोस्रो\nत्रैमासिक";
     private static final String COLUMN_Q1        = "पहिलो\nत्रैमासिक";
 
-    // यल वान — तरलता
-    private static final String ROW_L1_IND  = "यल वान";
-    private static final String ROW_L1_DET  = "तरलता";
-    private static final String ROW_L1_DESC = "नगद र बैंक\nखातामा रहेको रकम";
-    private static final String ROW_L1_TGT  = "१०-२०%";
+    // यस टेन — सदस्य वृद्धिदर
+    private static final String ROW_G10_IND  = "यस टेन";
+    private static final String ROW_G10_DET  = "सदस्य\nवृद्धिदर";
+    private static final String ROW_G10_DESC = "यस बर्ष - गत\nबर्ष भागा गत बर्ष";
+    private static final String ROW_G10_TGT  = "कम्तिमा\n१२%";
 
-    // यल थ्री — नगद
-    private static final String ROW_L3_IND  = "यल थ्री";
-    private static final String ROW_L3_DET  = "नगद";
-    private static final String ROW_L3_DESC = "संस्थाको नगद काउन्टर\nर भल्ट (ढुकुटि) मा\nरहेको रकम";
-    private static final String ROW_L3_TGT  = "१% भन्द\nकम";
+    // यस इलावेन — कूल सम्पत्ति वृद्धिदर
+    private static final String ROW_G11_IND  = "यस इलावेन";
+    private static final String ROW_G11_DET  = "कूल सम्पत्ति\nवृद्धिदर";
+    private static final String ROW_G11_DESC = "यस बर्ष - गत\nबर्ष भागा गत बर्ष";
+    private static final String ROW_G11_TGT  = "मुद्रास्फीति\nदर भन्दा\nबढी";
 
     private static final double      NORMAL_FONT_SIZE    = 14.0;
     private static final double      HEADER_FONT_SIZE    = 14.0;
     private static final PresetColor NORMAL_FONT_COLOR   = PresetColor.BLACK;
     private static final Color       NORMAL_BORDER_COLOR = Color.BLACK;
 
+    /**
+     * @param ppt                  the slide show
+     * @param slideTitle           slide title string
+     * @param excel                current year trial balance helper
+     * @param previousYearMembers  total member count as of end of last fiscal year
+     * @param currentYearMembers   total member count as of current quarter end
+     * @param previousYearAssets   total assets at end of last fiscal year (in your unit, e.g. lakhs)
+     */
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
-                                       ExcelTrialBalanceExcelRowHelper excel) {
+                                       ExcelTrialBalanceExcelRowHelper excel,
+                                       long previousYearMembers,
+                                       long currentYearMembers,
+                                       double previousYearAssets) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -91,61 +102,46 @@ public class SlideFourtyEight {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double l1Value = calcL1(excel);
-        double l3Value = calcL3(excel);
+        double g10Value = calcG10(previousYearMembers, currentYearMembers);
+        double g11Value = calcG11(excel, previousYearAssets);
 
-        fillRow(table, 1, ROW_L1_IND, ROW_L1_DET, ROW_L1_DESC, ROW_L1_TGT,
-                currentQuarter, l1Value, nepFmt, lightOrange);
+        fillRow(table, 1, ROW_G10_IND, ROW_G10_DET, ROW_G10_DESC, ROW_G10_TGT,
+                currentQuarter, g10Value, nepFmt, lightOrange);
 
-        fillRow(table, 2, ROW_L3_IND, ROW_L3_DET, ROW_L3_DESC, ROW_L3_TGT,
-                currentQuarter, l3Value, nepFmt, lightBlue);
+        fillRow(table, 2, ROW_G11_IND, ROW_G11_DET, ROW_G11_DESC, ROW_G11_TGT,
+                currentQuarter, g11Value, nepFmt, lightBlue);
     }
 
     // ── Calculations ──────────────────────────────────────────────────────────
 
     /**
-     * L1: तरलता
-     * = (Cash + All Bank Balances) ÷ Total Assets × 100
+     * G10: सदस्य वृद्धिदर
+     * = (Current Year Members − Previous Year Members) ÷ Previous Year Members × 100
      * <p>
-     * Liquid assets = cash on hand + all bank/cooperative account balances
+     * Member counts are NOT in the trial balance — they must be passed in
+     * from your membership register / database.
      */
-    private static double calcL1(ExcelTrialBalanceExcelRowHelper excel) {
-        double cash = excel.getDebit(TrialBalanceEnum.CASH);
-
-        double bankBalances = excel.getDebitSum(
-                TrialBalanceEnum.KRISHI_BIKASH_BANK,
-                TrialBalanceEnum.NEPAL_INV_BANK,
-                TrialBalanceEnum.NATIONAL_COOPERATIVE,
-                TrialBalanceEnum.KASKUN_REGULAR_SAVING,
-                TrialBalanceEnum.KASKUN_DAINIK,
-                TrialBalanceEnum.KASKUN_TIME_SAVING,
-                TrialBalanceEnum.BANK_DEVIDEND_SAVING,
-                TrialBalanceEnum.SANIMA_BANK,
-                TrialBalanceEnum.RSB_TIME_SAVING,
-                TrialBalanceEnum.NEFSCUN_REGULAR_SAVING
-        );
-
-        double totalAssets = getTotalAssets(excel);
-        if (totalAssets == 0) return 0;
-        return ((cash + bankBalances) / totalAssets) * 100.0;
+    private static double calcG10(long previousYearMembers, long currentYearMembers) {
+        if (previousYearMembers == 0) return 0;
+        return ((double)(currentYearMembers - previousYearMembers) / previousYearMembers) * 100.0;
     }
 
     /**
-     * L3: नगद
-     * = Cash in vault/counter ÷ Total Assets × 100
+     * G11: कूल सम्पत्ति वृद्धिदर
+     * = (Current Total Assets − Previous Year Total Assets) ÷ Previous Year Total Assets × 100
      * <p>
-     * Only physical cash on hand (CASH ledger 5001),
-     * excludes bank balances
+     * Current total assets are derived from trial balance.
+     * Previous year total assets must be passed in (prior year closing balance sheet).
      */
-    private static double calcL3(ExcelTrialBalanceExcelRowHelper excel) {
-        double cash        = excel.getDebit(TrialBalanceEnum.CASH);
-        double totalAssets = getTotalAssets(excel);
-        if (totalAssets == 0) return 0;
-        return (cash / totalAssets) * 100.0;
+    private static double calcG11(ExcelTrialBalanceExcelRowHelper excel,
+                                  double previousYearAssets) {
+        if (previousYearAssets == 0) return 0;
+        double currentAssets = getTotalAssets(excel);
+        return ((currentAssets - previousYearAssets) / previousYearAssets) * 100.0;
     }
 
     /**
-     * Total Assets — consistent with SlideFourtyFour/Seven.
+     * Total Assets — consistent with previous slides.
      */
     private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper excel) {
         double bankBalances = excel.getDebitSum(

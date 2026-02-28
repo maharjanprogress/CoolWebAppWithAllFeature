@@ -556,6 +556,14 @@ public class ExcelService implements IExcelService {
 
         SlideFourtyEight.createDataSlide(ppt, "१७.(ङ) तरलता (Liquidity)", excel);
 
+        SlideFourtyNine.createDataSlide(ppt,
+                "१७.(च) वृद्धिको संकेत (Sign of Growth)",
+                excel,
+                100,   // e.g. fetch from your DB/entity
+                200,    // e.g. fetch from your DB/entity
+                300     // e.g. stored from last year's closing balance sheet
+        );
+
 
         // Generate output file path
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
