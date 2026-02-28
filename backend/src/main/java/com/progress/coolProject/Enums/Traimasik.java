@@ -24,7 +24,7 @@ public enum Traimasik {
      */
     public static Traimasik getCurrent() {
         NepaliDate nepaliDate = NepaliDate.now();
-        int currentMonth = nepaliDate.getMonth();
+        int currentMonth = nepaliDate.plusMonths(-1).getMonth();
 
         // Determine which quarter we're in
         return getTraimasikForMonth(currentMonth);
@@ -37,9 +37,7 @@ public enum Traimasik {
     public Traimasik[] getIncludingPrevious() {
         int currentOrdinal = this.ordinal();
         Traimasik[] result = new Traimasik[currentOrdinal + 1];
-        for (int i = 0; i <= currentOrdinal; i++) {
-            result[i] = Traimasik.values()[i];
-        }
+        System.arraycopy(Traimasik.values(), 0, result, 0, currentOrdinal + 1);
         return result;
     }
 
