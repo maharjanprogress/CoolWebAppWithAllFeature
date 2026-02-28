@@ -552,7 +552,8 @@ public class ExcelService implements IExcelService {
         SlideFourtySix.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", plExcel, bsExcel, previousMonthShareCapital);
 
         double previousMonthTotalBalanceSheetCredit = pTbExcel.getTotalCredit();
-        SlideFourtySeven.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", plExcel, bsExcel, previousMonthTotalBalanceSheetCredit);
+        double previousMonthLoanAccount = pTbExcel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
+        SlideFourtySeven.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", excel, bsExcel, previousMonthTotalBalanceSheetCredit, previousMonthLoanAccount);
 
         SlideFourtyEight.createDataSlide(ppt, "१७.(ङ) तरलता (Liquidity)", excel);
 

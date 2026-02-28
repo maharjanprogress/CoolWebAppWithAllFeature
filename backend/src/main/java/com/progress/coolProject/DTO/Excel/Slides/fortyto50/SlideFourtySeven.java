@@ -1,5 +1,6 @@
 package com.progress.coolProject.DTO.Excel.Slides.fortyto50;
 
+import com.progress.coolProject.DTO.Excel.Slides.SlideTwo;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Enums.Traimasik;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
@@ -48,9 +49,10 @@ public class SlideFourtySeven {
 
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
-                                       ExcelTrialBalanceExcelRowHelper plExcel,
+                                       ExcelTrialBalanceExcelRowHelper excel,
                                        ExcelTrialBalanceExcelRowHelper bsExcel,
-                                       double previousMonthTotalBalanceSheetCredit
+                                       double previousMonthTotalBalanceSheetCredit,
+                                       double previousMonthLoanAccount
                                        ) {
 
         XSLFSlide slide = ppt.createSlide();
@@ -94,8 +96,8 @@ public class SlideFourtySeven {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double r9Value  = calcR9(plExcel);
-        double r10Value = calcR10(plExcel);
+        double r9Value  = calcR9(excel, bsExcel, previousMonthTotalBalanceSheetCredit);
+        double r10Value = calcR10(excel, previousMonthLoanAccount);
 
         fillRow(table, 1, ROW_R9_IND,  ROW_R9_DET,  ROW_R9_DESC,  ROW_R9_TGT,
                 currentQuarter, r9Value,  nepFmt, lightOrange);
@@ -109,106 +111,35 @@ public class SlideFourtySeven {
     /**
      * R9: संचालन खर्च
      * = Total Operating/Administrative Expenses ÷ Total Assets × 100
-     *
+     * <p>
      * All admin/operating expense ledgers from TrialBalanceEnum (debit-side expenses):
      */
-    private static double calcR9(ExcelTrialBalanceExcelRowHelper excel) {
-        double operatingExpenses = excel.getDebitSum(
-                TrialBalanceEnum.SALARY,
-                TrialBalanceEnum.TELEPHONE_EXPENSE,
-                TrialBalanceEnum.ELECTRICITY_EXPENSE,
-                TrialBalanceEnum.WATER_EXPENSE,
-                TrialBalanceEnum.PRINTING_EXPENSE,
-                TrialBalanceEnum.STATIONARY_EXPENSE,
-                TrialBalanceEnum.TRAVELLING_EXPENSE,
-                TrialBalanceEnum.FINE_AND_PENALTY,
-                TrialBalanceEnum.AUDIT_FEE_EXPENSE,
-                TrialBalanceEnum.DASHAIN_ALLOWANCE,
-                TrialBalanceEnum.TIFFIN_EXPENSE,
-                TrialBalanceEnum.GENERAL_MEETING,
-                TrialBalanceEnum.REPAIR_AND_MAINTENANCE_CHARGE,
-                TrialBalanceEnum.TRAINING_CHARGE_EXPENSE,
-                TrialBalanceEnum.MISCELLANEOUS_EXPENSE,
-                TrialBalanceEnum.BONUS_EXPENCES,
-                TrialBalanceEnum.OFFICE_EXPENSE,
-                TrialBalanceEnum.AGM_EXPENSE,
-                TrialBalanceEnum.FINE_AND_PENALTIES_EXPENSES,
-                TrialBalanceEnum.OFFICE_CLEANING,
-                TrialBalanceEnum.AMC_EXPENSE,
-                TrialBalanceEnum.CLOUD_EXPENSE,
-                TrialBalanceEnum.RAHAT_KHARCHA,
-                TrialBalanceEnum.CURBS_FEE,
-                TrialBalanceEnum.SANTONA_KHARCHA,
-                TrialBalanceEnum.PROVIDENT_EXP,
-                TrialBalanceEnum.SOCIAL_PROGRAMME,
-                TrialBalanceEnum.VAT_EXP,
-                TrialBalanceEnum.SANJAL_MEMBER_FEE,
-                TrialBalanceEnum.DRESS
-        );
+    private static double calcR9(
+            ExcelTrialBalanceExcelRowHelper excel,
+            ExcelTrialBalanceExcelRowHelper bsExcel,
+            double previousMonthTotalBalanceSheetCredit
+    ) {
+        double operatingExpenses = SlideTwo.getAdministrativeExpense(excel);
 
-        double totalAssets = getTotalAssets(excel);
-        if (totalAssets == 0) return 0;
-        return (operatingExpenses / totalAssets) * 100.0;
+        double averageBalanceSheet = (bsExcel.getTotalCredit() + previousMonthTotalBalanceSheetCredit)/2;
+
+        if (averageBalanceSheet == 0) return 0;
+        return (operatingExpenses / averageBalanceSheet) * 100.0;
     }
 
     /**
      * R10: ऋण जोखिम व्यहोर्ने खर्च
      * = Loan Loss Provision Expense ÷ Total Loan Portfolio × 100
-     *
+     * <p>
      * Numerator:   LOAN_LOSS_PROVISION_EXPENSES (9901) — LLP expense booked this period
      * Denominator: LOAN_ACCOUNT (3001)                 — total loan portfolio
      */
-    private static double calcR10(ExcelTrialBalanceExcelRowHelper excel) {
+    private static double calcR10(ExcelTrialBalanceExcelRowHelper excel , double previousMonthLoanAccount) {
         double llpExpense = excel.getDebit(TrialBalanceEnum.LOAN_LOSS_PROVISION_EXPENSES);
-        double totalLoan  = excel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
+        double totalLoan  = (excel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT) + previousMonthLoanAccount)/2;
+
         if (totalLoan == 0) return 0;
         return (llpExpense / totalLoan) * 100.0;
-    }
-
-    /**
-     * Total Assets — consistent with SlideFourtyFour.
-     * Sum of all debit-side balance sheet items.
-     */
-    private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper excel) {
-        double bankBalances = excel.getDebitSum(
-                TrialBalanceEnum.KRISHI_BIKASH_BANK,
-                TrialBalanceEnum.NEPAL_INV_BANK,
-                TrialBalanceEnum.NATIONAL_COOPERATIVE,
-                TrialBalanceEnum.KASKUN_REGULAR_SAVING,
-                TrialBalanceEnum.KASKUN_DAINIK,
-                TrialBalanceEnum.KASKUN_TIME_SAVING,
-                TrialBalanceEnum.BANK_DEVIDEND_SAVING,
-                TrialBalanceEnum.SANIMA_BANK,
-                TrialBalanceEnum.RSB_TIME_SAVING,
-                TrialBalanceEnum.SHARE_INVEST_NCBL
-        );
-
-        double loans = excel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
-
-        double fixedAssets = excel.getDebitSum(
-                TrialBalanceEnum.LAND,
-                TrialBalanceEnum.BUILDING,
-                TrialBalanceEnum.FURNITURE,
-                TrialBalanceEnum.PRINTER,
-                TrialBalanceEnum.OFFICE_GOODS,
-                TrialBalanceEnum.LAND_AND_BUILDING,
-                TrialBalanceEnum.OFFICE_EQUIPMENTS
-        );
-
-        double cash = excel.getDebit(TrialBalanceEnum.CASH);
-
-        double receivables = excel.getDebitSum(
-                TrialBalanceEnum.ADVANCES_RECEIVABLES,
-                TrialBalanceEnum.TDS_RECEIVABLES_ADVANCE_TAX,
-                TrialBalanceEnum.TDS_ON_INTEREST_RECEIVABLE
-        );
-
-        double other = excel.getDebitSum(
-                TrialBalanceEnum.SAMAN_MAUJDAT,
-                TrialBalanceEnum.PUGIGAT_JAGAEDA_KOSH
-        );
-
-        return bankBalances + loans + fixedAssets + cash + receivables + other;
     }
 
     // ── Row / cell helpers ────────────────────────────────────────────────────
