@@ -555,7 +555,7 @@ public class ExcelService implements IExcelService {
         double previousMonthLoanAccount = pTbExcel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
         SlideFourtySeven.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", excel, bsExcel, previousMonthTotalBalanceSheetCredit, previousMonthLoanAccount);
 
-        SlideFourtyEight.createDataSlide(ppt, "१७.(ङ) तरलता (Liquidity)", excel);
+        SlideFourtyEight.createDataSlide(ppt, "१७.(ङ) तरलता (Liquidity)", bsExcel);
 
         SlideFourtyNine.createDataSlide(ppt,
                 "१७.(च) वृद्धिको संकेत (Sign of Growth)",

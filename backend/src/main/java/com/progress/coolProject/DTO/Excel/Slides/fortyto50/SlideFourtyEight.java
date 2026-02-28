@@ -1,5 +1,6 @@
 package com.progress.coolProject.DTO.Excel.Slides.fortyto50;
 
+import com.progress.coolProject.DTO.Excel.Slides.SlideOne;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Enums.Traimasik;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
@@ -48,7 +49,7 @@ public class SlideFourtyEight {
 
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
-                                       ExcelTrialBalanceExcelRowHelper excel) {
+                                       ExcelTrialBalanceExcelRowHelper bsExcel) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -91,8 +92,8 @@ public class SlideFourtyEight {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double l1Value = calcL1(excel);
-        double l3Value = calcL3(excel);
+        double l1Value = calcL1(bsExcel);
+        double l3Value = calcL3(bsExcel);
 
         fillRow(table, 1, ROW_L1_IND, ROW_L1_DET, ROW_L1_DESC, ROW_L1_TGT,
                 currentQuarter, l1Value, nepFmt, lightOrange);
@@ -109,23 +110,14 @@ public class SlideFourtyEight {
      * <p>
      * Liquid assets = cash on hand + all bank/cooperative account balances
      */
-    private static double calcL1(ExcelTrialBalanceExcelRowHelper excel) {
-        double cash = excel.getDebit(TrialBalanceEnum.CASH);
+    private static double calcL1(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        double cash = bsExcel.getDebit(TrialBalanceEnum.CASH);
 
-        double bankBalances = excel.getDebitSum(
-                TrialBalanceEnum.KRISHI_BIKASH_BANK,
-                TrialBalanceEnum.NEPAL_INV_BANK,
-                TrialBalanceEnum.NATIONAL_COOPERATIVE,
-                TrialBalanceEnum.KASKUN_REGULAR_SAVING,
-                TrialBalanceEnum.KASKUN_DAINIK,
-                TrialBalanceEnum.KASKUN_TIME_SAVING,
-                TrialBalanceEnum.BANK_DEVIDEND_SAVING,
-                TrialBalanceEnum.SANIMA_BANK,
-                TrialBalanceEnum.RSB_TIME_SAVING,
-                TrialBalanceEnum.NEFSCUN_REGULAR_SAVING
-        );
+        double bankBalances = SlideOne.getBank(bsExcel);
 
-        double totalAssets = getTotalAssets(excel);
+
+
+        double totalAssets = bsExcel.getCredit(TrialBalanceEnum.SAVING_ACCOUNT);
         if (totalAssets == 0) return 0;
         return ((cash + bankBalances) / totalAssets) * 100.0;
     }
@@ -137,56 +129,14 @@ public class SlideFourtyEight {
      * Only physical cash on hand (CASH ledger 5001),
      * excludes bank balances
      */
-    private static double calcL3(ExcelTrialBalanceExcelRowHelper excel) {
-        double cash        = excel.getDebit(TrialBalanceEnum.CASH);
-        double totalAssets = getTotalAssets(excel);
+    private static double calcL3(ExcelTrialBalanceExcelRowHelper bsExcel) {
+        double cash = bsExcel.getDebit(TrialBalanceEnum.CASH);
+
+        double chaltiAccount = bsExcel.getDebitSum(TrialBalanceEnum.SANIMA_BANK, TrialBalanceEnum.KRISHI_BIKASH_BANK);
+
+        double totalAssets = bsExcel.getTotalCredit();
         if (totalAssets == 0) return 0;
-        return (cash / totalAssets) * 100.0;
-    }
-
-    /**
-     * Total Assets — consistent with SlideFourtyFour/Seven.
-     */
-    private static double getTotalAssets(ExcelTrialBalanceExcelRowHelper excel) {
-        double bankBalances = excel.getDebitSum(
-                TrialBalanceEnum.KRISHI_BIKASH_BANK,
-                TrialBalanceEnum.NEPAL_INV_BANK,
-                TrialBalanceEnum.NATIONAL_COOPERATIVE,
-                TrialBalanceEnum.KASKUN_REGULAR_SAVING,
-                TrialBalanceEnum.KASKUN_DAINIK,
-                TrialBalanceEnum.KASKUN_TIME_SAVING,
-                TrialBalanceEnum.BANK_DEVIDEND_SAVING,
-                TrialBalanceEnum.SANIMA_BANK,
-                TrialBalanceEnum.RSB_TIME_SAVING,
-                TrialBalanceEnum.SHARE_INVEST_NCBL
-        );
-
-        double loans = excel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
-
-        double fixedAssets = excel.getDebitSum(
-                TrialBalanceEnum.LAND,
-                TrialBalanceEnum.BUILDING,
-                TrialBalanceEnum.FURNITURE,
-                TrialBalanceEnum.PRINTER,
-                TrialBalanceEnum.OFFICE_GOODS,
-                TrialBalanceEnum.LAND_AND_BUILDING,
-                TrialBalanceEnum.OFFICE_EQUIPMENTS
-        );
-
-        double cash = excel.getDebit(TrialBalanceEnum.CASH);
-
-        double receivables = excel.getDebitSum(
-                TrialBalanceEnum.ADVANCES_RECEIVABLES,
-                TrialBalanceEnum.TDS_RECEIVABLES_ADVANCE_TAX,
-                TrialBalanceEnum.TDS_ON_INTEREST_RECEIVABLE
-        );
-
-        double other = excel.getDebitSum(
-                TrialBalanceEnum.SAMAN_MAUJDAT,
-                TrialBalanceEnum.PUGIGAT_JAGAEDA_KOSH
-        );
-
-        return bankBalances + loans + fixedAssets + cash + receivables + other;
+        return (( cash + chaltiAccount ) / totalAssets) * 100.0;
     }
 
     // ── Row / cell helpers ────────────────────────────────────────────────────
