@@ -1,6 +1,7 @@
 package com.progress.coolProject.Utils.Excel;
 
 import com.progress.coolProject.DTO.Excel.AccountSummaryDTO;
+import com.progress.coolProject.DTO.Excel.MemberAccountDTO;
 import com.progress.coolProject.Enums.AccountType;
 import com.progress.coolProject.Enums.LoanCategory;
 import lombok.experimental.UtilityClass;
@@ -11,6 +12,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @UtilityClass
@@ -19,8 +21,12 @@ public class LoanSummaryExcelUtil {
     private static final int HEADER_ROW_INDEX = 1; // Row 2 in Excel (0-indexed)
     private static final int DATA_START_ROW = 2;   // Row 3 in Excel (0-indexed)
 
-    private static final String[] EXPECTED_HEADERS = {
+    private static final String[] EXPECTED_HEADERS_FOR_SUMMARY_EXCEL = {
             "Code", "Description", "Opening", "Type", "Debit", "Credit", "Balance", "Type"
+    };
+
+    private static final String[] EXPECTED_HEADERS = {
+            "Account No", "Description", "Opening", "Type", "Debit", "Credit", "Balance", "Type"
     };
 
     /**
@@ -70,6 +76,93 @@ public class LoanSummaryExcelUtil {
         }
 
         return resultMap;
+    }
+
+    public static HashMap<String, MemberAccountDTO> extractLoanMemberData(Sheet sheet) throws Exception {
+        validateHeaders(sheet);
+
+        HashMap<String, MemberAccountDTO> resultMap = new HashMap<>();
+        List<String> errors = new ArrayList<>();
+
+        int lastRowNum = sheet.getLastRowNum();
+        for (int i = DATA_START_ROW; i <= lastRowNum - 5; i++) {
+            Row row = sheet.getRow(i);
+            if (row == null || ExcelUtil.isRowEmpty(row)) {
+                continue;
+            }
+
+            try {
+                MemberAccountDTO dto = parseMemberRow(row);
+                if (dto.getAccountNumber() == null || dto.getAccountNumber().trim().isEmpty()) {
+                    errors.add("Row " + (i + 1) + ": Account number is required");
+                    continue;
+                }
+
+                Optional<LoanCategory> loanCategory = LoanCategory.findByAccountNumber(dto.getAccountNumber());
+                if (loanCategory.isEmpty()) {
+                    errors.add("Row " + (i + 1) + ": Unable to resolve loan category from account number " + dto.getAccountNumber());
+                    continue;
+                }
+                dto.setLoanCategory(loanCategory.get());
+
+                resultMap.put(dto.getAccountNumber(), dto);
+            } catch (Exception e) {
+                errors.add("Row " + (i + 1) + ": " + e.getMessage());
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            throw new Exception("Validation errors found:\n" + String.join("\n", errors));
+        }
+        return resultMap;
+    }
+
+    public static HashMap<LoanCategory, AccountSummaryDTO> getSummary(HashMap<String, MemberAccountDTO> memberData) {
+        HashMap<LoanCategory, AccountSummaryDTO> result = new HashMap<>();
+
+        if (memberData == null || memberData.isEmpty()) {
+            return result;
+        }
+
+        HashMap<LoanCategory, Aggregate> aggregateByCategory = new HashMap<>();
+
+        for (Map.Entry<String, MemberAccountDTO> entry : memberData.entrySet()) {
+            MemberAccountDTO member = entry.getValue();
+            if (member == null || member.getLoanCategory() == null) {
+                continue;
+            }
+
+            Aggregate aggregate = aggregateByCategory.computeIfAbsent(member.getLoanCategory(), k -> new Aggregate());
+            aggregate.openingSigned += toSignedValue(member.getOpening(), member.getOpeningType());
+            aggregate.debit += defaultZero(member.getDebit());
+            aggregate.credit += defaultZero(member.getCredit());
+            aggregate.balanceSigned += toSignedValue(member.getBalance(), member.getBalanceType());
+
+            if (isNonZero(member.getBalance())) {
+                aggregate.memberCount++;
+            }
+        }
+
+        for (Map.Entry<LoanCategory, Aggregate> entry : aggregateByCategory.entrySet()) {
+            LoanCategory category = entry.getKey();
+            Aggregate aggregate = entry.getValue();
+
+            AccountSummaryDTO dto = new AccountSummaryDTO();
+            dto.setCode(category.getCode());
+            dto.setDescription(category.getLoanTypeName());
+            dto.setMemberCount(aggregate.memberCount);
+            dto.setOpeningAmount(Math.abs(aggregate.openingSigned));
+            dto.setOpeningType(getTypeFromSignedValue(aggregate.openingSigned));
+            dto.setDebit(aggregate.debit);
+            dto.setCredit(aggregate.credit);
+            dto.setBalance(Math.abs(aggregate.balanceSigned));
+            dto.setBalanceType(getTypeFromSignedValue(aggregate.balanceSigned));
+            dto.setLoanCategory(category);
+
+            result.put(category, dto);
+        }
+
+        return result;
     }
 
     private static void validateHeaders(Sheet sheet) throws Exception {
@@ -137,5 +230,66 @@ public class LoanSummaryExcelUtil {
         }
 
         return dto;
+    }
+
+    private static MemberAccountDTO parseMemberRow(Row row) {
+        MemberAccountDTO dto = new MemberAccountDTO();
+
+        dto.setAccountNumber(ExcelUtil.getCellValueAsString(row.getCell(0)));
+        dto.setDescription(ExcelUtil.getCellValueAsString(row.getCell(1)));
+        dto.setOpening(readNumericValue(row.getCell(2)));
+        dto.setOpeningType(readAccountType(row.getCell(3)));
+        dto.setDebit(readNumericValue(row.getCell(4)));
+        dto.setCredit(readNumericValue(row.getCell(5)));
+        dto.setBalance(readNumericValue(row.getCell(6)));
+        dto.setBalanceType(readAccountType(row.getCell(7)));
+
+        return dto;
+    }
+
+    private static Double readNumericValue(Cell cell) {
+        try {
+            return ExcelUtil.getCellValueAsDouble(cell);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
+
+    private static AccountType readAccountType(Cell cell) {
+        String accountType = ExcelUtil.getCellValueAsString(cell);
+        if (accountType == null || accountType.trim().isEmpty()) {
+            return null;
+        }
+        return AccountType.fromCode(accountType);
+    }
+
+    private static double defaultZero(Double value) {
+        return value == null ? 0.0 : value;
+    }
+
+    private static double toSignedValue(Double amount, AccountType type) {
+        if (amount == null) {
+            return 0.0;
+        }
+        if (type == AccountType.CR) {
+            return -Math.abs(amount);
+        }
+        return Math.abs(amount);
+    }
+
+    private static AccountType getTypeFromSignedValue(double value) {
+        return value < 0 ? AccountType.CR : AccountType.DR;
+    }
+
+    private static boolean isNonZero(Double value) {
+        return value != null && Math.abs(value) > 0.0;
+    }
+
+    private static class Aggregate {
+        double openingSigned;
+        double debit;
+        double credit;
+        double balanceSigned;
+        int memberCount;
     }
 }

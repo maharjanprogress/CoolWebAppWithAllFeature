@@ -3,6 +3,7 @@ package com.progress.coolProject.Services.Excel;
 import com.progress.coolProject.DTO.Excel.AccountSummaryDTO;
 import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
 import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
+import com.progress.coolProject.DTO.Excel.MemberAccountDTO;
 import com.progress.coolProject.DTO.Excel.ProgressUpdate;
 import com.progress.coolProject.DTO.Excel.Slides.*;
 import com.progress.coolProject.DTO.Excel.Slides.fortyto50.*;
@@ -58,6 +59,8 @@ public class ExcelService implements IExcelService {
                                          MultipartFile loanSummary,
                                          MultipartFile savingSummary,
                                          MultipartFile previousBalanceSheet,
+                                         MultipartFile loanMember,
+                                         MultipartFile savingMember,
                                          User user) {
         // Check if user already has an active job
         Optional<ProcessingJob> existingJob = jobRepository.findFirstByUserAndStatusInOrderByCreatedAtDesc(
@@ -69,7 +72,10 @@ public class ExcelService implements IExcelService {
             throw new RuntimeException("You already have a file being processed. Please wait.");
         }
 
-        String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet, previousBalanceSheet);
+        String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(
+                trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet,
+                loanSummary, savingSummary, previousBalanceSheet, loanMember, savingMember
+        );
 
         // Create job record
         ProcessingJob job = new ProcessingJob();
@@ -81,7 +87,7 @@ public class ExcelService implements IExcelService {
 
         // Process asynchronously
         processExcelAsync(job, trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet,
-                loanSummary, savingSummary, previousBalanceSheet);
+                loanSummary, savingSummary, previousBalanceSheet, loanMember, savingMember);
 
         return job;
     }
@@ -101,7 +107,9 @@ public class ExcelService implements IExcelService {
                                   MultipartFile loanAgeingSheet,
                                   MultipartFile loanSummary,
                                   MultipartFile savingSummary,
-                                  MultipartFile previousBalanceSheet
+                                  MultipartFile previousBalanceSheet,
+                                  MultipartFile loanMember,
+                                  MultipartFile savingMember
     ) {
         Workbook workbook = null;
         try {
@@ -153,8 +161,16 @@ public class ExcelService implements IExcelService {
             workbook = new XSSFWorkbook(savingSummary.getInputStream());
             Sheet savingSummarySheet = workbook.getSheetAt(0);
 
+            sendProgress(job, 32, "Reading loan member Excel file...");
+            workbook = new XSSFWorkbook(loanMember.getInputStream());
+            Sheet loanMemberSheet = workbook.getSheetAt(0);
+
+            sendProgress(job, 33, "Reading saving member Excel file...");
+            workbook = new XSSFWorkbook(savingMember.getInputStream());
+            Sheet savingMemberSheet = workbook.getSheetAt(0);
+
             // Parse and validate data
-            sendProgress(job, 32, "Validating data...");
+            sendProgress(job, 34, "Validating data...");
             Map<TrialBalanceEnum, ExcelRowDTO> tbRows = parseAndValidateData(sheet);
             if (tbRows.isEmpty()) {
                 throw new RuntimeException("No valid data found in the Trial Balance Excel file");
@@ -178,11 +194,15 @@ public class ExcelService implements IExcelService {
             Map<String, LoanAccountAgeingDTO> loanData =
                     LoanAccountAgeingExcelUtil.extractLoanAccountAgeingData(lASheet);
 
+            Map<String, MemberAccountDTO> loanMemberData =
+                    LoanSummaryExcelUtil.extractLoanMemberData(loanMemberSheet);
             Map<LoanCategory, AccountSummaryDTO> loanSummData =
-                    LoanSummaryExcelUtil.extractLoanSummaryData(loanSummarySheet);
+                    LoanSummaryExcelUtil.getSummary(new HashMap<>(loanMemberData));
 
+            Map<String, MemberAccountDTO> savingMemberData =
+                    SavingSummaryExcelUtil.extractSavingMemberData(savingMemberSheet);
             Map<SavingCategory, AccountSummaryDTO> savingSummData =
-                    SavingSummaryExcelUtil.extractSavingSummaryData(savingSummarySheet);
+                    SavingSummaryExcelUtil.getSummary(new HashMap<>(savingMemberData));
 
             sendProgress(job, 40, "Combining data from all files...");
             Map<TrialBalanceEnum, ExcelRowDTO> rows = new HashMap<>(tbRows);

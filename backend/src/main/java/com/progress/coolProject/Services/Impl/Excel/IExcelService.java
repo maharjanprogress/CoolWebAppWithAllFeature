@@ -13,6 +13,8 @@ public interface IExcelService {
             MultipartFile loanSummary,
             MultipartFile savingSummary,
             MultipartFile previousBalanceSheet,
+            MultipartFile loanMember,
+            MultipartFile savingMember,
             User user
     );
     ProcessingJob getActiveJob(User user);

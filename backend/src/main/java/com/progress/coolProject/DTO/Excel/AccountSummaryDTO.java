@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 public class AccountSummaryDTO {
     private Integer code;
     private String description;
+    private Integer memberCount;
     private Double openingAmount;
     private AccountType openingType; // DR or CR
     private Double debit;
@@ -54,15 +55,5 @@ public class AccountSummaryDTO {
             return "Balance type (DR/CR) is required";
         }
         return null;
-    }
-
-    // Helper method to check if this is a loan account
-    public boolean isLoanAccount() {
-        return code != null && code >= 301 && code <= 308;
-    }
-
-    // Helper method to check if this is a saving account
-    public boolean isSavingAccount() {
-        return code != null && code >= 201 && code <= 209;
     }
 }
