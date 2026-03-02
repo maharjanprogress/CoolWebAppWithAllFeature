@@ -57,7 +57,7 @@ public class ExcelService implements IExcelService {
                                          MultipartFile loanAgeingSheet,
                                          MultipartFile loanSummary,
                                          MultipartFile savingSummary,
-                                         MultipartFile previousTrialBalance,
+                                         MultipartFile previousBalanceSheet,
                                          User user) {
         // Check if user already has an active job
         Optional<ProcessingJob> existingJob = jobRepository.findFirstByUserAndStatusInOrderByCreatedAtDesc(
@@ -69,7 +69,7 @@ public class ExcelService implements IExcelService {
             throw new RuntimeException("You already have a file being processed. Please wait.");
         }
 
-        String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet, previousTrialBalance);
+        String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet, previousBalanceSheet);
 
         // Create job record
         ProcessingJob job = new ProcessingJob();
@@ -81,7 +81,7 @@ public class ExcelService implements IExcelService {
 
         // Process asynchronously
         processExcelAsync(job, trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet,
-                loanSummary, savingSummary, previousTrialBalance);
+                loanSummary, savingSummary, previousBalanceSheet);
 
         return job;
     }
@@ -101,7 +101,7 @@ public class ExcelService implements IExcelService {
                                   MultipartFile loanAgeingSheet,
                                   MultipartFile loanSummary,
                                   MultipartFile savingSummary,
-                                  MultipartFile previousTrialBalance
+                                  MultipartFile previousBalanceSheet
     ) {
         Workbook workbook = null;
         try {
@@ -134,7 +134,7 @@ public class ExcelService implements IExcelService {
             validateHeaders(bsSheet);
 
             sendProgress(job, 27, "Reading Previous Trial Balance Excel file...");
-            workbook = new XSSFWorkbook(previousTrialBalance.getInputStream());
+            workbook = new XSSFWorkbook(previousBalanceSheet.getInputStream());
             Sheet pTBSheet = workbook.getSheetAt(0);
 
             sendProgress(job, 28, "Validating Previous Trial Balance file structure...");
