@@ -35,7 +35,7 @@ public class SavingSummaryExcelUtil {
      * @return HashMap with Code as key and AccountSummaryDTO as value
      */
     public static HashMap<SavingCategory, AccountSummaryDTO> extractSavingSummaryData(Sheet sheet) throws Exception {
-        validateHeaders(sheet);
+        validateHeaders(sheet, EXPECTED_HEADERS_FOR_SUMMARY_EXCEL);
 
         HashMap<SavingCategory, AccountSummaryDTO> resultMap = new HashMap<>();
         List<String> errors = new ArrayList<>();
@@ -79,7 +79,7 @@ public class SavingSummaryExcelUtil {
     }
 
     public static HashMap<String, MemberAccountDTO> extractSavingMemberData(Sheet sheet) throws Exception {
-        validateHeaders(sheet);
+        validateHeaders(sheet, EXPECTED_HEADERS);
 
         HashMap<String, MemberAccountDTO> resultMap = new HashMap<>();
         List<String> errors = new ArrayList<>();
@@ -165,7 +165,7 @@ public class SavingSummaryExcelUtil {
         return result;
     }
 
-    private static void validateHeaders(Sheet sheet) throws Exception {
+    private static void validateHeaders(Sheet sheet, String[] expectedHeaders) throws Exception {
         Row headerRow = sheet.getRow(HEADER_ROW_INDEX);
         if (headerRow == null) {
             throw new Exception("Header row not found at row " + (HEADER_ROW_INDEX + 1));
@@ -173,21 +173,21 @@ public class SavingSummaryExcelUtil {
 
         List<String> errors = new ArrayList<>();
 
-        for (int i = 0; i < EXPECTED_HEADERS.length; i++) {
+        for (int i = 0; i < expectedHeaders.length; i++) {
             Cell cell = headerRow.getCell(i);
             String actualHeader = ExcelUtil.getCellValueAsString(cell);
 
             if (actualHeader == null || actualHeader.trim().isEmpty()) {
-                errors.add("Column " + (i + 1) + ": Header is missing. Expected: '" + EXPECTED_HEADERS[i] + "'");
+                errors.add("Column " + (i + 1) + ": Header is missing. Expected: '" + expectedHeaders[i] + "'");
                 continue;
             }
 
             String normalizedActual = actualHeader.trim().replaceAll("\\s+", " ");
-            String normalizedExpected = EXPECTED_HEADERS[i].trim().replaceAll("\\s+", " ");
+            String normalizedExpected = expectedHeaders[i].trim().replaceAll("\\s+", " ");
 
             if (!normalizedActual.equalsIgnoreCase(normalizedExpected)) {
                 errors.add("Column " + (i + 1) + ": Invalid header. Expected: '"
-                        + EXPECTED_HEADERS[i] + "', Found: '" + actualHeader + "'");
+                        + expectedHeaders[i] + "', Found: '" + actualHeader + "'");
             }
         }
 
