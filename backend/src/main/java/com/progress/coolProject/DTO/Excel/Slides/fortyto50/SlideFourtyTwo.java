@@ -146,7 +146,7 @@ public class SlideFourtyTwo {
     private static double calcE1(ExcelTrialBalanceExcelRowHelper bsExcel, ExcelLoanAgeingHelper loanHelper) {
         // (Total Loan portfolio − Loan Loss Provision) ÷ Total Assets × 100
 
-        double totalLoan = bsExcel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);          // adjust key
+        double totalLoan = loanHelper.getTotalBalance();          // adjust key
         double llp       = SlideThirteen.getTotalAffectedRiskAmount(loanHelper);
         double totalAssets = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
