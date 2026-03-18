@@ -50,7 +50,8 @@ public class SlideFourtyFour {
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
                                        ExcelLoanAgeingHelper loanHelper,
-                                       ExcelTrialBalanceExcelRowHelper bsExcel) {
+                                       ExcelTrialBalanceExcelRowHelper bsExcel
+                                       ) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -148,7 +149,8 @@ public class SlideFourtyFour {
         double receivables = excel.getDebitSum(
                 TrialBalanceEnum.ADVANCES_RECEIVABLES,
                 TrialBalanceEnum.TDS_RECEIVABLES_ADVANCE_TAX,
-                TrialBalanceEnum.TDS_ON_INTEREST_RECEIVABLE
+                TrialBalanceEnum.TDS_ON_INTEREST_RECEIVABLE,
+                TrialBalanceEnum.ADVANCE_SALARY
         );
 
         double fixedAssets = excel.getDebitSum(
@@ -163,7 +165,12 @@ public class SlideFourtyFour {
 
         double otherAssets = excel.getDebit(TrialBalanceEnum.SAMAN_MAUJDAT);
 
-        double nonEarningAssets = cash + receivables + fixedAssets + otherAssets;
+        double krishiBikashBank = excel.getDebitSum(
+                TrialBalanceEnum.KRISHI_BIKASH_BANK,
+                TrialBalanceEnum.SANIMA_BANK
+        );
+
+        double nonEarningAssets = cash + receivables + fixedAssets + otherAssets + krishiBikashBank;
         double totalAssets      = getTotalAssets(excel);
 
         if (totalAssets == 0) return 0;

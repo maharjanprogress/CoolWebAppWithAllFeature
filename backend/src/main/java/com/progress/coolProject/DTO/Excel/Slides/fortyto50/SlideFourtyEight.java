@@ -1,6 +1,5 @@
 package com.progress.coolProject.DTO.Excel.Slides.fortyto50;
 
-import com.progress.coolProject.DTO.Excel.Slides.SlideOne;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Enums.Traimasik;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
@@ -111,15 +110,13 @@ public class SlideFourtyEight {
      * Liquid assets = cash on hand + all bank/cooperative account balances
      */
     private static double calcL1(ExcelTrialBalanceExcelRowHelper bsExcel) {
-        double cash = bsExcel.getDebit(TrialBalanceEnum.CASH);
-
-        double bankBalances = SlideOne.getBank(bsExcel);
+        double bankBalances = SlideFourtyTwo.getBankBalances(bsExcel);
 
 
 
         double totalAssets = bsExcel.getCredit(TrialBalanceEnum.SAVING_ACCOUNT);
         if (totalAssets == 0) return 0;
-        return ((cash + bankBalances) / totalAssets) * 100.0;
+        return ((bankBalances) / totalAssets) * 100.0;
     }
 
     /**

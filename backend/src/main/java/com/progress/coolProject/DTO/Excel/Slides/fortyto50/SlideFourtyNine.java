@@ -1,5 +1,6 @@
 package com.progress.coolProject.DTO.Excel.Slides.fortyto50;
 
+import com.progress.coolProject.DTO.Excel.PreviousMonthCalculations;
 import com.progress.coolProject.Enums.Traimasik;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
@@ -51,14 +52,14 @@ public class SlideFourtyNine {
      * @param excel                current year trial balance helper
      * @param previousYearMembers  total member count as of end of last fiscal year
      * @param currentYearMembers   total member count as of current quarter end
-     * @param previousYearAssets   total assets at end of last fiscal year (in your unit, e.g. lakhs)
+     * @param previousMonthCalculations   total assets at end of last fiscal year (in your unit, e.g. lakhs)
      */
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
                                        ExcelTrialBalanceExcelRowHelper excel,
                                        long previousYearMembers,
                                        long currentYearMembers,
-                                       double previousYearAssets) {
+                                       PreviousMonthCalculations previousMonthCalculations) {
 
         XSLFSlide slide = ppt.createSlide();
 
@@ -102,7 +103,7 @@ public class SlideFourtyNine {
         Traimasik currentQuarter = Traimasik.getCurrent();
 
         double g10Value = calcS10(previousYearMembers, currentYearMembers);
-        double g11Value = calcS11(excel, previousYearAssets);
+        double g11Value = calcS11(excel, previousMonthCalculations);
 
         fillRow(table, 1, ROW_G10_IND, ROW_G10_DET, ROW_G10_DESC, ROW_G10_TGT,
                 currentQuarter, g10Value, nepFmt, lightOrange);
@@ -133,7 +134,8 @@ public class SlideFourtyNine {
      * Previous year total assets must be passed in (prior year closing balance sheet).
      */
     private static double calcS11(ExcelTrialBalanceExcelRowHelper bsExcel,
-                                  double previousYearAssets) {
+                                  PreviousMonthCalculations previousMonthCalculations) {
+        double previousYearAssets = previousMonthCalculations.getPreviousMonthTotalBalanceSheetCredit();
         if (previousYearAssets == 0) return 0;
         double currentAssets = bsExcel.getTotalCredit();
         return ((currentAssets - previousYearAssets) / previousYearAssets) * 100.0;

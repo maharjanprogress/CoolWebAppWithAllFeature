@@ -1,5 +1,6 @@
 package com.progress.coolProject.DTO.Excel.Slides.fortyto50;
 
+import com.progress.coolProject.DTO.Excel.PreviousMonthCalculations;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Enums.Traimasik;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
@@ -56,7 +57,7 @@ public class SlideFourtySix {
                                        String slideTitle,
                                        ExcelTrialBalanceExcelRowHelper plExcel,
                                        ExcelTrialBalanceExcelRowHelper bsExcel,
-                                       double previousMonthShareCapital
+                                       PreviousMonthCalculations previousMonthCalculations
     ) {
 
         XSLFSlide slide = ppt.createSlide();
@@ -101,11 +102,9 @@ public class SlideFourtySix {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double bsTotal = bsExcel.getTotalCredit();
-
-        double r5Value = calcR5(plExcel, bsTotal);
-        double r6Value = calcR6(plExcel, bsTotal);
-        double r7Value = calcR7(bsExcel, previousMonthShareCapital);
+        double r5Value = calcR5(plExcel, bsExcel, previousMonthCalculations);
+        double r6Value = calcR6(plExcel, bsExcel, previousMonthCalculations);
+        double r7Value = calcR7(bsExcel, previousMonthCalculations);
 
         fillRow(table, 1, ROW_R5_IND, ROW_R5_DET, ROW_R5_DESC, ROW_R5_TGT,
                 currentQuarter, r5Value, nepFmt, lightOrange);
@@ -127,14 +126,15 @@ public class SlideFourtySix {
      *              — all interest paid out on saving accounts
      * Denominator: SAVING_ACCOUNT (4001) — total member saving deposits
      */
-    private static double calcR5(ExcelTrialBalanceExcelRowHelper plExcel, double bsTotal) {
+    private static double calcR5(ExcelTrialBalanceExcelRowHelper plExcel,ExcelTrialBalanceExcelRowHelper bsExcel,  PreviousMonthCalculations previousMonthCalculations) {
         double interestPaid = plExcel.getDebitSum(
                 TrialBalanceEnum.INTEREST_EXPENDITURE,
                 TrialBalanceEnum.INTEREST_EXPENDITURE_2
         );
 
-        if (bsTotal == 0) return 0;
-        return (interestPaid / bsTotal) * 100.0;
+        double averageSaving = previousMonthCalculations.getAverageSaving(bsExcel);
+        if (averageSaving == 0) return 0;
+        return (interestPaid / averageSaving) * 100.0;
     }
 
     /**
@@ -150,14 +150,14 @@ public class SlideFourtySix {
      * <p>
      * Note: If the institution has no external loan (balance = 0), this correctly returns 0.00
      */
-    private static double calcR6(ExcelTrialBalanceExcelRowHelper plExcel, double bsTotal) {
+    private static double calcR6(ExcelTrialBalanceExcelRowHelper plExcel, ExcelTrialBalanceExcelRowHelper bsExcel, PreviousMonthCalculations previousMonthCalculations) {
         // Interest payable on external loan (accrued but not yet paid)
         double externalInterest = 0; //they have not taken loan from external source so this is zero
 
-
+        double outstandingLoan = 0; //if there is outstanding loan in trialbalance then this will not be zero...
         // Total external borrowing principal
-        if (bsTotal == 0) return 0;
-        return (externalInterest / bsTotal) * 100.0;
+        return 0;
+//        return (externalInterest / outstandingLoan) * 100.0;
     }
 
     /**
@@ -167,9 +167,9 @@ public class SlideFourtySix {
      * Numerator:   SHARE_DIVIDEND_FUND (9991) — dividend declared/paid to members
      * Denominator: SHARE_CAPITAL (9009)       — total member share capital
      */
-    private static double calcR7(ExcelTrialBalanceExcelRowHelper bsExcel, double previousMonthShareCapital) {
+    private static double calcR7(ExcelTrialBalanceExcelRowHelper bsExcel, PreviousMonthCalculations previousMonthCalculations) {
         double dividendPaid  = bsExcel.getCredit(TrialBalanceEnum.SHARE_DIVIDEND_FUND);
-        double averageShareCapital = (bsExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL) + previousMonthShareCapital)/2;
+        double averageShareCapital = (bsExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL) + previousMonthCalculations.getPreviousMonthShareCapital())/2;
         if (averageShareCapital == 0) return 0;
         return (dividendPaid / averageShareCapital) * 100.0;
     }

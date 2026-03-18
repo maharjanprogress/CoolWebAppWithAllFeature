@@ -14,6 +14,8 @@ public class PreviousMonthCalculations {
     private final double previousMonthLoanAccount;
     private final double previousMonthTotalLoan;
     private final double previousLLP;
+    private final ExcelTrialBalanceExcelRowHelper previousMonthBalanceSheet;
+    private final ExcelLoanAgeingHelper previousMonthLoanAgeing;
 
     public PreviousMonthCalculations(ExcelTrialBalanceExcelRowHelper previousMonthBalanceSheet, ExcelLoanAgeingHelper previousMonthLoanAgeing){
         this.previousMonthShareCapital = previousMonthBalanceSheet.getCredit(TrialBalanceEnum.SHARE_CAPITAL);
@@ -21,9 +23,20 @@ public class PreviousMonthCalculations {
         this.previousMonthLoanAccount = previousMonthBalanceSheet.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
         this.previousMonthTotalLoan = previousMonthLoanAgeing.getTotalBalance();
         this.previousLLP = SlideThirteen.getTotalAffectedRiskAmount(previousMonthLoanAgeing);
+        this.previousMonthBalanceSheet = previousMonthBalanceSheet;
+        this.previousMonthLoanAgeing = previousMonthLoanAgeing;
     }
 
     public double getKhudRin(){
         return this.previousMonthTotalLoan - this.previousLLP;
+    }
+
+    public double getAverageTotalKhudRin(ExcelLoanAgeingHelper currentMonthLoanAgeing){
+        double currentKhudRin = currentMonthLoanAgeing.getTotalBalance() - SlideThirteen.getTotalAffectedRiskAmount(currentMonthLoanAgeing);
+        return (this.getKhudRin() + currentKhudRin) / 2;
+    }
+
+    public double getAverageSaving(ExcelTrialBalanceExcelRowHelper currentBalanceSheet){
+        return (this.previousMonthBalanceSheet.getCredit(TrialBalanceEnum.SAVING_ACCOUNT) + currentBalanceSheet.getCredit(TrialBalanceEnum.SAVING_ACCOUNT)) / 2;
     }
 }

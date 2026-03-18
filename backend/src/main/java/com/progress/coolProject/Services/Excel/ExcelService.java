@@ -1,10 +1,6 @@
 package com.progress.coolProject.Services.Excel;
 
-import com.progress.coolProject.DTO.Excel.AccountSummaryDTO;
-import com.progress.coolProject.DTO.Excel.ExcelRowDTO;
-import com.progress.coolProject.DTO.Excel.LoanAccountAgeingDTO;
-import com.progress.coolProject.DTO.Excel.MemberAccountDTO;
-import com.progress.coolProject.DTO.Excel.ProgressUpdate;
+import com.progress.coolProject.DTO.Excel.*;
 import com.progress.coolProject.DTO.Excel.Slides.*;
 import com.progress.coolProject.DTO.Excel.Slides.fortyto50.*;
 import com.progress.coolProject.DTO.ResponseDTO;
@@ -61,6 +57,7 @@ public class ExcelService implements IExcelService {
                                          MultipartFile previousBalanceSheet,
                                          MultipartFile loanMember,
                                          MultipartFile savingMember,
+                                         MultipartFile previousLoanAgeing,
                                          User user) {
         // Check if user already has an active job
         Optional<ProcessingJob> existingJob = jobRepository.findFirstByUserAndStatusInOrderByCreatedAtDesc(
@@ -74,7 +71,8 @@ public class ExcelService implements IExcelService {
 
         String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(
                 trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet,
-                loanSummary, savingSummary, previousBalanceSheet, loanMember, savingMember
+                loanSummary, savingSummary, previousBalanceSheet, loanMember,
+                savingMember, previousLoanAgeing
         );
 
         // Create job record
@@ -87,7 +85,9 @@ public class ExcelService implements IExcelService {
 
         // Process asynchronously
         processExcelAsync(job, trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet,
-                loanSummary, savingSummary, previousBalanceSheet, loanMember, savingMember);
+                loanSummary, savingSummary, previousBalanceSheet, loanMember, savingMember,
+                previousLoanAgeing
+        );
 
         return job;
     }
@@ -109,7 +109,8 @@ public class ExcelService implements IExcelService {
                                   MultipartFile savingSummary,
                                   MultipartFile previousBalanceSheet,
                                   MultipartFile loanMember,
-                                  MultipartFile savingMember
+                                  MultipartFile savingMember,
+                                  MultipartFile previousLoanAgeing
     ) {
         Workbook workbook = null;
         try {
@@ -141,12 +142,14 @@ public class ExcelService implements IExcelService {
             sendProgress(job, 26, "Validating BalanceSheet file structure...");
             validateHeaders(bsSheet);
 
-            sendProgress(job, 27, "Reading Previous Trial Balance Excel file...");
+            sendProgress(job, 27, "Reading Previous Trial Balance and Loan Ageing Excel file...");
             workbook = new XSSFWorkbook(previousBalanceSheet.getInputStream());
-            Sheet pTBSheet = workbook.getSheetAt(0);
+            Sheet pBSSheet = workbook.getSheetAt(0);
+            workbook = new XSSFWorkbook(previousLoanAgeing.getInputStream());
+            Sheet previousLoanAgeingSheet = workbook.getSheetAt(0);
 
             sendProgress(job, 28, "Validating Previous Trial Balance file structure...");
-            validateHeaders(pTBSheet);
+            validateHeaders(pBSSheet);
 
 
             sendProgress(job, 29, "Validating LoanAgeing Excel file...");
@@ -186,13 +189,16 @@ public class ExcelService implements IExcelService {
                 throw new RuntimeException("No valid data found in the BalanceSheet Excel file");
             }
 
-            Map<TrialBalanceEnum, ExcelRowDTO> pTbRows = parseAndValidateData(pTBSheet);
-            if (pTbRows.isEmpty()) {
+            Map<TrialBalanceEnum, ExcelRowDTO> pBSRows = parseAndValidateData(pBSSheet);
+            if (pBSRows.isEmpty()) {
                 throw new RuntimeException("No valid data found in the Previous Trial Balance Excel file");
             }
 
             Map<String, LoanAccountAgeingDTO> loanData =
                     LoanAccountAgeingExcelUtil.extractLoanAccountAgeingData(lASheet);
+
+            Map<String, LoanAccountAgeingDTO> previousLoanData =
+                    LoanAccountAgeingExcelUtil.extractLoanAccountAgeingData(previousLoanAgeingSheet);
 
             Map<String, MemberAccountDTO> loanMemberData =
                     LoanSummaryExcelUtil.extractLoanMemberData(loanMemberSheet);
@@ -227,8 +233,9 @@ public class ExcelService implements IExcelService {
             sendProgress(job, 70, "Generating PowerPoint presentation...");
             String outputPptPath = generatePowerPoint(
                     rows,bsRows, plRows,
-                    pTbRows,
+                    pBSRows,
                     loanData, loanSummData, savingSummData,
+                    previousLoanData,
                     job.getUser().getUserName()
             );
             job.setProcessedPowerpointFilePath(outputPptPath);
@@ -485,10 +492,11 @@ public class ExcelService implements IExcelService {
             Map<TrialBalanceEnum, ExcelRowDTO> rowsMap,
             Map<TrialBalanceEnum, ExcelRowDTO> bsRowsMap,
             Map<TrialBalanceEnum, ExcelRowDTO> plRows,
-            Map<TrialBalanceEnum, ExcelRowDTO> pTbRows,
+            Map<TrialBalanceEnum, ExcelRowDTO> pBSRows,
             Map<String, LoanAccountAgeingDTO> loanAgeingMap,
             Map<LoanCategory, AccountSummaryDTO> loanSummaryMap,
             Map<SavingCategory, AccountSummaryDTO> savingSummaryMap,
+            Map<String, LoanAccountAgeingDTO> previousLoanAgeingMap,
             String username
     ) throws IOException {
         XMLSlideShow ppt = new XMLSlideShow();
@@ -499,10 +507,12 @@ public class ExcelService implements IExcelService {
 
         ExcelTrialBalanceExcelRowHelper plExcel = new ExcelTrialBalanceExcelRowHelper(plRows);
 
-        ExcelTrialBalanceExcelRowHelper pTbExcel = new ExcelTrialBalanceExcelRowHelper(pTbRows);
+        ExcelTrialBalanceExcelRowHelper pBSExcel = new ExcelTrialBalanceExcelRowHelper(pBSRows);
 
 
         ExcelLoanAgeingHelper loanAgeing = new ExcelLoanAgeingHelper(loanAgeingMap);
+
+        ExcelLoanAgeingHelper previousLoanAgeing = new ExcelLoanAgeingHelper(previousLoanAgeingMap);
 
         //todo:remove this
         Map<String, LoanAccountAgeingDTO> test = loanAgeing.getFilteredPayCategory(LoanPayerCategory.ONE_TO_THREE_MONTHS,LoanPayerCategory.UPTO_ONE_MONTH);
@@ -559,6 +569,8 @@ public class ExcelService implements IExcelService {
         SlideFourteen.createDataSlide(ppt,
                 SlideFourteen.FIRST_ROW_TITLE);
 
+        PreviousMonthCalculations previousMonthCalculations = new PreviousMonthCalculations(pBSExcel, previousLoanAgeing);
+
         SlideFourtyOne.createDataSlide(ppt,"१७.(क) सुरक्षण (Protection)", loanAgeing, excel);
 
         SlideFourtyTwo.createDataSlide(ppt, "१७.(ख) प्र.वित्तिय संरचना (Effective Financial Structure)", loanAgeing, bsExcel);
@@ -567,14 +579,11 @@ public class ExcelService implements IExcelService {
 
         SlideFourtyFour.createDataSlide(ppt, "१७.(ग) सम्पत्तिको गुणस्तर (Asset Quality)", loanAgeing, bsExcel);
 
-        SlideFourtyFive.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)",plExcel, bsExcel);
+        SlideFourtyFive.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)",plExcel, bsExcel, loanAgeing, previousMonthCalculations);
 
-        double previousMonthShareCapital = pTbExcel.getCredit(TrialBalanceEnum.SHARE_CAPITAL);
-        SlideFourtySix.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", plExcel, bsExcel, previousMonthShareCapital);
+        SlideFourtySix.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", plExcel, bsExcel, previousMonthCalculations);
 
-        double previousMonthTotalBalanceSheetCredit = pTbExcel.getTotalCredit();
-        double previousMonthLoanAccount = pTbExcel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT);
-        SlideFourtySeven.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", excel, bsExcel, previousMonthTotalBalanceSheetCredit, previousMonthLoanAccount);
+        SlideFourtySeven.createDataSlide(ppt, "१७.(घ) प्रतिफलता र लागतदर (Rate of Return & Cost)", excel, bsExcel, previousMonthCalculations);
 
         SlideFourtyEight.createDataSlide(ppt, "१७.(ङ) तरलता (Liquidity)", bsExcel);
 
@@ -584,7 +593,7 @@ public class ExcelService implements IExcelService {
                 bsExcel,
                 1008,
                 1014,
-                previousMonthTotalBalanceSheetCredit
+                previousMonthCalculations
         );
 
 

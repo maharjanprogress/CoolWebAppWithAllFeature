@@ -155,15 +155,23 @@ public class SlideFourtyTwo {
 
     private static double calcE2(ExcelTrialBalanceExcelRowHelper bsExcel) {
         // Bank / financial institution balances earning interest ÷ Total Assets × 100
-        double bankBalances = SlideOne.getBank(bsExcel) + SlideOne.getCash(bsExcel);
+        double bankBalances = getBankBalances(bsExcel);
         double totalAssets = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return (bankBalances / totalAssets) * 100.0;
     }
 
+    public static double getBankBalances(ExcelTrialBalanceExcelRowHelper bsExcel){
+        return SlideOne.getBank(bsExcel) + SlideOne.getCash(bsExcel);
+    }
+
+    public static double getFinancialInv(ExcelTrialBalanceExcelRowHelper bsExcel){
+        return bsExcel.getDebitSum(TrialBalanceEnum.SHARE_INVEST_NCBL, TrialBalanceEnum.SHARE_JILLA_SAHAKARI, TrialBalanceEnum.SHARE_NEFSCUN);
+    }
+
     private static double calcE3(ExcelTrialBalanceExcelRowHelper bsExcel) {
         // Shares + fixed deposits ÷ Total Assets × 100
-        double financialInv = bsExcel.getDebitSum(TrialBalanceEnum.SHARE_INVEST_NCBL, TrialBalanceEnum.SHARE_JILLA_SAHAKARI, TrialBalanceEnum.SHARE_NEFSCUN); // adjust as needed
+        double financialInv = getFinancialInv(bsExcel);
         double totalAssets = getTotalAssets(bsExcel);
         if (totalAssets == 0) return 0;
         return (financialInv / totalAssets) * 100.0;

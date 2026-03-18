@@ -1,5 +1,6 @@
 package com.progress.coolProject.DTO.Excel.Slides.fortyto50;
 
+import com.progress.coolProject.DTO.Excel.PreviousMonthCalculations;
 import com.progress.coolProject.DTO.Excel.Slides.SlideTwo;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Enums.Traimasik;
@@ -51,8 +52,7 @@ public class SlideFourtySeven {
                                        String slideTitle,
                                        ExcelTrialBalanceExcelRowHelper excel,
                                        ExcelTrialBalanceExcelRowHelper bsExcel,
-                                       double previousMonthTotalBalanceSheetCredit,
-                                       double previousMonthLoanAccount
+                                       PreviousMonthCalculations previousMonthCalculations
                                        ) {
 
         XSLFSlide slide = ppt.createSlide();
@@ -96,8 +96,8 @@ public class SlideFourtySeven {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double r9Value  = calcR9(excel, bsExcel, previousMonthTotalBalanceSheetCredit);
-        double r10Value = calcR10(excel, previousMonthLoanAccount);
+        double r9Value  = calcR9(excel, bsExcel, previousMonthCalculations);
+        double r10Value = calcR10(excel, previousMonthCalculations);
 
         fillRow(table, 1, ROW_R9_IND,  ROW_R9_DET,  ROW_R9_DESC,  ROW_R9_TGT,
                 currentQuarter, r9Value,  nepFmt, lightOrange);
@@ -117,11 +117,11 @@ public class SlideFourtySeven {
     private static double calcR9(
             ExcelTrialBalanceExcelRowHelper excel,
             ExcelTrialBalanceExcelRowHelper bsExcel,
-            double previousMonthTotalBalanceSheetCredit
+            PreviousMonthCalculations previousMonthCalculations
     ) {
         double operatingExpenses = SlideTwo.getAdministrativeExpense(excel);
 
-        double averageBalanceSheet = (bsExcel.getTotalCredit() + previousMonthTotalBalanceSheetCredit)/2;
+        double averageBalanceSheet = (bsExcel.getTotalCredit() + previousMonthCalculations.getPreviousMonthTotalBalanceSheetCredit())/2;
 
         if (averageBalanceSheet == 0) return 0;
         return (operatingExpenses / averageBalanceSheet) * 100.0;
@@ -134,9 +134,9 @@ public class SlideFourtySeven {
      * Numerator:   LOAN_LOSS_PROVISION_EXPENSES (9901) — LLP expense booked this period
      * Denominator: LOAN_ACCOUNT (3001)                 — total loan portfolio
      */
-    private static double calcR10(ExcelTrialBalanceExcelRowHelper excel , double previousMonthLoanAccount) {
+    private static double calcR10(ExcelTrialBalanceExcelRowHelper excel , PreviousMonthCalculations previousMonthCalculations) {
         double llpExpense = excel.getDebit(TrialBalanceEnum.LOAN_LOSS_PROVISION_EXPENSES);
-        double totalLoan  = (excel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT) + previousMonthLoanAccount)/2;
+        double totalLoan  = (excel.getDebit(TrialBalanceEnum.LOAN_ACCOUNT) + previousMonthCalculations.getPreviousMonthLoanAccount())/2;
 
         if (totalLoan == 0) return 0;
         return (llpExpense / totalLoan) * 100.0;

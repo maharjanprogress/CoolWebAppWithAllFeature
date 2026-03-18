@@ -1,7 +1,9 @@
 package com.progress.coolProject.DTO.Excel.Slides.fortyto50;
 
+import com.progress.coolProject.DTO.Excel.PreviousMonthCalculations;
 import com.progress.coolProject.Enums.TrialBalanceEnum;
 import com.progress.coolProject.Enums.Traimasik;
+import com.progress.coolProject.Utils.Excel.ExcelLoanAgeingHelper;
 import com.progress.coolProject.Utils.Excel.ExcelTrialBalanceExcelRowHelper;
 import com.progress.coolProject.Utils.PowerPoint.PPTUtils;
 import com.ibm.icu.text.NumberFormat;
@@ -55,7 +57,9 @@ public class SlideFourtyFive {
     public static void createDataSlide(XMLSlideShow ppt,
                                        String slideTitle,
                                        ExcelTrialBalanceExcelRowHelper plExcel,
-                                       ExcelTrialBalanceExcelRowHelper bsExcel
+                                       ExcelTrialBalanceExcelRowHelper bsExcel,
+                                       ExcelLoanAgeingHelper currentLoanAgeing,
+                                       PreviousMonthCalculations previousMonthCalculations
     ) {
 
         XSLFSlide slide = ppt.createSlide();
@@ -100,11 +104,11 @@ public class SlideFourtyFive {
 
         Traimasik currentQuarter = Traimasik.getCurrent();
 
-        double bsTotal = bsExcel.getTotalCredit();
+        double averageTotalLoan = previousMonthCalculations.getAverageTotalKhudRin(currentLoanAgeing);
 
-        double r1Value = calcR1(plExcel,bsTotal);
-        double r2Value = calcR2(plExcel, bsTotal);
-        double r3Value = calcR3(plExcel, bsTotal);
+        double r1Value = calcR1(plExcel,averageTotalLoan);
+        double r2Value = calcR2(plExcel, bsExcel, previousMonthCalculations.getPreviousMonthBalanceSheet());
+        double r3Value = calcR3(plExcel, bsExcel);
 
         fillRow(table, 1, ROW_R1_IND, ROW_R1_DET, ROW_R1_DESC, ROW_R1_TGT,
                 currentQuarter, r1Value, nepFmt, lightOrange);
@@ -125,10 +129,10 @@ public class SlideFourtyFive {
      * Numerator:   INTEREST_INCOME (3010) — all income earned from lending
      * Denominator: LOAN_ACCOUNT (3001)    — total loan portfolio balance
      */
-    private static double calcR1(ExcelTrialBalanceExcelRowHelper plExcel, double totalLoan) {
+    private static double calcR1(ExcelTrialBalanceExcelRowHelper plExcel, double averageTotalLoan) {
         double interestIncome = plExcel.getCreditSum(TrialBalanceEnum.INTEREST_INCOME, TrialBalanceEnum.SERVICE_CHARGE);
-        if (totalLoan == 0) return 0;
-        return (interestIncome / totalLoan) * 100.0;
+        if (averageTotalLoan == 0) return 0;
+        return (interestIncome / averageTotalLoan) * 100.0;
     }
 
     /**
@@ -139,13 +143,13 @@ public class SlideFourtyFive {
      *            + KRISHI_BIKASH_SPECIAL_FD_INTEREST (3642)
      * Denominator: All bank/liquid balances
      */
-    private static double calcR2(ExcelTrialBalanceExcelRowHelper plExcel, double bsTotal) {
+    private static double calcR2(ExcelTrialBalanceExcelRowHelper plExcel, ExcelTrialBalanceExcelRowHelper bsExcel, ExcelTrialBalanceExcelRowHelper previousMonthBS) {
         double bankInterestIncome = plExcel.getCredit(
                 TrialBalanceEnum.BANK_INTEREST_INCOME
         );
-
-        if (bsTotal == 0) return 0;
-        return (bankInterestIncome / bsTotal) * 100.0;
+        double averageLiquidity = (SlideFourtyTwo.getBankBalances(bsExcel) + SlideFourtyTwo.getBankBalances(previousMonthBS)) / 2;
+        if (averageLiquidity == 0) return 0;
+        return (bankInterestIncome / averageLiquidity) * 100.0;
     }
 
     /**
@@ -157,11 +161,12 @@ public class SlideFourtyFive {
      *            + MISCELLANEOUS_INCOME (1023) — for share dividends if booked here
      * Denominator: Financial investment balances (shares + FDs)
      */
-    private static double calcR3(ExcelTrialBalanceExcelRowHelper plExcel, double bsTotal) {
+    private static double calcR3(ExcelTrialBalanceExcelRowHelper plExcel, ExcelTrialBalanceExcelRowHelper bsExcel) {
         double financialIncome = 0; //if dividend comes then only this will not be 0... but since the share owner doesn't get dividend it is 0
 
-        if (bsTotal == 0) return 0;
-        return (financialIncome / bsTotal) * 100.0;
+        double pastInvestment = SlideFourtyTwo.getFinancialInv(bsExcel);
+        if (pastInvestment == 0) return 0;
+        return (financialIncome / pastInvestment) * 100.0;
     }
 
     // ── Row / cell helpers ────────────────────────────────────────────────────
