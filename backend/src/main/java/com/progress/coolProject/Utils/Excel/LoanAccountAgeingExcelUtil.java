@@ -25,7 +25,7 @@ public class LoanAccountAgeingExcelUtil {
             "Matured Date",
             "Last Repayment Date",
             "Current Date",
-            "Lapsed Days",
+            "Lapsed / Due Days",
             "Loan Amount",
             "Balance Amount",
             "1-30",

@@ -71,7 +71,8 @@ public final class SlideTwo {
                 TrialBalanceEnum.TRAINING_CHARGE_EXPENSE, TrialBalanceEnum.MISCELLANEOUS_EXPENSE,
                 TrialBalanceEnum.AMC_EXPENSE, TrialBalanceEnum.CLOUD_EXPENSE,
                 TrialBalanceEnum.RAHAT_KHARCHA, TrialBalanceEnum.SANTONA_KHARCHA,
-                TrialBalanceEnum.OFFICE_CLEANING, TrialBalanceEnum.VAT_EXP, TrialBalanceEnum.BONUS_EXPENCES
+                TrialBalanceEnum.OFFICE_CLEANING, TrialBalanceEnum.VAT_EXP, TrialBalanceEnum.BONUS_EXPENCES,
+                TrialBalanceEnum.INTERNET_EXPENCES
         );
     }
 

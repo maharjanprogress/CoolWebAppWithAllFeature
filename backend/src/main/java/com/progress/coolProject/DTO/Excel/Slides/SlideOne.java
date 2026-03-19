@@ -137,7 +137,7 @@ public final class SlideOne {
     public static Double getReceivable(ExcelTrialBalanceExcelRowHelper excel) {
         return excel.getDebitSum(
                 TrialBalanceEnum.TDS_RECEIVABLES_ADVANCE_TAX, TrialBalanceEnum.TDS_ON_INTEREST_RECEIVABLE,
-                TrialBalanceEnum.ADVANCES_RECEIVABLES
+                TrialBalanceEnum.ADVANCES_RECEIVABLES, TrialBalanceEnum.INTEREST_RECEIVABLES
         );
     }
 
