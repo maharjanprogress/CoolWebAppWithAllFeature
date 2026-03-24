@@ -61,6 +61,6 @@ public class LoginAndRegistration {
 
     @GetMapping("/serverCheck")
     public void serverCheck() {
-        log.info("Server Check");
+        log.info("Server Check Successful(Test for CICD)");
     }
 }
