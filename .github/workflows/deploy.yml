@@ -4,11 +4,11 @@ name: Deploy to Production
 on:
   push:
     branches:
-      - master  # Changed to master branch
+      - master
 
 jobs:
   detect-changes:
-    runs-on: self-hosted  # Changed from ubuntu-latest
+    runs-on: self-hosted
     outputs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
@@ -27,10 +27,10 @@ jobs:
   deploy-backend:
     needs: detect-changes
     if: needs.detect-changes.outputs.backend == 'true'
-    runs-on: self-hosted  # Changed from ubuntu-latest
+    runs-on: self-hosted
     environment:
       name: production
-      url: http://progress.devanasoft.com.np
+      url: https://progressmaharjan.me
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -46,10 +46,10 @@ jobs:
   deploy-frontend:
     needs: detect-changes
     if: needs.detect-changes.outputs.frontend == 'true'
-    runs-on: self-hosted  # Changed from ubuntu-latest
+    runs-on: self-hosted
     environment:
       name: production
-      url: http://progress.devanasoft.com.np
+      url: https://progressmaharjan.me
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
