@@ -9,4 +9,5 @@ import java.util.List;
 public interface IRoleService {
     void createRole(RoleDTO roleDTO);
     List<Role> getAllRoles();
+    Role getRoleByRoleAlias(String roleAlias);
 }

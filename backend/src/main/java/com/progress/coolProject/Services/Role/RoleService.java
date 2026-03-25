@@ -35,4 +35,10 @@ public class RoleService implements IRoleService {
     public List<Role> getAllRoles() {
         return roleRepo.findAll();
     }
+
+    @Override
+    public Role getRoleByRoleAlias(String roleAlias) {
+        return roleRepo.findRoleByRoleAlias(roleAlias)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found with alias: " + roleAlias));
+    }
 }

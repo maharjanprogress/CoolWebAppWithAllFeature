@@ -66,5 +66,32 @@ public class AdminInitializer {
         }else {
             logger.error("Client Role already exists");
         }
+        if (!roleRepo.existsByRoleAlias("MOM")){
+            logger.info("Creating MOM Role");
+            Role role = new Role();
+            role.setRoleAlias("MOM");
+            role.setRoleName("MOM");
+            role.setRemarks("nice peoples that uses our engineering services");
+            Role savedRole =roleRepo.save(role);
+            logger.info("MOM Role created");
+            logger.info("Creating MOM user");
+            if (userRepo.findByUserName("mom").isEmpty()) {
+                User user = new User();
+                user.setUserName("mom");
+                user.setPasswordHash(encoder.encode("mom"));
+                user.setFirstName("Prabha");
+                user.setLastName("Maharjan");
+                user.setPhoneNumber("9841330434");
+                user.setIsActive(true);
+                user.setEmail("prabhadhmr@gmail.com");
+                user.setRole(savedRole);
+                userRepo.save(user);
+                logger.info("MOM User created");
+            }else {
+                logger.error("MOM User already exists");
+            }
+        }else {
+            logger.error("MOM Role already exists");
+        }
     }
 }
