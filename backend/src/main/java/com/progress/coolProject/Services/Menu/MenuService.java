@@ -6,7 +6,6 @@ import com.progress.coolProject.Repo.menu.MenuRepo;
 import com.progress.coolProject.Services.Impl.menu.IMenuService;
 import com.progress.coolProject.Services.Impl.menu.IMenuTemplateService;
 import com.progress.coolProject.Utils.menu.MenuUtils;
-import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,7 @@ public class MenuService implements IMenuService {
         Optional<Menu> duplicateMenu = menuRepo.findDistinctFirstByTitleAndParentMenu_Id(menuDTO.getTitle(),menuDTO.getParentId());
         if (duplicateMenu.isPresent()){
             menuDTO.setId(duplicateMenu.get().getId());
-            throw new DuplicateRequestException("Duplicate Menu, Skipping " + menuDTO.getTitle() + " creation");
+            throw new IllegalArgumentException("Duplicate Menu, Skipping " + menuDTO.getTitle() + " creation");
         }
         Menu menu = menuUtils.convertToEntity(menuDTO);
         Menu savedMenu = menuRepo.save(menu);
