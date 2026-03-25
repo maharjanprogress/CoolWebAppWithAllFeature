@@ -140,7 +140,7 @@ public class MenuInitializer {
         try {
             menuTemplateDTO.setRoleId(rolesService.getRoleByRoleAlias(roleAlias).getId());
             menuTemplateDTO.setMenuIds(subMenuIds);
-            menuTemplateService.createOrUpdateTemplate(menuTemplateDTO);
+            logger.info("{}",menuTemplateService.createOrUpdateTemplate(menuTemplateDTO));
             logger.info("created menu for {}",roleAlias);
         } catch (Exception e) {
             logger.error(e.getMessage());
