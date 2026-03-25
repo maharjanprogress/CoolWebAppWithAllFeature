@@ -6,7 +6,6 @@ import com.progress.coolProject.Enums.MenuType;
 import com.progress.coolProject.Services.Impl.IRoleService;
 import com.progress.coolProject.Services.Impl.menu.IMenuService;
 import com.progress.coolProject.Services.Impl.menu.IMenuTemplateService;
-import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -152,7 +151,7 @@ public class MenuInitializer {
         try {
             logger.info("Trying to create {} menu...", menuDTO.getTitle());
             menuService.createMenu(menuDTO);
-        } catch (IllegalArgumentException | DuplicateRequestException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
