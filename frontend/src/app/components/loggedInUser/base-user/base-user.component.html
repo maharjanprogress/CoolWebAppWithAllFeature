@@ -1,14 +1,43 @@
-<div class="dashboard-layout" [class.menu-closed]="!isMenuOpen">
-  <app-dynamic-menu (menuToggle)="onMenuToggle($event)"></app-dynamic-menu>
+<div *ngIf="isMenuLoading" class="shell-state loading-state">
+  <div class="state-card">
+    <div class="loading-spinner"></div>
+    <h2>Loading menu</h2>
+    <p>Please wait while your dashboard is being prepared.</p>
+  </div>
+</div>
+
+<div *ngIf="!isMenuLoading && menuLoadError" class="shell-state error-state">
+  <div class="state-card">
+    <mat-icon>error_outline</mat-icon>
+    <h2>Menu failed to load</h2>
+    <p>{{ menuLoadError }}</p>
+    <button class="state-action" (click)="retryMenuLoad()">Retry</button>
+  </div>
+</div>
+
+<div *ngIf="!isMenuLoading && !menuLoadError" class="dashboard-layout" [class.menu-closed]="!isMenuOpen">
+  <app-dynamic-menu
+    [menuItems]="menuItems"
+    [activeSuperMenu]="activeSuperMenu"
+    [isLoading]="isMenuLoading"
+    (menuToggle)="onMenuToggle($event)">
+  </app-dynamic-menu>
 
   <main class="content-area">
     <button class="mobile-menu-trigger" *ngIf="!isMenuOpen" (click)="openMenu()" cdkDrag cdkDragBoundary="body">
       <mat-icon>menu</mat-icon>
     </button>
-    <div class="router-content">
+
+    <div class="empty-router-state" *ngIf="menuItems.length === 0">
+      <mat-icon>menu</mat-icon>
+      <h2>No menu items available</h2>
+      <p>This role does not have any configured menus yet.</p>
+    </div>
+
+    <div class="router-content" *ngIf="menuItems.length > 0">
       <router-outlet></router-outlet>
     </div>
   </main>
-
-  <app-snackbar></app-snackbar>
 </div>
+
+<app-snackbar></app-snackbar>

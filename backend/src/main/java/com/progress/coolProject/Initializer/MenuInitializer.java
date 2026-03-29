@@ -62,6 +62,20 @@ public class MenuInitializer {
         chatSubMenu1.setUrl("allChat");
         chatSubMenu1.setParentId(chatSuperMenu.getId());
         createMenu(chatSubMenu1);
+
+        MenuDTO adminSuperMenu = new MenuDTO();
+        adminSuperMenu.setMenuType(MenuType.SUPER);
+        adminSuperMenu.setTitle("Admin");
+        adminSuperMenu.setUrl(null);
+        adminSuperMenu.setParentId(null);
+        createMenu(adminSuperMenu);
+
+        MenuDTO adminSubMenu1 = new MenuDTO();
+        adminSubMenu1.setMenuType(MenuType.SUB);
+        adminSubMenu1.setTitle("Menu Template");
+        adminSubMenu1.setUrl("menu-template");
+        adminSubMenu1.setParentId(adminSuperMenu.getId());
+        createMenu(adminSubMenu1);
 //
 //
 //        MenuDTO experienceSuperMenu = new MenuDTO();
@@ -108,22 +122,29 @@ public class MenuInitializer {
 
 
         makeMenuTemplate(
-                "ADMIN",getListofMenuIds(
+                "ADMIN",
+                getListofMenuIds(
+                        adminSubMenu1,
                         excelSubMenu1,
                         chatSubMenu1
-                )
+                ),
+                null
         );
 
         makeMenuTemplate(
-                "CLIENT",getListofMenuIds(
+                "CLIENT",
+                getListofMenuIds(
                         chatSubMenu1
-                )
+                ),
+                null
         );
 
         makeMenuTemplate(
-                "MOM",getListofMenuIds(
+                "MOM",
+                getListofMenuIds(
                         excelSubMenu1
-                )
+                ),
+                null
         );
 
     }
@@ -134,12 +155,13 @@ public class MenuInitializer {
                 .toList();
     }
 
-    private void makeMenuTemplate(String roleAlias, List<Long> subMenuIds) {
+    private void makeMenuTemplate(String roleAlias, List<Long> subMenuIds, Long primaryMenuId) {
         logger.info("Creating menu Template for {}", roleAlias);
         MenuTemplateDTO menuTemplateDTO = new MenuTemplateDTO();
         try {
             menuTemplateDTO.setRoleId(rolesService.getRoleByRoleAlias(roleAlias).getId());
             menuTemplateDTO.setMenuIds(subMenuIds);
+            menuTemplateDTO.setPrimaryMenuId(primaryMenuId);
             logger.info("{}",menuTemplateService.createOrUpdateTemplate(menuTemplateDTO));
             logger.info("created menu for {}",roleAlias);
         } catch (Exception e) {

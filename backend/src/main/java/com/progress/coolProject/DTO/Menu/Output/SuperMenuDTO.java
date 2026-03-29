@@ -8,5 +8,6 @@ import java.util.List;
 public class SuperMenuDTO {
     private Long id;
     private String title;
+    private boolean primaryMenu;
     private List<SubMenuDTO> subMenuDTOList;
 }

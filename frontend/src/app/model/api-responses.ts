@@ -25,7 +25,8 @@ export interface LoginDetails{
 
 export enum UserRole {
   ADMIN = 'ADMIN',
-  CLIENT = 'CLIENT'
+  CLIENT = 'CLIENT',
+  MOM = 'MOM'
 }
 
 export enum JobStatus{
@@ -53,17 +54,28 @@ export interface SubMenuDTO {
   id: number;
   title: string;
   url: string;
+  parentMenuId: number | null;
+  parentMenuTitle: string | null;
+  primaryMenu: boolean;
 }
 
 export interface MenuDTO {
   id: number;
   title: string;
+  primaryMenu: boolean;
+  subMenuDTOList: SubMenuDTO[];
+}
+
+export interface MenuTemplateDTO {
+  roleId: number;
+  menuIds: number[];
+  primaryMenuId: number | null;
   subMenuDTOList: SubMenuDTO[];
 }
 
 export interface RoleDTO {
   id: number;
-  roleAlias: UserRole
+  roleAlias: UserRole;
   roleName: string;
   remarks: string;
 }
@@ -110,9 +122,10 @@ export interface UserResponse extends RestApiResponse<UserDTO, never> {}
 
 export interface MenuResponse extends RestApiResponse<null, MenuDTO[]> {}
 
+export interface MenuTemplateResponse extends RestApiResponse<MenuTemplateDTO, never> {}
+
 export interface RoleListResponse extends RestApiResponse<null, RoleDTO[]> {}
 
 export interface FileProcessResponse extends RestApiResponse<ProcessingJob, never> {}
 
 export interface ExcelUploadResponse extends RestApiResponse<ProgressUpdate, never> {}
-

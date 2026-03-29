@@ -1,13 +1,9 @@
-import {Component, EventEmitter, HostBinding, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, HostBinding, Input, Output} from '@angular/core';
 import {Router, RouterLink, RouterLinkActive} from "@angular/router";
-import {MenuDTO, ResponseStatus} from "../../../model/api-responses";
-import {Subscription} from "rxjs";
+import {MenuDTO} from "../../../model/api-responses";
 import { NgForOf, NgIf} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
-import {HttpErrorResponse} from "@angular/common/http";
-import {MenuService} from "../../../services/menu/menu.service";
 import {SessionService} from "../../../services/session.service";
-import {SnackbarService} from "../../../services/snackbar.service";
 
 @Component({
   selector: 'app-dynamic-menu',
@@ -22,40 +18,17 @@ import {SnackbarService} from "../../../services/snackbar.service";
   templateUrl: './dynamic-menu.component.html',
   styleUrl: './dynamic-menu.component.scss'
 })
-export class DynamicMenuComponent implements OnInit, OnDestroy {
+export class DynamicMenuComponent {
   @HostBinding('class.menu-open') isMenuOpen = true;
   @Output() menuToggle = new EventEmitter<boolean>();
-
-  menuItems: MenuDTO[] = [];
-  activeSuperMenu: number | null = null;
-  isLoading = false;
-  private menuSubscription?: Subscription;
+  @Input() menuItems: MenuDTO[] = [];
+  @Input() activeSuperMenu: number | null = null;
+  @Input() isLoading = false;
 
   constructor(
-    private menuService: MenuService,
     private sessionService: SessionService,
-    private router: Router,
-    private snackbarService: SnackbarService
+    private router: Router
   ) {}
-
-  ngOnInit(): void {
-    this.isLoading = true;
-    this.menuSubscription = this.menuService.getMenuForRole().subscribe({
-      next: (response) => {
-        if (response.status === ResponseStatus.SUCCESS) {
-          this.menuItems = response.details || [];
-        } else {
-          this.snackbarService.show(response.message || 'Failed to load menu.', 'error');
-        }
-        this.isLoading = false;
-      },
-      error: (err: HttpErrorResponse) => {
-        this.snackbarService.show(err.error?.message || 'A server error occurred while loading the menu.', 'error');
-        this.isLoading = false;
-        console.error(err);
-      }
-    });
-  }
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
@@ -71,9 +44,5 @@ export class DynamicMenuComponent implements OnInit, OnDestroy {
     this.router.navigate(['/login']).catch(error => {
       console.error('Navigation failed', error);
     });
-  }
-
-  ngOnDestroy(): void {
-    this.menuSubscription?.unsubscribe();
   }
 }

@@ -7,4 +7,7 @@ public class SubMenuDTO {
     private Long id;
     private String title;
     private String url;
+    private Long parentMenuId;
+    private String parentMenuTitle;
+    private boolean primaryMenu;
 }

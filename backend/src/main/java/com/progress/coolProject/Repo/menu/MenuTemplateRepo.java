@@ -12,4 +12,6 @@ public interface MenuTemplateRepo extends JpaRepository<MenuTemplate, Long> {
     Optional<MenuTemplate> findByRoleId(Long roleId);
 
     List<MenuTemplate> findByMenus_Id(Long menuId);
+
+    List<MenuTemplate> findByPrimaryMenu_Id(Long menuId);
 }

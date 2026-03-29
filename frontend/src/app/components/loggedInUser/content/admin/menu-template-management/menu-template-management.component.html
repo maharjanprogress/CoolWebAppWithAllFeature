@@ -1,0 +1,86 @@
+<section class="page-shell">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Admin</p>
+      <h1>Menu Template Primary Sub Menu</h1>
+      <p class="subtitle">Choose the submenu that should open first for each role. If no primary submenu is saved, the first assigned submenu stays the automatic fallback.</p>
+    </div>
+  </header>
+
+  <form class="toolbar" [formGroup]="form">
+    <app-role-choose formControlName="roleId" label="Role"></app-role-choose>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Primary Sub Menu</mat-label>
+      <mat-select formControlName="primaryMenuId" [disabled]="template === null || primaryMenuOptions.length === 0 || isTemplateLoading || isSaving">
+        <mat-option [value]="null">Automatic: keep current or use first assigned submenu</mat-option>
+        <mat-option *ngFor="let option of primaryMenuOptions" [value]="option.id">
+          {{ option.parentMenuTitle }} / {{ option.title }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-flat-button type="button" class="save-button" (click)="savePrimaryMenu()" [disabled]="template === null || isTemplateLoading || isSaving">
+      {{ isSaving ? 'Saving...' : 'Save Primary Sub Menu' }}
+    </button>
+  </form>
+
+  <section class="content-panel loading-panel" *ngIf="isTemplateLoading">
+    <mat-progress-spinner mode="indeterminate" diameter="42"></mat-progress-spinner>
+    <p>Loading menu template...</p>
+  </section>
+
+  <section class="content-panel empty-panel" *ngIf="!isTemplateLoading && template === null">
+    <mat-icon>manage_search</mat-icon>
+    <p>{{ emptyStateMessage }}</p>
+  </section>
+
+  <section class="content-panel template-panel" *ngIf="!isTemplateLoading && template !== null">
+    <div class="panel-header">
+      <div>
+        <h2>Assigned Menu Structure</h2>
+        <p>Select the exact submenu that should receive the user first after login.</p>
+      </div>
+      <span class="template-meta">{{ primaryMenuOptions.length }} submenu{{ primaryMenuOptions.length === 1 ? '' : 's' }}</span>
+    </div>
+
+    <div class="menu-grid" *ngIf="menuGroups.length > 0">
+      <article
+        *ngFor="let group of menuGroups; trackBy: trackByGroupId"
+        class="menu-card"
+        [class.primary]="groupHasPrimary(group)"
+        [class.fallback]="groupIsFallback(group)">
+        <div class="menu-card-header">
+          <div>
+            <h3>{{ group.title }}</h3>
+            <p>{{ group.subMenus.length }} submenu{{ group.subMenus.length === 1 ? '' : 's' }}</p>
+          </div>
+          <span class="badge" *ngIf="groupHasPrimary(group)">Primary Group</span>
+          <span class="badge fallback-badge" *ngIf="groupIsFallback(group)">Fallback Group</span>
+        </div>
+
+        <div class="sub-menu-list">
+          <button
+            *ngFor="let subMenu of group.subMenus; trackBy: trackByMenuId"
+            type="button"
+            class="sub-menu-item"
+            [class.selected]="isPrimaryMenu(subMenu.id)"
+            [class.fallback]="form.controls.primaryMenuId.value === null && subMenu.isFallbackPrimary"
+            (click)="selectPrimaryMenu(subMenu.id)">
+            <span class="sub-menu-copy">
+              <strong>{{ subMenu.title }}</strong>
+              <code>/{{ subMenu.url }}</code>
+            </span>
+            <span class="sub-menu-badge" *ngIf="isPrimaryMenu(subMenu.id)">Primary</span>
+            <span class="sub-menu-badge fallback-badge" *ngIf="form.controls.primaryMenuId.value === null && subMenu.isFallbackPrimary">Fallback First</span>
+          </button>
+        </div>
+      </article>
+    </div>
+
+    <div class="empty-panel inline-empty" *ngIf="primaryMenuOptions.length === 0">
+      <mat-icon>menu</mat-icon>
+      <p>This role has no selected submenus yet, so there is no primary submenu to choose.</p>
+    </div>
+  </section>
+</section>

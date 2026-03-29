@@ -9,5 +9,6 @@ import java.util.List;
 public class MenuTemplateDTO {
     private Long roleId;
     private List<Long> menuIds;
+    private Long primaryMenuId;
     private List<SubMenuDTO> subMenuDTOList;
 }

@@ -25,4 +25,8 @@ public class MenuTemplate {
             inverseJoinColumns = @JoinColumn(name = "menu_id")
     )
     private List<Menu> menus;
+
+    @ManyToOne
+    @JoinColumn(name = "primary_menu_id")
+    private Menu primaryMenu;
 }

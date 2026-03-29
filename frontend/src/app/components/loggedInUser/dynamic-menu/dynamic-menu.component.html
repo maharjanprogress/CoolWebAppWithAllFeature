@@ -20,7 +20,7 @@
         <div class="sub-menu-container" [class.open]="activeSuperMenu === superMenu.id">
           <ul>
             <li *ngFor="let subMenu of superMenu.subMenuDTOList">
-              <a [routerLink]="subMenu.url" routerLinkActive="active-link">{{ subMenu.title }}</a>
+              <a [routerLink]="subMenu.url" routerLinkActive="active-link" (click)="activeSuperMenu = superMenu.id">{{ subMenu.title }}</a>
             </li>
           </ul>
         </div>

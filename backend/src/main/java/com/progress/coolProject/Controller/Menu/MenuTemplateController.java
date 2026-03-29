@@ -26,7 +26,7 @@ public class MenuTemplateController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<ResponseDTO> createOrUpdateTemplate(@RequestBody MenuTemplateDTO menuTemplateDTO) {
         MenuTemplateDTO result = menuTemplateService.createOrUpdateTemplate(menuTemplateDTO);
-        return new ResponseEntity<>(ResponseDTO.success(result, "Menu template saved successfully"), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseDTO.success("Menu template saved successfully", result), HttpStatus.OK);
     }
 
     @GetMapping("/role")
@@ -35,6 +35,12 @@ public class MenuTemplateController {
         User user = currentUser.getCurrentUser();
         Long roleId = user.getRole().getId();
         return ResponseEntity.ok(ResponseDTO.success(menuTemplateService.getTemplateByRoleId(roleId), "Template retrieved"));
+    }
+
+    @GetMapping("/role/{roleId}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<ResponseDTO> getTemplateByRoleId(@PathVariable Long roleId) {
+        return ResponseEntity.ok(ResponseDTO.success("Template retrieved", menuTemplateService.getTemplateByRoleId(roleId)));
     }
 
     @GetMapping("/role/formatted")
