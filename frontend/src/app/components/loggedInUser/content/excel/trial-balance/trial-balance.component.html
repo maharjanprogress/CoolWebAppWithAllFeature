@@ -1,6 +1,6 @@
 <div class="container">
   <h2>Upload Trial Balance Files</h2>
-  <p class="subtitle">Upload your Trial Balance, Profit & Loss, and Balance Sheet files (.xlsx or .xls).</p>
+  <p class="subtitle">Upload all required Excel files (.xlsx, .xls, or .csv) before processing.</p>
 
   <!-- Upload interface -->
   <div class="upload-section" *ngIf="!isProcessing">
@@ -48,6 +48,38 @@
     <div class="file-upload-group">
       <label>Saving Summary Sheet</label>
       <app-file-upload #savingSummarySheetUpload
+                       [onlyInclude]="allowedFileTypes"
+                       [singleFile]="true">
+      </app-file-upload>
+    </div>
+
+    <div class="file-upload-group">
+      <label>Previous Balance Sheet</label>
+      <app-file-upload #previousBalanceSheetUpload
+                       [onlyInclude]="allowedFileTypes"
+                       [singleFile]="true">
+      </app-file-upload>
+    </div>
+
+    <div class="file-upload-group">
+      <label>Loan Member</label>
+      <app-file-upload #loanMemberUpload
+                       [onlyInclude]="allowedFileTypes"
+                       [singleFile]="true">
+      </app-file-upload>
+    </div>
+
+    <div class="file-upload-group">
+      <label>Saving Member</label>
+      <app-file-upload #savingMemberUpload
+                       [onlyInclude]="allowedFileTypes"
+                       [singleFile]="true">
+      </app-file-upload>
+    </div>
+
+    <div class="file-upload-group">
+      <label>Previous Loan Ageing</label>
+      <app-file-upload #previousLoanAgeingUpload
                        [onlyInclude]="allowedFileTypes"
                        [singleFile]="true">
       </app-file-upload>

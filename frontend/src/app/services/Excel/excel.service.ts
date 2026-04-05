@@ -16,7 +16,11 @@ export class ExcelService {
     balanceSheet: File,
     loanAgeingSheet: File,
     loanSummary: File,
-    savingSummary: File
+    savingSummary: File,
+    previousBalanceSheet: File,
+    loanMember: File,
+    savingMember: File,
+    previousLoanAgeing: File
   ): Observable<FileProcessResponse> {
     const formData = new FormData();
     formData.append('trialBalance', trialBalance);
@@ -25,6 +29,10 @@ export class ExcelService {
     formData.append('loanAgeingSheet', loanAgeingSheet);
     formData.append('loanSummary', loanSummary);
     formData.append('savingSummary', savingSummary);
+    formData.append('previousBalanceSheet', previousBalanceSheet);
+    formData.append('loanMember', loanMember);
+    formData.append('savingMember', savingMember);
+    formData.append('previousLoanAgeing', previousLoanAgeing);
     return this.apiService.postMultipart<FileProcessResponse>('/api/excel/upload', formData);
   }
 
