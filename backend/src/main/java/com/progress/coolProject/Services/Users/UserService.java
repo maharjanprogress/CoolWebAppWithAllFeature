@@ -95,7 +95,8 @@ public class UserService implements IUserService {
 
     @Override
     public LoginOutput verify(LoginDTO dto) {
-        Authentication authentication = authmanager.authenticate(new UsernamePasswordAuthenticationToken(dto.getUserName(), dto.getPassword()));
+        Authentication authentication = authmanager.authenticate(
+                new UsernamePasswordAuthenticationToken(dto.getUserName(), dto.getPassword()));
         if (authentication.isAuthenticated()) {
             User user = userRepo.findByUserName(dto.getUserName())
                     .orElseThrow(() -> new RuntimeException("User not found"));
