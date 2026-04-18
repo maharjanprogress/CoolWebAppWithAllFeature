@@ -59,6 +59,7 @@ public enum TrialBalanceEnum {
     BYAG_MULTABI_HISAB(3009, "Byag Multabi Hisab", "ब्याज मुल्ताबी हिसाब"),
     INTEREST_INCOME(3010, "Interest Income", "ब्याज आय"),
     INCOME_TAX_MANAGE(3639, "Income Tax Manage", "आयकर व्यवस्थापन"),
+    TRAINING_TAX(3640, "Training Tax","प्रशिक्षण कर"),
     KRISHI_BIKASH_SAHAKARI_SPECIAL(3641, "Krishi Bikash Sahakari Ltd. Special Tax", "कृषि विकास सहकारी लि. विशेष"),
     KRISHI_BIKASH_SPECIAL_FD_INTEREST(3642, "Krishi Bikash Sahakari Ltd. Special FD Interest", "कृषि विकास सहकारी लि. विशेष एफडी ब्याज"),
     SAVING_ACCOUNT(4001, "Saving Account", "बचत खाता"),

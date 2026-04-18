@@ -87,7 +87,7 @@ public final class SlideOne {
                 TrialBalanceEnum.TDS_AUDIT_FEE, TrialBalanceEnum.BAITHAK_BHATTA_TAX,
                 TrialBalanceEnum.TDS_PAYABLE, TrialBalanceEnum.INTEREST_PAYABLE,
                 TrialBalanceEnum.INCOME_TAX_PAYABLE, TrialBalanceEnum.BHAJANGAL_SAHAKARI,
-                TrialBalanceEnum.INCOME_TAX_MANAGE
+                TrialBalanceEnum.INCOME_TAX_MANAGE, TrialBalanceEnum.TRAINING_TAX
         );
     }
 
