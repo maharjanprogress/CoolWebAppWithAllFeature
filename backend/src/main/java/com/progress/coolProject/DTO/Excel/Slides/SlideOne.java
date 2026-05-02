@@ -65,8 +65,8 @@ public final class SlideOne {
                 TrialBalanceEnum.OTHER_RISK_MANAGEMENT_FUND, TrialBalanceEnum.SAMUDAIYIK_BIKASH_KOSH,
                 TrialBalanceEnum.STHIRKARAN_KOSH, TrialBalanceEnum.DUBANTI_KOSH,
                 TrialBalanceEnum.EMPLOYEE_BONUS_FUND, TrialBalanceEnum.COOPERATIVE_EDUCATION_FUND,
-                TrialBalanceEnum.COOPERATIVE_DEVELOPMENT_FUND, TrialBalanceEnum.LOSS_FULFILMENT_FUND,
-                TrialBalanceEnum.LOAN_LOSS_PROVISION, TrialBalanceEnum.COOPERATIVE_PROMOTION_FUND,
+                TrialBalanceEnum.COOPERATIVE_DEVELOPMENT_FUND, TrialBalanceEnum.LOSS_FULFILMENT_FUND
+                , TrialBalanceEnum.COOPERATIVE_PROMOTION_FUND,
                 TrialBalanceEnum.SHARE_DIVIDEND_FUND, TrialBalanceEnum.SECURED_CAPITAL_REDEMPTION_FUND
                 );
     }
@@ -82,17 +82,22 @@ public final class SlideOne {
     public static Double getPayable(ExcelTrialBalanceExcelRowHelper excel) {
         return excel.getCreditSum(
                 TrialBalanceEnum.KRISHI_BIKASH_SPECIAL_FD_INTEREST, TrialBalanceEnum.INTEREST_TAX,
-                TrialBalanceEnum.OTHER_PAYABLE, TrialBalanceEnum.SALARY_PAYABLE,
+                TrialBalanceEnum.SALARY_PAYABLE,
                 TrialBalanceEnum.AUDIT_FEE_PAYABLE, TrialBalanceEnum.TDS_SOCIAL_SECURITY_TAX,
                 TrialBalanceEnum.TDS_AUDIT_FEE, TrialBalanceEnum.BAITHAK_BHATTA_TAX,
-                TrialBalanceEnum.TDS_PAYABLE, TrialBalanceEnum.INTEREST_PAYABLE,
+                TrialBalanceEnum.TDS_PAYABLE,
                 TrialBalanceEnum.INCOME_TAX_PAYABLE, TrialBalanceEnum.BHAJANGAL_SAHAKARI,
                 TrialBalanceEnum.INCOME_TAX_MANAGE, TrialBalanceEnum.TRAINING_TAX
         );
     }
 
     public static Double getOtherLiability(ExcelTrialBalanceExcelRowHelper excel) {
-        return excel.getCreditSum(TrialBalanceEnum.OTHER_LIABILITIES);
+        return excel.getCreditSum(
+                TrialBalanceEnum.OTHER_LIABILITIES,
+                TrialBalanceEnum.LOAN_LOSS_PROVISION,
+                TrialBalanceEnum.INTEREST_PAYABLE,
+                TrialBalanceEnum.OTHER_PAYABLE
+        );
     }
 
     public static Double getProfitLossLeft(ExcelTrialBalanceExcelRowHelper excel) {
