@@ -29,6 +29,12 @@
     <properties>
         <java.version>21</java.version>
     </properties>
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>com.ibm.icu</groupId>
@@ -116,6 +122,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.maharjanprogress</groupId>
+            <artifactId>nepali-unicode-preeti-converter</artifactId>
+            <version>v1.0.0</version>
         </dependency>
     </dependencies>
 
