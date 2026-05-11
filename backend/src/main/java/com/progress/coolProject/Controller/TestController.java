@@ -1,6 +1,7 @@
 package com.progress.coolProject.Controller;
 
 import com.progress.coolProject.DTO.ResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@Slf4j
 public class TestController {
 
     @GetMapping("/test/get")
@@ -23,6 +25,11 @@ public class TestController {
         Thread.sleep(1000);
         System.out.println(message);
         return "Server receives: " + message;
+    }
+
+    @GetMapping("/serverCheck")
+    public void serverCheck() {
+        log.info("Server Check");
     }
 
 }

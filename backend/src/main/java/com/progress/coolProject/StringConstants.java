@@ -4,6 +4,8 @@ public class StringConstants {
     public static final String FILE_STORAGE_PATH = "/opt/coolwebapp/";
     public static final String FILE_ACCESS_URL = "/coolwebapp/";
 
+    public static final String PRODUCTION_URL = "https://progressmaharjan.me";
+
     public static final String[] months = {
             "Baisakh", "Jestha", "Ashadh", "Shrawan",
             "Bhadra", "Ashwin", "Kartik", "Mangsir",
