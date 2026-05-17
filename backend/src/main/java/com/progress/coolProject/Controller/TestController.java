@@ -26,10 +26,4 @@ public class TestController {
         System.out.println(message);
         return "Server receives: " + message;
     }
-
-    @GetMapping("/serverCheck")
-    public void serverCheck() {
-        log.info("Server Check");
-    }
-
 }
