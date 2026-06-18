@@ -16,7 +16,7 @@ public enum TrialBalanceEnum {
     AUDIT_FEE_EXPENSE(1026, "Audit Fee Expenses", "लेखापरिक्षण शुल्क खर्च"),
     DASHAIN_ALLOWANCE(1028, "Dashain Allowance", "दशैं भत्ता"),
     TIFFIN_EXPENSE(1029, "Tiffin Expenses", "खाजा खर्च"),
-    GENERAL_MEETING(1030, "General Meeting Expenses", "साधारण सभा खर्च"),
+    GENERAL_MEETING(1030, "staff tifin exp", "साधारण सभा खर्च"),
     REPAIR_AND_MAINTENANCE_CHARGE(1031, "Repair And Maintenance Charge", "मर्मत तथा संभार"),
     TRAINING_CHARGE_EXPENSE(1033, "Training Charge Expenses", "प्रशिक्षण शुल्क खर्च"),
     MISCELLANEOUS_EXPENSE(1035, "Miscellaneous Expenses", "विविध खर्च"),
