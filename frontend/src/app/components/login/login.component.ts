@@ -93,7 +93,7 @@ export class LoginComponent implements OnInit, OnDestroy{
           this.isLoading = false;
           if (res.status === ResponseStatus.SUCCESS) {
             this.snackbarService.show('Login successful!', 'success', 2);
-            this.router.navigate(['/app']).catch(error => {
+            this.router.navigate(['/user']).catch(error => {
               console.error('Navigation failed', error)
             });
           }
@@ -119,7 +119,7 @@ export class LoginComponent implements OnInit, OnDestroy{
             this.isLoading = false;
             if (res.status === ResponseStatus.SUCCESS) {
               this.snackbarService.show('Login successful!', 'success', 2);
-              this.router.navigate(['/app']).catch(error => {
+              this.router.navigate(['/user']).catch(error => {
                 console.error('Navigation failed', error)
               });
             }
