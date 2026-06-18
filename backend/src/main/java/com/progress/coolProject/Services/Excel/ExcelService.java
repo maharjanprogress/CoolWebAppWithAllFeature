@@ -71,8 +71,11 @@ public class ExcelService implements IExcelService {
 
         String fileNames = ExcelUtil.validateExcelFilesAndGetFileNames(
                 trialBalance, profitAndLoss, balanceSheet, loanAgeingSheet,
-                loanSummary, savingSummary, previousBalanceSheet, loanMember,
-                savingMember, previousLoanAgeing
+                // Commented out for now, might be needed in the future
+                // loanSummary, savingSummary,
+                previousBalanceSheet,
+                // loanMember, savingMember,
+                previousLoanAgeing
         );
 
         // Create job record
@@ -156,21 +159,22 @@ public class ExcelService implements IExcelService {
             workbook = new XSSFWorkbook(loanAgeingSheet.getInputStream());
             Sheet lASheet = workbook.getSheetAt(0);
 
-            sendProgress(job, 30, "Validating loan summary Excel file...");
-            workbook = new XSSFWorkbook(loanSummary.getInputStream());
-            Sheet loanSummarySheet = workbook.getSheetAt(0);
+            // Commented out for now, might be needed in the future
+            // sendProgress(job, 30, "Validating loan summary Excel file...");
+            // workbook = new XSSFWorkbook(loanSummary.getInputStream());
+            // Sheet loanSummarySheet = workbook.getSheetAt(0);
 
-            sendProgress(job, 31, "Validating saving summary Excel file...");
-            workbook = new XSSFWorkbook(savingSummary.getInputStream());
-            Sheet savingSummarySheet = workbook.getSheetAt(0);
+            // sendProgress(job, 31, "Validating saving summary Excel file...");
+            // workbook = new XSSFWorkbook(savingSummary.getInputStream());
+            // Sheet savingSummarySheet = workbook.getSheetAt(0);
 
-            sendProgress(job, 32, "Reading loan member Excel file...");
-            workbook = new XSSFWorkbook(loanMember.getInputStream());
-            Sheet loanMemberSheet = workbook.getSheetAt(0);
+            // sendProgress(job, 32, "Reading loan member Excel file...");
+            // workbook = new XSSFWorkbook(loanMember.getInputStream());
+            // Sheet loanMemberSheet = workbook.getSheetAt(0);
 
-            sendProgress(job, 33, "Reading saving member Excel file...");
-            workbook = new XSSFWorkbook(savingMember.getInputStream());
-            Sheet savingMemberSheet = workbook.getSheetAt(0);
+            // sendProgress(job, 33, "Reading saving member Excel file...");
+            // workbook = new XSSFWorkbook(savingMember.getInputStream());
+            // Sheet savingMemberSheet = workbook.getSheetAt(0);
 
             // Parse and validate data
             sendProgress(job, 34, "Validating data...");
@@ -200,15 +204,16 @@ public class ExcelService implements IExcelService {
             Map<String, LoanAccountAgeingDTO> previousLoanData =
                     LoanAccountAgeingExcelUtil.extractLoanAccountAgeingData(previousLoanAgeingSheet);
 
-            Map<String, MemberAccountDTO> loanMemberData =
-                    LoanSummaryExcelUtil.extractLoanMemberData(loanMemberSheet);
-            Map<LoanCategory, AccountSummaryDTO> loanSummData =
-                    LoanSummaryExcelUtil.getSummary(new HashMap<>(loanMemberData));
+            // Commented out for now, might be needed in the future
+            // Map<String, MemberAccountDTO> loanMemberData =
+            //         LoanSummaryExcelUtil.extractLoanMemberData(loanMemberSheet);
+            // Map<LoanCategory, AccountSummaryDTO> loanSummData =
+            //         LoanSummaryExcelUtil.getSummary(new HashMap<>(loanMemberData));
 
-            Map<String, MemberAccountDTO> savingMemberData =
-                    SavingSummaryExcelUtil.extractSavingMemberData(savingMemberSheet);
-            Map<SavingCategory, AccountSummaryDTO> savingSummData =
-                    SavingSummaryExcelUtil.getSummary(new HashMap<>(savingMemberData));
+            // Map<String, MemberAccountDTO> savingMemberData =
+            //         SavingSummaryExcelUtil.extractSavingMemberData(savingMemberSheet);
+            // Map<SavingCategory, AccountSummaryDTO> savingSummData =
+            //         SavingSummaryExcelUtil.getSummary(new HashMap<>(savingMemberData));
 
             sendProgress(job, 40, "Combining data from all files...");
             Map<TrialBalanceEnum, ExcelRowDTO> rows = new HashMap<>(tbRows);
@@ -234,7 +239,8 @@ public class ExcelService implements IExcelService {
             String outputPptPath = generatePowerPoint(
                     rows,bsRows, plRows,
                     pBSRows,
-                    loanData, loanSummData, savingSummData,
+                    // Commented out for now, might be needed in the future: loanSummData, savingSummData
+                    loanData, null, null,
                     previousLoanData,
                     job.getUser().getUserName()
             );

@@ -24,11 +24,13 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
   @ViewChild('profitAndLossUpload') profitAndLossUpload!: FileUploadComponent;
   @ViewChild('balanceSheetUpload') balanceSheetUpload!: FileUploadComponent;
   @ViewChild('loanAgeingSheetUpload') loanAgeingSheetUpload!: FileUploadComponent;
-  @ViewChild('loanSummarySheetUpload') loanSummarySheetUpload!: FileUploadComponent;
-  @ViewChild('savingSummarySheetUpload') savingSummarySheetUpload!: FileUploadComponent;
+  // Commented out for now, might be needed in the future
+  // @ViewChild('loanSummarySheetUpload') loanSummarySheetUpload!: FileUploadComponent;
+  // @ViewChild('savingSummarySheetUpload') savingSummarySheetUpload!: FileUploadComponent;
   @ViewChild('previousBalanceSheetUpload') previousBalanceSheetUpload!: FileUploadComponent;
-  @ViewChild('loanMemberUpload') loanMemberUpload!: FileUploadComponent;
-  @ViewChild('savingMemberUpload') savingMemberUpload!: FileUploadComponent;
+  // Commented out for now, might be needed in the future
+  // @ViewChild('loanMemberUpload') loanMemberUpload!: FileUploadComponent;
+  // @ViewChild('savingMemberUpload') savingMemberUpload!: FileUploadComponent;
   @ViewChild('previousLoanAgeingUpload') previousLoanAgeingUpload!: FileUploadComponent;
 
   allowedFileTypes = [FileType.XLSX, FileType.XLS, FileType.CSV];
@@ -102,17 +104,21 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
     const profitAndLoss = this.profitAndLossUpload.getFile();
     const balanceSheet = this.balanceSheetUpload.getFile();
     const loanAgeingSheet = this.loanAgeingSheetUpload.getFile();
-    const loanSummarySheetUpload = this.loanSummarySheetUpload.getFile();
-    const savingSummarySheetUpload = this.savingSummarySheetUpload.getFile();
+    // Commented out for now, might be needed in the future
+    // const loanSummarySheetUpload = this.loanSummarySheetUpload.getFile();
+    // const savingSummarySheetUpload = this.savingSummarySheetUpload.getFile();
     const previousBalanceSheet = this.previousBalanceSheetUpload.getFile();
-    const loanMember = this.loanMemberUpload.getFile();
-    const savingMember = this.savingMemberUpload.getFile();
+    // Commented out for now, might be needed in the future
+    // const loanMember = this.loanMemberUpload.getFile();
+    // const savingMember = this.savingMemberUpload.getFile();
     const previousLoanAgeing = this.previousLoanAgeingUpload.getFile();
 
     if (
       !trialBalance || !profitAndLoss || !balanceSheet || !loanAgeingSheet
-      || !loanSummarySheetUpload || !savingSummarySheetUpload
-      || !previousBalanceSheet || !loanMember || !savingMember || !previousLoanAgeing
+      // Commented out for now, might be needed in the future
+      // || !loanSummarySheetUpload || !savingSummarySheetUpload
+      // || !loanMember || !savingMember
+      || !previousBalanceSheet || !previousLoanAgeing
     ) {
       this.snackbar.show("Please select all required files to upload.", 'warning', 3);
       return;
@@ -126,9 +132,10 @@ export class TrialBalanceComponent implements OnInit, OnDestroy {
     this.excelService.uploadExcel(
       trialBalance, profitAndLoss,
       balanceSheet, loanAgeingSheet,
-      loanSummarySheetUpload, savingSummarySheetUpload,
-      previousBalanceSheet, loanMember,
-      savingMember, previousLoanAgeing
+      // Commented out for now, might be needed in the future:
+      // loanSummarySheetUpload, savingSummarySheetUpload, loanMember, savingMember
+      previousBalanceSheet,
+      previousLoanAgeing
     ).subscribe({
       next: (jobDetail) => {
         const job = jobDetail.detail;

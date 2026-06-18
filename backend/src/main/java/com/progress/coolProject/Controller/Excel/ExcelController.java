@@ -25,11 +25,13 @@ public class ExcelController {
             @RequestParam("profitAndLoss") MultipartFile profitAndLoss,
             @RequestParam("balanceSheet") MultipartFile balanceSheet,
             @RequestParam("loanAgeingSheet") MultipartFile loanAgeingSheet,
-            @RequestParam("loanSummary") MultipartFile loanSummary,
-            @RequestParam("savingSummary") MultipartFile savingSummary,
+            // Commented out for now, might be needed in the future
+            @RequestParam(value = "loanSummary", required = false) MultipartFile loanSummary,
+            @RequestParam(value = "savingSummary", required = false) MultipartFile savingSummary,
             @RequestParam("previousBalanceSheet") MultipartFile previousBalanceSheet,
-            @RequestParam("loanMember") MultipartFile loanMember,
-            @RequestParam("savingMember") MultipartFile savingMember,
+            // Commented out for now, might be needed in the future
+            @RequestParam(value = "loanMember", required = false) MultipartFile loanMember,
+            @RequestParam(value = "savingMember", required = false) MultipartFile savingMember,
             @RequestParam("previousLoanAgeing") MultipartFile previousLoanAgeing
     ) {
         ProcessingJob job = excelService.startProcessing(
